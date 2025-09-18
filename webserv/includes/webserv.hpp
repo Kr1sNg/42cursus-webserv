@@ -1,18 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/15 17:42:34 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/15 17:42:36 by tat-nguy         ###   ########.fr       */
+/*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
+/*   Updated: 2025/09/18 12:22:21 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/webserv.h"
+#ifndef _WEBSERV_HPP_
+# define _WEBSERV_HPP_
 
-int main(int ac, char *av)
-{
-    
-}
+# include <iostream>
+# include <exception>
+
+
+#endif
