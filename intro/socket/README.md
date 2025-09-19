@@ -2,7 +2,7 @@
 ## A Webserver
 
 	1. Listens
-	2. on a Port
+	2. on a Port (of server machine)
 	3. for a Request
 	4. sent via a Transport Protocol
 	5. return the Response
@@ -92,16 +92,38 @@ struct in_addr
 #include <netdb.h>
 
 int	getaddrinfo(const char *node,	// hostname or IP address to connect to, e.g. "www.example.com"
-				const char *service,	// e.g. "http" or port number
+				const char *service,	// e.g. "http" or port number of server
 				const struct addrinfo *hints, // points to specified criteria of addrinfo which will be returned in res
 				struct addrinfo **res);	// points to linked list results
 
 void	freeaddrinfo(struct addrinfor *res);
 
-const char	*gai_strerror(int errcode);
 ```
 
 `freeaddrinfo(res)`: free memory allocated by `getaddrinfo()` (linked list in result).
+
+
+#### `strerror()`, `gai_strerror()`, `errno`
+
+- `errno`: A global variable, which is called when a system call fails. After a function (system call) fails, it returns `-1` or `NULL`, we can check `errno` to see the reason.
+
+- `strerror()`: converts an `errno` integer code into a human-readable string. *e.g. 01*
+
+```cpp
+#include <cerrno>	// errno
+#include <cstring>	// strerror
+
+char	*strerror(int errno);
+
+```
+
+- `gai_strerror()`: similar to `strerror()` but only for errors from `getaddrinfo()` (because `getaddrinfo()` doesn't set `errno`, instead it returns an error code).
+
+```cpp
+#include <netdb.h>
+
+const char	*gai_strerror(int errcode);
+```
 
 
 #### `socket()`
@@ -137,18 +159,79 @@ int	bind(int sockfd,	// socket fd returned by socket()
 
 ```
 
+
 #### `setsockopt()`
 
-`setsockopt()` helps to manipulate options for the socket `sockfd`
+`setsockopt()` helps to manipulate options for the socket `sockfd`. It helps to avoid "Address already in use" when restarting the server.
 
 ```cpp
-int	setsockopt(int sockfd,
-				int level,
-				int optname,
+int	setsockopt(int sockfd,	// socket fd
+				int level,	// SOL_SOCKET
+				int optname,	// SO_REUSEADDR -> to reuse the address/port
 				const void *optval,
 				socklen_t optlen);
+
+int	yes = 1;
+setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+
 ```
 
 
+#### `connect()`
 
+`connect()` initiates a connection on a socket.
+
+```cpp
+#include <sys/socket.h>
+
+int	connect(int sockfd,
+			const struct sockaddr *addr,	// contains destination port and IP address
+			socklen_t addrlen);				// length in bytes of addr
+
+```
+
+#### `listen()`, `accept()`
+
+`listen()` marks socket `sockfd` as a passive socket (server mode), which waits for incomming connection requests using `accept()` and handle them in some way.
+`accept()` extracts the first connection request (client) on the queue of incomming connections, creates a new connected socket for this single connection and return fd of this socket. The original socket `sockfd` is unaffected by this call, and it is still listening for more new connections.
+
+```cpp
+#include <sys/socket.h>
+
+int listen(int sockfd,
+			int backlog);	// SOMAXCONN - number of connections allowed on the incomming queue (waiting until accept())
+
+int	accept(int sockfd,	// the listen() socket descriptor (original from socket())
+			struct sockaddr *addr,	// pointer to the client address
+			socklen_t *addrlen);	// size of client address
+
+```
+
+As usual, `listen()` and `accept()` returns `-1` and set `errno` on error.
+We use the socket fd returned by `accept()` for all `send()` and `recv()` calls.
+
+
+#### `send()`, `recv()`
+
+- `send()` sends data on a connected socket, while `recv()` receives data from that socket.
+
+```cpp
+#include <sys/socket.h>
+
+int	send(int sockfd,			// socket fd we want to send data to (which returned from accept())
+			const void *msg,	// pointer to the data we want to send
+			int len,			// length of msg in bytes
+			int flags);			// 0
+
+int	recv(int sockfd,		// socket fd to read from (which returned from accept())
+			void *buf,		// buffer to read the data into
+			int len,		// maximum length of the buffer
+			int flags);		// 0
+
+```
+
+`send()` returns the number of bytes actually sent out (might be less than `len`).
+`recv()` returns the number of bytes actually read into the buffer. If `recv()` returns `0`, it means the remote side has closed the connection on us.
+
+`send()` and `recv()` returns `-1` and sets `errno` on error.
 
