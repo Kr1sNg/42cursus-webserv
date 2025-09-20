@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 22:28:57 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/19 23:29:00 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/20 20:41:36 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,10 @@ int	main(void)
 	int						yes = 1;
 	char					s[INET6_ADDRSTRLEN];
 	
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
+	std::memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET;	// my server works only in IPv4
 	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;	// use my IP, so set "NULL" for node of getaddrinfo
+	hints.ai_flags = AI_PASSIVE;	// use my IP bcs I'm server, so set "NULL" for node of getaddrinfo
 	
 	if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0)
 	{
@@ -82,10 +82,9 @@ int	main(void)
 		if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1)
 		{
 			std::cerr << "server: bind: " << std::strerror(errno) << std::endl;
-			close(sockfd);
 			continue ;
 		}
-		break;
+		break ;
 	}
 	
 	freeaddrinfo(servinfo);

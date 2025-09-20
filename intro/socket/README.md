@@ -30,7 +30,7 @@ Struct `addrinfo` (*address info*): is used to prep the socket address structure
 ```cpp
 struct addrinfo
 {
-	int				ai_flags;		// AI_PASSIVE, AI_CANONNAME, etc
+	int				ai_flags;		// AI_PASSIVE (server), AI_CANONNAME, etc
 	int				ai_family;		// AF_INET, AF_INET6, AF_UNSPEC
 	int				ai_socktype;	// SOCK_STREAM, SOCK_DGRAM
 	int				ai_protocol;	// use 0 for "any"
@@ -38,11 +38,11 @@ struct addrinfo
 	struct sockaddr	*ai_addr;		// struct sockaddr_in or sockaddr_in6
 	char			*ai_canonname;	// full canonical hostname
 
-	struct addrinfo	*ai_next;		// linked list, next node, because a host can have more than one IP
+	struct addrinfo	*ai_next;		// linked list, next node, because there can be multiple valid ways to connect to a hostname and service -> it let us choose which we want to
 };
 ```
 
-#### struct `sockaddr`
+#### struct `sockaddr` -> not really used
 
 struct `sockaddr`: holds *socket address information* for many types of sockets. `sa_data` contains a destination addresss and port number for the socket. Since we don't want to tediously pack the address in `sa_data` by hand, we use `sockaddr_in` (IPv4) and `sockaddr_in6` (IPv6) instead.
 
@@ -50,11 +50,12 @@ struct `sockaddr`: holds *socket address information* for many types of sockets.
 struct sockaddr
 {
 	unsigned short	sa_family;		// address family, AF_INET (IPv4) or AF_INET6 (IPv6)
+								// AF_UNSPEC (suitable for client, work with both IPv4 and IPv6 server)
 	char			sa_data[14];	// 14 bytes of protocol address
 };
 ```
 
-#### struct `sockaddr_in`
+#### struct `sockaddr_in` -> to cast `sockaddr` as type we want to
 
 struct `sockaddr_in` (IPv4): a pointer to a `struct sockaddr_in` can be cast to a pointer to a `struct sockaddr` and vice-versa. This structure makes it easier to reference elements of the socket address.
 
@@ -76,7 +77,18 @@ struct `in_addr`: IP address, a structure for historical reasons
 struct in_addr
 {
 	uint32_t	s_addr;	// 32-bit int (4 bytes) IP address (in Network Byte Order)
-}
+};
+```
+
+#### struct `sockaddr_storage`
+
+struct `sockaddr_storage`: similar to struct `sockaddr` but large, and then it can be casted to the type we need (struct `sockaddr_in` (IPv4) or struct `sockaddr_in6` (IPv6)).
+
+```cpp
+struct sockaddr_storage
+{
+	sa_family_t	ss_family;	// address family (AF_INET or AF_INET6)
+};
 ```
 
 
@@ -235,3 +247,21 @@ int	recv(int sockfd,		// socket fd to read from (which returned from accept())
 
 `send()` and `recv()` returns `-1` and sets `errno` on error.
 
+
+
+### Server vs Client sides in socket programming
+
+Server must announce itself and be ready to accept connections (must be reachable, must bind to a known port and wait)
+- `socket()` -> create a socket
+- `setsockopt()` -> configure socket options (allow reusing port if restarting quickly)
+- `bind()` -> assign a local IP + port number to a socket
+- `listen()` -> put socket into "passive mode", ready to accept incomming connections
+- `accept()` -> wait for client to connect and create a new socket for that connection
+
+Client must initiate a connection to the server's known address and port (only needs to reach the server, don't need to care about client port, OS can pick any temporary port automatically)
+- `socket()` -> create a socket
+- `connect()` -> actively connect to the server's IP + port
+
+After the Server `accept()` the connection and the Client `connect()` to the connection.
+- Once `accept()` returns a new socket for a client connection, the Server uses `send()` and `recv()` on that socket. The original socket from `socket()` still open to waiting other incomming connection requests.
+- After `connect()`, the Client uses `send()` and `recv()` on its socket to transfer and receive data from Server.

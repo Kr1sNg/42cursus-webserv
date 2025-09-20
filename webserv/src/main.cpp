@@ -6,11 +6,12 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:34 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/18 12:35:03 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/20 21:45:35 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/webserv.hpp"
+#include "../includes/Server.hpp"
 
 int main(int ac, char *av[])
 {
@@ -20,8 +21,8 @@ int main(int ac, char *av[])
 		throw std::length_error("Usage: ./webserv [configuration file]");
 		
 		// run server here
-		(void)av;
-		
+		Server	serv(av[1]);
+		serv.run();
 		
 	}
 	catch (std::exception const &e)
