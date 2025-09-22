@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/22 13:17:15 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/22 19:56:21 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/22 22:26:59 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,7 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <vector>
-
-#define PORT "80"
+#include <cstring>
 
 // convert socket to IP address
 char const *inet_ntop2(void *addr, char *buf, size_t size)
