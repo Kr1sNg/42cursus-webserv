@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/20 21:12:55 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:49:13 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@
 
 
 // function
-
 void	throwErrno(std::string const &reason);
 void	throwGaiError(std::string const &reason, int code);
 

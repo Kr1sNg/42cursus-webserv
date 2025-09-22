@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/19 22:28:57 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/20 20:41:36 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/22 09:54:41 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <arpa/inet.h> // inet_ntop
+#include <fcntl.h>
 
 #define PORT "3490"
 

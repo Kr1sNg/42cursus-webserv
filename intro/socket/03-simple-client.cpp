@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 11:14:30 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/20 12:50:32 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/22 09:58:08 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #include <arpa/inet.h>
 #include <cstdlib>
 
+#define PORT "3490"
+
 #define BUFFER_SIZE 1024
 
 // get sockaddr: IPv4 or IPv6 (the same with server)
@@ -33,24 +35,18 @@ void	*get_in_addr(struct sockaddr *sa)
 	return (&(((struct sockaddr_in6 *)sa)->sin6_addr));
 }
 
-int	main(int ac, char *av[])
+int	main(void)
 {
 	int				sockfd, numbytes, rv;
 	char			buf[BUFFER_SIZE];
 	struct addrinfo	hints, *servinfo, *p;
 	char			s[INET6_ADDRSTRLEN];
-	
-	if (ac != 3)
-	{
-		std::cerr << "Usage: ./a.out hostname port" << std::endl;
-		return (1);
-	}
 
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;	// try both IPv4 IPv6 -> choose the first working socket
 	hints.ai_socktype = SOCK_STREAM;	// TCP
 
-	if ((rv = getaddrinfo(av[1], av[2], &hints, &servinfo)) != 0)
+	if ((rv = getaddrinfo("localhost", PORT, &hints, &servinfo)) != 0)
 	{
 		std::cerr << "getaddrinfo: " << gai_strerror(rv) << std::endl;
 		return (1);
