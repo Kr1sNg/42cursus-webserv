@@ -1,7 +1,7 @@
 #include "Block.hpp"
 #include <string>
 
-Block::Block(const std::string& name) : _name(name)
+Block::Block()
 {
 
 }

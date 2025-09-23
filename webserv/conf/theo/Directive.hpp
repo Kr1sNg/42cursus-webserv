@@ -10,7 +10,7 @@ class Directive :
         std::string _name;
         std::vector<std::string> _args;
     public :
-        Directive(const std::string& name);
+        Directive();
         Directive(const Directive& obj);
         Directive& operator=(const Directive& obj);
         ~Directive();

@@ -12,7 +12,7 @@ class Block :
         std::vector<Directive> _directives;
         std::vector<Block> _blocks;
     public :
-        Block(const std::string& name);
+        Block();
         Block(const Block& obj);
         Block& operator=(const Block& obj);
         ~Block();
