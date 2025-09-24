@@ -1,12 +1,11 @@
-#include "Block.hpp"
-#include <string>
+#include "generalTest.hpp"
 
 Block::Block()
 {
 
 }
 
-Block::Block(const Block& obj) : _name(obj._name), _directives(obj._directives)
+Block::Block(const Block& obj) : _name(obj._name), _args(obj._args), _directives(obj._directives), _blocks(obj._blocks) 
 {
 
 }
@@ -17,6 +16,8 @@ Block& Block::operator=(const Block& obj)
     {
         _name = obj._name;
          _directives = obj._directives;
+         _blocks = obj._blocks;
+         _args = obj._args;
     }
     return (*this);
 }
@@ -34,6 +35,16 @@ void Block::setName(std::string name)
 const std::string& Block::getName(void) const
 {
     return (_name);
+}
+
+void Block::addArg(const std::string& arg)
+{
+    _args.push_back(arg);
+}
+
+const std::vector<std::string>& Block::getArgs(void) const
+{
+    return(_args);
 }
 
 void Block::addDirective(const Directive& directive)

@@ -1,9 +1,56 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <cctype>
+#include "generalTest.hpp"
+
+void displayInfos(const Block& block)
+{
+    size_t j = 0;
+
+    std::cout << std::endl;
+    std::cout << "Block : " << block.getName();
+    while (j < block.getArgs().size())
+    {
+        std::cout << " " << block.getArgs()[j];
+        j++;
+    }
+    std::cout << " {" << std::endl;
+}
+
+void display(const Block& block)
+{
+    size_t i = 0;
+    size_t j = 0;
+
+    while (i < block.getDirectives().size())
+    {
+        std::cout << "Directive : " << block.getDirectives()[i].getName();
+        j = 0;
+        while (j < block.getDirectives()[i].getArgs().size())
+        {
+            std::cout << " " << block.getDirectives()[i].getArgs()[j];
+            j++;
+        }
+        std::cout << std::endl;
+        i++;
+    }
+    i = 0;
+    while (i < block.getBlocks().size())
+    {
+        displayInfos(block.getBlocks()[i]);
+        display(block.getBlocks()[i]);
+        std::cout << "}" << std::endl;
+        i++;
+    }
+}
+
+void display_list(std::vector<std::string> list)
+{
+       size_t i = 0;
+
+       while (i < list.size())
+       {
+            std::cout << list[i] << std::endl;
+            i++;
+       }
+}
 
 void tokenization(std::vector<std::string> &token_list, std::string &token)
 {
@@ -22,6 +69,8 @@ int main(int ac, char **av)
     std::string token;
     size_t i;
 
+    if (ac != 2)
+        std::cout << "Eroor : not enough arguments" << std::endl;
     if (!file.is_open())
     {
         std::cout << "Error : failed open file" << std::endl;
@@ -54,5 +103,9 @@ int main(int ac, char **av)
         }
         tokenization (token_list, token);
     }
+    i = 0;
+    // display_list(token_list);
+    // createBlock(token_list, &i);
+    display(createBlock(token_list, &i));
     return (0);
 }

@@ -1,7 +1,4 @@
-#include <vector>
-#include <string>
-#include "Block.hpp"
-#include "Directive.hpp"
+#include "generalTest.hpp"
 
 bool checkSpecial(std::string str)
 {
@@ -11,35 +8,65 @@ bool checkSpecial(std::string str)
         return (true);
 }
 
+std::string searchSpecial(std::vector<std::string> list, size_t i)
+{
+    while (i < list.size() && checkSpecial(list[i]))
+        i++;
+    return (list[i]);
+}
+
 Directive createDirective(std::vector<std::string> list, size_t *i)
 {
     Directive directive;
+
     if (checkSpecial(list[*i]))
     {
         directive.setName(list[*i]);
-        *i++;
+        (*i)++;
     }
     while (checkSpecial(list[*i]))
     {
         directive.addArg(list[*i]);
-        *i++;
+        (*i)++;
     }
     return (directive);
 }
 
-Block  parsing(std::vector<std::string> list, size_t i)
+void infosBlock(Block *block, std::vector<std::string> list, size_t *i)
 {
-    int check_arg = 0;
 
-    Block block;
-    Directive directive();
-    while (list[i] != "}")
+    if (checkSpecial(list[*i]))
     {
-        if (list[i] == "{")
-            block.addBlock(parsing(list, i));
-        else if (list [i] != ";")
-           block.addDirective(createDirective(list, &i));
-        i++;
+        block->setName(list[*i]);
+        (*i)++;
+    }
+    while (checkSpecial(list[*i]))
+    {
+         block->addArg(list[*i]);
+        (*i)++;
+    }
+    (*i)++;
+}
+
+Block createBlock(std::vector<std::string> list, size_t *i)
+{
+    Block block;
+    if (searchSpecial(list, *i) == "{")
+        infosBlock(&block, list , i);
+    while (*i < list.size() && list[*i] != "}")
+    {
+
+        if (searchSpecial(list, *i) == ";")
+           block.addDirective(createDirective(list, i));
+        else if (searchSpecial(list, *i) == "{")
+        {
+
+            block.addBlock(createBlock(list, i));
+        }
+        else
+            std::cout << "error" << std::endl;
+        (*i)++;
     }
     return (block);
 }
+
