@@ -1,16 +1,15 @@
 #ifndef DIRECTIVE_H
 # define DIRECTIVE_H
 
-#include <string>
-#include <vector>
+#include "generalTest.hpp"
 
-class Directive :
+class Directive
 {
     private :
         std::string _name;
         std::vector<std::string> _args;
     public :
-        Directive(const std::string& name);
+        Directive();
         Directive(const Directive& obj);
         Directive& operator=(const Directive& obj);
         ~Directive();

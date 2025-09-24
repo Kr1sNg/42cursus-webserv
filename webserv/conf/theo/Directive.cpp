@@ -1,6 +1,6 @@
-#include "Directive.hpp"
+#include "generalTest.hpp"
 
-Directive::Directive(const std::string& name) : _name(name)
+Directive::Directive()
 {
 
 }
