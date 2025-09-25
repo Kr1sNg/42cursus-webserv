@@ -43,3 +43,53 @@ struct	pollfd
 - `POLLHUP` (only returned in `revents`): the remote (client) closed this connection.
 
 `poll()` returns the numbers of elements in `fds` array for which events have occurred.
+
+
+#### `epoll()` - Synchronous I/O Multiplexing (Linux Only)
+
+`epoll()` is similar to `poll()`, it monitors multiple fds to see if I/O is possible on any of them. However, it is designed for scalability (thousands of connections), it doen't need to pass the full array of `pollfd` each time in scanning, the kernel will tell us about the active ones.
+
+- `epoll_create()` opens an epoll file descriptor. It returns a fd referring to the new epoll instance. This fd is used for all the subsequent calls to the epoll interface. After using, this fd should be closed by `close()`. On. error, `-1` is returned with `errno`.
+
+```cpp
+# include <sys/epoll.h>
+
+int	epoll_create(int size);	// size can be ignored but must be greater than zero
+```
+
+- `epoll_ctl()` controls interface for an epoll file descriptor. This system call is used to add, modify, or remove entries in the interest list of the epoll instance.
+
+```cpp
+# include <sys/epoll.h>
+
+union	epoll_data
+{
+	void		*ptr;
+	int			fd;
+	uint32_t	u32;
+	uint64_t	u64;
+};
+typedef union epoll_data	epoll_data_t;
+
+struct epoll_event
+{
+	uint32_t		events;	// epoll events
+	epoll_data_t	data;	// user data variable
+};
+
+int	epoll_ctl(int epfd,		// list of fds epoll instance
+				int op,		// operation to perform	EPOLL_CTR_ADD / _MOD / _DEL
+				int fd,		// target fd
+				struct epoll_event *event);	// event arguments describe the object lined to fd
+```
+
+- `epoll_wait()` waits until one or more fds registered become ready. It returns numbers of ready fds.
+
+```cpp
+# include <sys/epoll.h>
+int	epoll_wait(int epfd,	// list of fds epoll
+				struct epoll_event *event,	// array of events
+				int	maxevents,				// size of array
+				int	timeout);				// microsecond to wait (-1 = wait forever)
+```
+

@@ -1,40 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Connection.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/25 11:07:37 by tat-nguy         ###   ########.fr       */
+/*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
+/*   Updated: 2025/09/25 11:25:28 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _SERVER_HPP_
-# define _SERVER_HPP_
+#ifndef _CONNECTION_HPP_
+# define _CONNECTION_HPP_
 
-# include "webserv.hpp"
-
-class Server
+class Connection
 {
 	private:
-		char	*_port;		// port 
-		int		_sockfd;
-	
-		Server(void);
-		Server(Server const &src);
-		Server	&operator=(Server const &rhs);
-		
-		static bool	_signal;
-		
+		/* data */
 	public:
-		Server(char *av);
-		~Server();
-
-		void	run(void);	//start the Server
-		static void	sigchild_handler(int s);
-		static void signal_handler(int s);
-	
+		Connection(/* args */);
+		~Connection();
 };
+
+Connection::Connection(/* args */)
+{
+}
+
+Connection::~Connection()
+{
+}
+
 
 #endif

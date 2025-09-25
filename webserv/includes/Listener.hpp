@@ -1,40 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Listener.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/25 11:07:37 by tat-nguy         ###   ########.fr       */
+/*   Created: 2025/09/24 14:52:04 by tat-nguy          #+#    #+#             */
+/*   Updated: 2025/09/25 11:04:16 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _SERVER_HPP_
-# define _SERVER_HPP_
+#ifndef	_LISTENER_HPP_
+# define _LISTENER_HPP_
 
 # include "webserv.hpp"
 
-class Server
+class	Listener
 {
 	private:
-		char	*_port;		// port 
-		int		_sockfd;
-	
-		Server(void);
-		Server(Server const &src);
-		Server	&operator=(Server const &rhs);
-		
-		static bool	_signal;
-		
-	public:
-		Server(char *av);
-		~Server();
+		int		_listenerFd;		// listener fd
+		char	*_hostname;	//e.g. localhost // 127.0.0.1
+		char	*_port;
 
-		void	run(void);	//start the Server
-		static void	sigchild_handler(int s);
-		static void signal_handler(int s);
+		Listener(void);
+		Listener(Listener const &src);
+		Listener	&operator=(Listener const &rhs);
 	
+	public:
+		Listener(char *hostname, char *port);
+		~Listener();
+
+		int	getListenerFd(void) const;
+		int	acceptConnection(void);
 };
 
 #endif

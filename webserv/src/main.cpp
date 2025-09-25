@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:34 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/20 21:45:35 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/24 17:40:54 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,10 @@ int main(int ac, char *av[])
 	try
 	{
 		if (ac != 2)
-		throw std::length_error("Usage: ./webserv [configuration file]");
+			throw std::length_error("Usage: ./webserv [configuration file]");
 		
 		// run server here
+		
 		Server	serv(av[1]);
 		serv.run();
 		

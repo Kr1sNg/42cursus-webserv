@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/20 21:45:46 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/24 15:13:03 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,11 @@ void	Server::signal_handler(int s)
 	Server::_signal = true;
 }
 
-void	Server::run(void)
+void	Server::run(void)	// create listener, eventloop
 {
+	
+
+	
 	int					newfd, status;
 	struct addrinfo		hints, *servinfo, *p;
 	struct sockaddr_in	client_addr;

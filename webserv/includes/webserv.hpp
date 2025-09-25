@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/22 17:49:13 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/25 11:07:27 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 # include <netdb.h>	// addrinfo
 # include <csignal>
 # include <sys/wait.h> // waitpid
+# include <poll.h>	// poll
+# include <fcntl.h>	//fcntl
 
 
 // function
