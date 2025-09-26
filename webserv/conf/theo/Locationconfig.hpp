@@ -6,7 +6,6 @@
 class Locationconfig
 {
     private :
-        std::string _path;
         std::string _root;
         std::string _index;
         bool _autoindex;
@@ -18,9 +17,6 @@ class Locationconfig
         ~Locationconfig();
         Locationconfig(const Locationconfig& obj);
         Locationconfig& operator=(const Locationconfig& obj);
-
-        void setPath(const std::string& path);
-        const std::string& getPath(void) const;
 
         void setRoot(const std::string& root);
         const std::string& getRoot(void) const;

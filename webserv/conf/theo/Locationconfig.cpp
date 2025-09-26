@@ -5,9 +5,8 @@ Locationconfig::Locationconfig()
 
 }
 
-Locationconfig::Locationconfig(const Locationconfig& obj) :
+Locationconfig::Locationconfig(const Locationconfig& obj)
 {
-    _path = obj._path;
     _root = obj._root;
     _index = obj._index;
     _autoindex = obj._autoindex;
@@ -20,7 +19,6 @@ Locationconfig& Locationconfig::operator=(const Locationconfig& obj)
 {
     if (this != &obj)
     {
-        _path = obj._path;
         _root = obj._root;
         _index = obj._index;
         _autoindex = obj._autoindex;
@@ -35,17 +33,6 @@ Locationconfig::~Locationconfig()
 {
 
 }
-
-void Locationconfig::setPath(const std::string& path)
-{
-    _path = path;
-}
-
-const std::string& Locationconfig::getPath(void) const
-{
-    return (_path);
-}
-
 
 void Locationconfig::setRoot(const std::string& root)
 {

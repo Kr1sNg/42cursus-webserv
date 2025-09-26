@@ -64,7 +64,7 @@ const std::string& Serverconfig::getRoot(void) const
     return (_root);
 }
 
-void Serverconfig::setError_pages(const int& index, const std::string& error_pages)
+void Serverconfig::addError_pages(const int& index, const std::string& error_pages)
 {
     _error_pages[index] = error_pages;
 }
@@ -84,7 +84,7 @@ const size_t& Serverconfig::getClient_max_size(void) const
     return (_client_max_body_size);
 }
 
-void Serverconfig::setlocation(const Locationconfig& location)
+void Serverconfig::addlocation(const Locationconfig& location)
 {
     _locations.push_back(location);
 }
