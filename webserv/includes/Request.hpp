@@ -6,7 +6,7 @@
 /*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 17:45:07 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/09/26 14:31:29 by cfiachet         ###   ########.fr       */
+/*   Updated: 2025/09/26 16:46:10 by cfiachet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <string>
 # include <iostream>
 # include <map>
+# include <cctype>
 
 /* std::map<string, string> variable ; explanation.
 ** it tooks 2 strings, the result will be something like that

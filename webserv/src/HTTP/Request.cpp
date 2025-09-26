@@ -6,7 +6,7 @@
 /*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 13:03:07 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/09/26 14:18:01 by cfiachet         ###   ########.fr       */
+/*   Updated: 2025/09/26 16:45:53 by cfiachet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ Request::Request()
 	body() {
 }
 
-Request	parseHTTPRequest(const std::string &rawRequest) {
+Request    parseHTTPRequest(const std::string &rawRequest) {
 	Request req;
 	std::istringstream iss(rawRequest);
 	std::string line;
@@ -39,17 +39,26 @@ Request	parseHTTPRequest(const std::string &rawRequest) {
 		if (position != std::string::npos) {
 			std::string key = line.substr(0, position);
 			std::string value = line.substr(position + 2);
+
+			for(size_t i = 0; i < key.size(); ++i)
+				key[i] = std::tolower(key[i]);
 			req.headers[key] = value;
 		}
 	}
 	/* body */
-	std::string body;
-	while (std::getline(iss, line)) {
-		body += line + "\n";
+	std::map<std::string, std::string>::const_iterator it = req.headers.find("content-length");
+	if (it != req.headers.end()) {
+		int contentLength = 0;
+		std::istringstream conv(it->second);
+		conv >> contentLength;
+		if (contentLength > 0) {
+			char *buffer = new char[contentLength + 1];
+			iss.read(buffer, contentLength);
+			buffer[contentLength] = '\0';
+			req.body = std::string(buffer);
+			delete[] buffer;
+		}
 	}
-	if (!body.empty() && body.back() == '\n')
-		body.pop_back();
-	req.body = body;
 
 	return req;
 }
