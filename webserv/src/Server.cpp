@@ -1,12 +1,12 @@
 /* ************************************************************************** */
-/*                                                                            */
+/*	                                                                        */
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/20 21:45:46 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/24 16:49:40 by cfiachet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,4 +119,50 @@ void	Server::run(void)
 		close(newfd); // parent
 	}
 	close(_sockfd);
+}
+
+void	Server::HandleClient(int fd) {
+	char buffer[4096];
+	ssize_t readed = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	if (readed <= 0) {
+		std::cerr << "server: recv: " << std::strerror(errno) << std::endl;
+		return ;
+	}
+	buffer[readed] = '\0';
+	std::string request(buffer); //transformation in std::string
+	/*
+	** first line extraction
+	** we found the position with request.find(), string::npos is
+	** here to check if at position -1 there are our position,
+	** and then if the searched line is existing.
+	*/
+	ssize_t position = request.find("\r\n");
+	std::string	requestLine;
+	if (position != std::string::npos)
+		requestLine = request.substr(0, position);
+	else
+		requestLine = request;
+	/* cutting the differents category of our request */
+	std::string method, path, version;
+	std::istringstream iss(requestLine);
+	iss >> method >> path >> version;
+
+	/* debug */
+	std::cout << "Method: " << method << std::endl;
+	std::cout << "Chemin: " << path << std::endl;
+	std::cout << "Version: " << version << std::endl;
+
+	std::string body = "Hello World!\n";
+	std::ostringstream oss;
+	oss << body.size();
+	std::string contentLength = oss.str();
+	/* Construction the HTTP response */
+	std::string response = "HTTP/1.1 200 OK\r\n";
+	response += "Content-Length: " + contentLength + "\r\n";
+	response += "Content-Type: text/plain\r\n";
+	response += "\r\n";
+	response += body;
+
+	send(fd, response.c_str(), response.size(), 0);
+	
 }
