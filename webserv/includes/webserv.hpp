@@ -6,7 +6,7 @@
 /*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/26 13:09:32 by cfiachet         ###   ########.fr       */
+/*   Updated: 2025/09/26 13:36:38 by cfiachet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,9 @@
 # include <netdb.h>	// addrinfo
 # include <csignal>
 # include <sys/wait.h> // waitpid
+
+# include "Response.hpp"
+# include "Request.hpp"
 
 
 // function
