@@ -6,23 +6,26 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:34 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/24 17:40:54 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/26 15:57:51 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/webserv.hpp"
-#include "../includes/Server.hpp"
+#include "../includes/server/Server.hpp"
 
 int main(int ac, char *av[])
 {
 	try
 	{
-		if (ac != 2)
-			throw std::length_error("Usage: ./webserv [configuration file]");
+		// if (ac != 2)
+		// 	throw std::length_error("Usage: ./webserv [configuration file]");
 		
+		if (ac != 3)
+			throw std::length_error("Usage: ./webserv [hostname] [PORT]");
+			
 		// run server here
 		
-		Server	serv(av[1]);
+		Server	serv(av[1], av[2]);
 		serv.run();
 		
 	}

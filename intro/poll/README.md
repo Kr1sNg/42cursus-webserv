@@ -73,7 +73,7 @@ typedef union epoll_data	epoll_data_t;
 
 struct epoll_event
 {
-	uint32_t		events;	// epoll events
+	uint32_t		events;	// epoll events -> exactly the same with poll events EPOLLIN/OUT/HUP = POLLIN/OUT/HUP
 	epoll_data_t	data;	// user data variable
 };
 
@@ -92,4 +92,27 @@ int	epoll_wait(int epfd,	// list of fds epoll
 				int	maxevents,				// size of array
 				int	timeout);				// microsecond to wait (-1 = wait forever)
 ```
+
+#### High-Level Class Design
+
+We use the Reactor Pattern:
+
+- EventLoop (abstract)
+	Defines the interface for running the loop.
+
+- EpollLoop (concrete)
+	Uses `epoll_create`, `epoll_ctl`, `epoll_wait`.
+
+- EventHandler (interface)
+	Something that reacts to an event (fd ready).
+
+- Listener (inherits EventHandler)
+	Accepts new connections.
+
+- Connection (inherits EventHandler)
+	Handles client I/O (read/write).
+
+- Server
+	Owns the loop and registers listeners.
+
 

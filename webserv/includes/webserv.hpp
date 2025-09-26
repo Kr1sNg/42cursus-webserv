@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/25 11:07:27 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/26 14:24:34 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,18 @@
 # include <cerrno>	// errno
 # include <cstring>	// strerror
 # include <unistd.h> // close
+# include <vector>
+# include <map>
+# include <utility> //pair
 
 
 // for socket
 # include <netdb.h>	// addrinfo
 # include <csignal>
 # include <sys/wait.h> // waitpid
-# include <poll.h>	// poll
+# include <poll.h>	// epoll
 # include <fcntl.h>	//fcntl
+// # include <sys/epoll.h>
 
 
 // function
