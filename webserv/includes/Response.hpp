@@ -6,7 +6,7 @@
 /*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 12:58:08 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/09/18 13:32:52 by cfiachet         ###   ########.fr       */
+/*   Updated: 2025/09/26 13:56:33 by cfiachet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ struct Response {
 	std::string	body; //Body for the HTTP POST mode.
 
 	Response();
+
+	std::string toString() const;
 };
 
 #endif

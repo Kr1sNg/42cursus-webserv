@@ -1,9 +1,9 @@
 /* ************************************************************************** */
-/*                                                                            */
+/*	                                                                        */
 /*                                                        :::      ::::::::   */
 /*   Server_old.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
 /*   Updated: 2025/09/26 15:57:35 by tat-nguy         ###   ########.fr       */
@@ -122,4 +122,42 @@ void	Server::run(void)	// create listener, eventloop
 		close(newfd); // parent
 	}
 	close(_sockfd);
+}
+
+void	Server::HandleClient(int fd) {
+	char buffer[4096];
+	ssize_t readed = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	if (readed <= 0) {
+		std::cerr << "server: recv: " << std::strerror(errno) << std::endl;
+		return ;
+	}
+	buffer[readed] = '\0';
+	std::string rawRequest(buffer); //transformation in std::string
+
+	Request req = parseHTTPRequest(rawRequest); //complete parsing
+	/*debug*/
+	std::cout << "Method: " << req.method << "\n";
+	std::cout << "URI: " << req.uri << "\n";
+	std::cout << "Version: " << req.version << "\n";
+	for (std::map<std::string, std::string>::const_iterator it = req.headers.begin();
+		it != req.headers.end(); ++it) {
+			std::cout << it->first << " => " << it->second << std::endl;
+	}
+	if (!req.body.empty()) {
+		std::cout << "Body: " << req.body << std::endl;
+	}
+	/* END OF THE DEBUT - Response construction */
+	Response res;
+	res.status = 200;
+	res.reason = "OK";
+	res.version = "HTTP/1.1";
+	res.headers["Content-Type"] = "text/plain";
+	res.body = "Hello World!\n";
+	std::ostringstream oss;
+	oss << res.body.size();
+	res.headers["Content-Length"] = oss.str();
+
+	/* Send response */
+	std::string responseString = res.toString();
+	send(fd, responseString.c_str(), responseString.size(), 0);
 }
