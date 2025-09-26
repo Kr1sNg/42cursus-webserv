@@ -129,40 +129,32 @@ void	Server::HandleClient(int fd) {
 		return ;
 	}
 	buffer[readed] = '\0';
-	std::string request(buffer); //transformation in std::string
-	/*
-	** first line extraction
-	** we found the position with request.find(), string::npos is
-	** here to check if at position -1 there are our position,
-	** and then if the searched line is existing.
-	*/
-	ssize_t position = request.find("\r\n");
-	std::string	requestLine;
-	if (position != std::string::npos)
-		requestLine = request.substr(0, position);
-	else
-		requestLine = request;
-	/* cutting the differents category of our request */
-	std::string method, path, version;
-	std::istringstream iss(requestLine);
-	iss >> method >> path >> version;
+	std::string rawRequest(buffer); //transformation in std::string
 
-	/* debug */
-	std::cout << "Method: " << method << std::endl;
-	std::cout << "Chemin: " << path << std::endl;
-	std::cout << "Version: " << version << std::endl;
-
-	std::string body = "Hello World!\n";
+	Request req = parseHTTPRequest(rawRequest); //complete parsing
+	/*debug*/
+	std::cout << "Method: " << req.method << "\n";
+	std::cout << "URI: " << req.uri << "\n";
+	std::cout << "Version: " << req.version << "\n";
+	for (std::map<std::string, std::string>::const_iterator it = req.headers.begin();
+		it != req.headers.end(); ++it) {
+			std::cout << it->first << " => " << it->second << std::endl;
+	}
+	if (!req.body.empty()) {
+		std::cout << "Body: " << req.body << std::endl;
+	}
+	/* END OF THE DEBUT - Response construction */
+	Response res;
+	res.status = 200;
+	res.reason = "OK";
+	res.version = "HTTP/1.1";
+	res.headers["Content-Type"] = "text/plain";
+	res.body = "Hello World!\n";
 	std::ostringstream oss;
-	oss << body.size();
-	std::string contentLength = oss.str();
-	/* Construction the HTTP response */
-	std::string response = "HTTP/1.1 200 OK\r\n";
-	response += "Content-Length: " + contentLength + "\r\n";
-	response += "Content-Type: text/plain\r\n";
-	response += "\r\n";
-	response += body;
+	oss << res.body.size();
+	res.headers["Content-Length"] = oss.str();
 
-	send(fd, response.c_str(), response.size(), 0);
-	
+	/* Send response */
+	std::string responseString = res.toString();
+	send(fd, responseString.c_str(), responseString.size(), 0);
 }

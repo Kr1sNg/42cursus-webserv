@@ -6,7 +6,7 @@
 /*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 17:45:07 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/09/18 13:17:30 by cfiachet         ###   ########.fr       */
+/*   Updated: 2025/09/26 14:31:29 by cfiachet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,5 +34,7 @@ struct Request {
 
 	Request();
 };
+
+Request	parseHTTPRequest(const std::string &rawRequest);
 
 #endif
