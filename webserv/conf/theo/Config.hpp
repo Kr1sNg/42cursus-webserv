@@ -1,0 +1,20 @@
+#ifndef CONFIG_H
+# define CONFIG_H
+
+#include "generalTest.hpp"
+
+class Config
+{
+    private :
+        std::vector<Serverconfig> _servers;
+    public :
+        Config();
+        ~Config();
+        Config(const Config& obj);
+        Config& operator=(const Config& obj);
+
+        void setServer(const Serverconfig& server);
+        const std::vector<Serverconfig>& getServers(void) const;
+};
+
+#endif
