@@ -7,8 +7,13 @@
 #include <fstream>
 #include <sstream>
 #include <cctype>
+#include <map>
+
 #include "Directive.hpp"
 #include "Block.hpp"
+#include "Locationconfig.hpp"
+#include "Serverconfig.hpp"
+#include "Config.hpp"
 
 Block  createBlock(std::vector<std::string> list, size_t *i);
 void display(const Block& block);
