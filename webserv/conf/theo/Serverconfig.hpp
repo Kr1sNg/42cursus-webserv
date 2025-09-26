@@ -12,6 +12,15 @@ class Serverconfig
         std::map<int, std::string> _error_pages;
         size_t _client_max_body_size;
         std::vector<Locationconfig> _locations;
+
+        enum DirectiveFlag
+        {
+            listen = 1 << 0,
+            server_name = 1 << 1,
+            root = 1 << 2,
+            error_pages = 1 << 3,
+            getClient_max_size = 1 << 4,
+        };
     public :
         Serverconfig();
         ~Serverconfig();
@@ -24,12 +33,14 @@ class Serverconfig
         const std::string& getServer_name(void) const;
         void setRoot(const std::string& root);
         const std::string& getRoot(void) const;
-        void setError_pages(const int& index, const std::string& error_pages);
+        void addError_pages(const int& index, const std::string& error_pages);
         const std::map<int, std::string>& getError_pages(void) const;
         void setClient_max_size(const size_t& client_max_body_size);
         const size_t& getClient_max_size(void) const;
-        void setlocation(const Locationconfig& location);
+        void addlocation(const Locationconfig& location);
         const std::vector<Locationconfig>& getlocations(void) const;
+
+
 };
 
 #endif
