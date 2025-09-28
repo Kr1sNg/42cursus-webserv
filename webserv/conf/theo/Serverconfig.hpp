@@ -23,6 +23,7 @@ class Serverconfig
 
         int _flags;
         const std::map<std::string, _directiveFlag> _validDirectives;
+
     public :
         Serverconfig();
         ~Serverconfig();
