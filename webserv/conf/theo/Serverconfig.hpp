@@ -6,21 +6,23 @@
 class Serverconfig
 {
     private :
-        int _listen;
-        std::string _server_name;
+        std::vector<int> _listen;
+        std::vector<std::string> _server_name;
         std::string _root;
         std::map<int, std::string> _error_pages;
         size_t _client_max_body_size;
         std::vector<Locationconfig> _locations;
 
-        enum DirectiveFlag
+        enum _directiveFlag
         {
-            listen = 1 << 0,
-            server_name = 1 << 1,
-            root = 1 << 2,
-            error_pages = 1 << 3,
-            getClient_max_size = 1 << 4,
+            LISTEN = 1 << 0,
+            ROOT = 1 << 1,
+            CLIENT_MAX_BODY_SIZE = 1 << 2,
+            ERROR_PAGE = 1 << 3,
         };
+
+        int _flags;
+        const std::map<std::string, _directiveFlag> _validDirectives;
     public :
         Serverconfig();
         ~Serverconfig();
@@ -28,9 +30,9 @@ class Serverconfig
         Serverconfig& operator=(const Serverconfig& obj);
 
         void setListen(const int& listen);
-        const int& getListen(void) const;
+        const std::vector<int>& getListen(void) const;
         void setServer_name(const std::string& server_name);
-        const std::string& getServer_name(void) const;
+        const std::vector<std::string>& getServer_name(void) const;
         void setRoot(const std::string& root);
         const std::string& getRoot(void) const;
         void addError_pages(const int& index, const std::string& error_pages);
@@ -40,7 +42,7 @@ class Serverconfig
         void addlocation(const Locationconfig& location);
         const std::vector<Locationconfig>& getlocations(void) const;
 
-
+        bool validDirective(const std::string& directive) const;
 };
 
 #endif
