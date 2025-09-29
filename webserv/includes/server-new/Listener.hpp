@@ -1,47 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Listener.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/26 16:24:05 by tat-nguy         ###   ########.fr       */
+/*   Created: 2025/09/24 14:52:04 by tat-nguy          #+#    #+#             */
+/*   Updated: 2025/09/26 15:58:35 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _SERVER_HPP_
-# define _SERVER_HPP_
+#ifndef	_LISTENER_HPP_
+# define _LISTENER_HPP_
 
 # include "../webserv.hpp"
-# include "Listener.hpp"
+# include "IEventHandler.hpp"
 # include "ILoop.hpp"
 # include "Connection.hpp"
 
-class Server
+class Server;
+
+class Listener: public IEventHandler
 {
 	private:
-		char	*_hostname;	//from file.conf
-		char	*_port;		//from file.conf
+		int		_listenerFd;	
+		Server	*_server;	// non-owning pointer
 	
-		PollLoop					_loop;
-		// std::map<int, Connection>	_connects;
-		Listener					_listeners;
-
-		
-
-
-		Server(void);
-		Server(Server const &src);
-		Server	&operator=(Server const &rhs);
 		
 	public:
-		Server(char *hostname, char *port);
-		~Server();
+		Listener(void);
+		Listener(Server *server, char *hostname, char *port);
+		Listener(Listener const &src);
+		Listener	&operator=(Listener const &rhs);
+		virtual ~Listener();	// to be able to be called by PollLoop
 
-		void	run(void);	//start the Server
-		void	addListener(Listener &l);
-	
+		virtual int		getFd(void) const;
+		virtual void	handleEvent(uint32_t events);
+		
 };
 
 #endif

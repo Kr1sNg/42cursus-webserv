@@ -18,23 +18,32 @@
 # include "ILoop.hpp"
 # include "PollLoop.hpp"
 
+class Server;
+
 class Connection: public IEventHandler
 {
 	private:
-		PollLoop	*_loop;		// take from Server
-		int			_clientFd;	// from Listener
-		std::string	_buffer;
+		Server	*_server; // non-owning pointer back to server for marking close/mod events	
+		int		_clientFd;
+		std::string	_inBuf;
+		std::string	_outBuf;
+	
 		
 		Connection	&operator=(Connection const &rhs);
+		Connection(Connection const &src);
 	
 	public:
 		Connection(void);
-		Connection(PollLoop &loop, int cfd);
-		Connection(Connection const &src);
+		Connection(Server *server, int cfd);
+		
 		virtual ~Connection();
 
 		virtual int		getFd(void) const;
 		virtual void	handleEvent(uint32_t events);
+
+		bool	recvIntoBuffer();
+		bool	flushOutBuffer();
+
 };
 
 #endif
