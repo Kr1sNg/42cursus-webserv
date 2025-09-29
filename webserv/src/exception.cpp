@@ -21,3 +21,11 @@ void	throwGaiError(std::string const &reason, int code)
 {
 	throw std::runtime_error(reason + ": " + gai_strerror(code));
 }
+
+int	setNonBlocking(int fd)
+{
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags < 0)
+		return (-1);
+	return (fcntl(fd, F_SETFL, flags | O_NONBLOCK));
+}

@@ -25,7 +25,9 @@ int main(int ac, char *av[])
 			
 		// run server here
 		
-		Server	serv(av[1], av[2]);
+		Server serv
+		serv.start(av[1], av[2]);
+		std::cout << "Server listening on port " << av[2] << std::endl;
 		serv.run();
 		
 	}

@@ -32,10 +32,10 @@ class Listener: public IEventHandler
 		Listener(PollLoop &loop, char *hostname, char *port);
 		Listener(Listener const &src);
 		Listener	&operator=(Listener const &rhs);
-		~Listener();
+		virtual ~Listener();
 
-		int		getFd(void) const;
-		void	handleEvent(uint32_t events);
+		virtual int		getFd(void) const;
+		virtual void	handleEvent(uint32_t events);
 		
 };
 
