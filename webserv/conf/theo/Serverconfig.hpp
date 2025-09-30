@@ -30,21 +30,20 @@ class Serverconfig
         Serverconfig(const Serverconfig& obj);
         Serverconfig& operator=(const Serverconfig& obj);
 
-        void setListen(const int& listen);
+        void setListen(const std::vector<std::string>& listen);
         const std::vector<int>& getListen(void) const;
-        void setServer_name(const std::string& server_name);
+        void setServer_name(const std::vector<std::string>& server_name);
         const std::vector<std::string>& getServer_name(void) const;
-        void setRoot(const std::string& root);
+        void setRoot(const std::vector<std::string>& root);
         const std::string& getRoot(void) const;
-        void addError_page(const int& index, const std::string& error_page);
+        void addError_page(const std::vector<std::string>& error_page);
         const std::map<int, std::string>& getError_pages(void) const;
-        void setClient_max_size(const size_t& client_max_body_size);
+        void setClient_max_size(const std::vector<std::string>& client_max_body_size);
         const size_t& getClient_max_size(void) const;
         void addlocation(const Locationconfig& location);
         const std::vector<Locationconfig>& getlocations(void) const;
 
-        bool validDirective(const std::string& directive) const;
-        void Serverconfig::addDirective(const std::vector& directive);
+        void Serverconfig::addDirective(const Directive& directive);
 };
 
 #endif
