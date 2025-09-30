@@ -43,7 +43,7 @@ class Serverconfig
         void addlocation(const Locationconfig& location);
         const std::vector<Locationconfig>& getlocations(void) const;
 
-        void Serverconfig::addDirective(const Directive& directive);
+        void addDirective(const Directive& directive);
 };
 
 #endif

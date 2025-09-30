@@ -1,5 +1,23 @@
 #include "generalTest.hpp"
 
+const std::map<std::string, Locationconfig::_directiveFlag> Locationconfig::_validDirective = {
+    {"index", Locationconfig::INDEX},
+    {"root", Locationconfig::ROOT},
+    {"autoindex", Locationconfig::AUTOINDEX},
+    {"methods", Locationconfig::METHODS},
+    {"cgipass", Locationconfig::CGIPASS},
+    {"redirect", Locationconfig::REDIRECT}
+};
+
+const std::map<std::string, void(Locationconfig::*)(const std::vector<std::string>&)> Locationconfig::_directiveHandler = {
+    {"index", &Locationconfig::setIndex},
+    {"root", &Locationconfig::setRoot},
+    {"autoindex", &Locationconfig::setAutoindex},
+    {"methods", &Locationconfig::setMethods},
+    {"cgipass", &Locationconfig::setCgi_pass},
+    {"redirect", &Locationconfig::setRedirect},
+};
+
 Locationconfig::Locationconfig()
 {
 
@@ -34,8 +52,10 @@ Locationconfig::~Locationconfig()
 
 }
 
-void Locationconfig::setRoot(const std::string& root)
+void Locationconfig::setRoot(const std::vector<std::string>& root)
 {
+    // if (root.size() > 1)
+    //     //error
     if (_flags & _validDirective.at("root"))
     {
         std::cout << "Error : root directive already defined in this location" << std::endl;
@@ -43,7 +63,7 @@ void Locationconfig::setRoot(const std::string& root)
     else
     {
         _flags |= _validDirective.at("root");
-        _root = root;
+        _root = root[0];
     }
 }
 
@@ -52,8 +72,10 @@ const std::string& Locationconfig::getRoot(void) const
     return (_root);
 }
 
-void Locationconfig::setIndex(const std::string& index)
+void Locationconfig::setIndex(const std::vector<std::string>& index)
 {
+    // if (index.size() > 1)
+    //     //error
     if (_flags & _validDirective.at("index"))
     {
         std::cout << "Error : index directive already defined in this location" << std::endl;
@@ -61,7 +83,7 @@ void Locationconfig::setIndex(const std::string& index)
     else
     {
         _flags |= _validDirective.at("index");
-        _index = index;
+        _index = index[0];
     }
 }
 
@@ -70,7 +92,7 @@ const std::string& Locationconfig::getIndex(void) const
     return (_index);
 }
 
-void Locationconfig::setAutoindex(const bool& autoindex)
+void Locationconfig::setAutoindex(const std::vector<std::string>& autoindex)
 {
     if (_flags & _validDirective.at("autoindex"))
     {
@@ -79,7 +101,10 @@ void Locationconfig::setAutoindex(const bool& autoindex)
     else
     {
         _flags |= _validDirective.at("autoindex");
-        _autoindex = autoindex;
+        if (autoindex[0] == "on")
+            _autoindex = true;
+        // else (autoindex[0] != "off")
+        //     //error
     }
 }
 
@@ -88,8 +113,10 @@ const bool& Locationconfig::getAutoindex(void) const
     return (_autoindex);
 }
 
-void Locationconfig::setMethod(const std::vector<std::string>& methods)
+void Locationconfig::setMethods(const std::vector<std::string>& methods)
 {
+    size_t i = 0;
+
     if (_flags & _validDirective.at("methods"))
     {
         std::cout << "Error : methods directive already defined in this location" << std::endl;
@@ -97,7 +124,13 @@ void Locationconfig::setMethod(const std::vector<std::string>& methods)
     else
     {
         _flags |= _validDirective.at("methods");
-        _methods = methods;
+        while (methods[i] == "GET" || methods[i] == "POST" || methods[i] == "DELETE")
+        {
+            _methods.push_back(methods[i]);
+            i++;
+        }
+        // if (i != methods.size())
+        //     //error
     }
 }
 
@@ -144,13 +177,16 @@ const std::string& Locationconfig::getRedirect(void) const
     return (_redirect);
 }
 
-bool Locationconfig::validDirective(const std::string& directive) const
+void Locationconfig::addDirective(const Directive& directive)
 {
-    if (_validDirective.find(directive) == _validDirective.end())
+    std::map<std::string, void(Locationconfig::*)(const std::vector<std::string>&)>::const_iterator it;
+    it = _directiveHandler.find(directive.getName());
+    if (it != _directiveHandler.end())
     {
-        std::cout << "Directive " << directive << " is invalid." << std::endl;
-        return (true);
+        (this->*(it->second))(directive.getArgs());
     }
     else
-        return (false);
+    {
+        std::cout << "Directive " << directive.getName() << " is invalid." << std::endl;
+    }
 }
