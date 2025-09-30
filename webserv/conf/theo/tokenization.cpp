@@ -68,7 +68,8 @@ int main(int ac, char **av)
     std::string line;
     std::string token;
     size_t i;
-
+    Block block;
+    Config config;
     if (ac != 2)
         std::cout << "Eroor : not enough arguments" << std::endl;
     if (!file.is_open())
@@ -106,6 +107,8 @@ int main(int ac, char **av)
     i = 0;
     // display_list(token_list);
     // createBlock(token_list, &i);
-    display(createBlock(token_list, &i));
+    block = createBlock(token_list, &i);
+    display(block);
+    config = checkConfig(block);
     return (0);
 }

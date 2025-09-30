@@ -22,14 +22,15 @@ class Serverconfig
         };
 
         int _flags;
-        static const std::map<std::string, _directiveFlag> _validDirective;
-        static const std::map<std::string, void(Serverconfig::*)(const std::vector<std::string>&)> _directiveHandler;
+        static std::map<std::string, _directiveFlag> _validDirective;
+        static std::map<std::string, void(Serverconfig::*)(const std::vector<std::string>&)> _directiveHandler;
     public :
         Serverconfig();
         ~Serverconfig();
         Serverconfig(const Serverconfig& obj);
         Serverconfig& operator=(const Serverconfig& obj);
 
+        void initStatics();
         void setListen(const std::vector<std::string>& listen);
         const std::vector<int>& getListen(void) const;
         void setServer_name(const std::vector<std::string>& server_name);

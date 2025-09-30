@@ -22,7 +22,7 @@ RESET = \033[0m
 NAME 		= parsing
 
 # Source Files
-SRCS     	= tokenization.cpp parsing.cpp Block.cpp Directive.cpp
+SRCS     	= tokenization.cpp parsing.cpp Block.cpp Directive.cpp Config.cpp fillConfig.cpp Locationconfig.cpp Serverconfig.cpp
 
 # Object Files
 OBJS = $(SRCS:.cpp=.o)

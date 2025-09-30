@@ -1,23 +1,26 @@
 #include "generalTest.hpp"
 
-const std::map<std::string, Serverconfig::_directiveFlag> Serverconfig::_validDirective = {
-    {"listen", Serverconfig::LISTEN},
-    {"root", Serverconfig::ROOT},
-    {"client_max_body_size", Serverconfig::CLIENT_MAX_BODY_SIZE},
-    {"error_page", Serverconfig::ERROR_PAGE}
-};
+std::map<std::string, Serverconfig::_directiveFlag> Serverconfig::_validDirective;
+std::map<std::string, void(Serverconfig::*)(const std::vector<std::string>&)> Serverconfig::_directiveHandler;
 
-const std::map<std::string, void(Serverconfig::*)(const std::vector<std::string>&)> Serverconfig::_directiveHandler = {
-    {"listen", &Serverconfig::setListen},
-    {"server_name", &Serverconfig::setServer_name},
-    {"root", &Serverconfig::setRoot},
-    {"error_page", &Serverconfig::addError_page},
-    {"client_max_body_size", &Serverconfig::setClient_max_size}
-};
+void Serverconfig::initStatics()
+{
+    _validDirective["listen"] = LISTEN;
+    _validDirective["root"] = ROOT;
+    _validDirective["client_max_body_size"] = CLIENT_MAX_BODY_SIZE;
+    _validDirective["error_page"] = ERROR_PAGE;
+
+    _directiveHandler["listen"] = &Serverconfig::setListen;
+    _directiveHandler["server_name"] = &Serverconfig::setServer_name;
+    _directiveHandler["root"] = &Serverconfig::setRoot;
+    _directiveHandler["error_page"] = &Serverconfig::addError_page;
+    _directiveHandler["client_max_body_size"] = &Serverconfig::setClient_max_size;
+}
 
 Serverconfig::Serverconfig()
 {
     _flags = 0;
+    initStatics();
 }
 
 Serverconfig::Serverconfig(const Serverconfig& obj)
@@ -28,7 +31,10 @@ Serverconfig::Serverconfig(const Serverconfig& obj)
     _error_pages = obj._error_pages;
     _client_max_body_size = obj._client_max_body_size;
     _locations = obj._locations;
+
     _flags = 0;
+
+    initStatics();
 }
 
 Serverconfig& Serverconfig::operator=(const Serverconfig& obj)
@@ -52,13 +58,17 @@ Serverconfig::~Serverconfig()
 
 void Serverconfig::setListen(const std::vector<std::string>& listen)
 {
+    std::stringstream ss(listen[0]);
+    int port;
+
     if (listen.size() > 1)
         //error
     if (!(_flags & _validDirective.at("listen")))
     {
         _flags |= _validDirective.at("listen");
     }
-    _listen.push_back(std::stoi(listen[0]));
+    ss >> port;
+    _listen.push_back(port);
 }
 
 const std::vector<int>& Serverconfig::getListen(void) const
@@ -100,7 +110,10 @@ const std::string& Serverconfig::getRoot(void) const
 
 void Serverconfig::addError_page(const std::vector<std::string>& error_page)
 {
-    int index = std::stoi(error_page[0]);
+    std::stringstream ss(error_page[0]);
+    int index;
+    
+    ss >> index;
     // if (error_page.size() != 2)
     //     //error
     if (_error_pages.find(index) != _error_pages.end())
@@ -122,8 +135,10 @@ const std::map<int, std::string>& Serverconfig::getError_pages(void) const
 
 void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max_body_size)
 {
+
     //  if (client_max_body_size.size() != 1)
     //     //error
+    size_t size = static_cast<size_t>(std::strtoul(client_max_body_size[0].c_str(), NULL, 10));
     if (_flags & _validDirective.at("_client_max_body_size"))
     {
         std::cout << "Error : _client_max_body_size directive already defined in this location" << std::endl;
@@ -131,7 +146,7 @@ void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max
     else
     {
         _flags |= _validDirective.at("_client_max_body_size");
-        _client_max_body_size = std::stoull(client_max_body_size[0]);
+        _client_max_body_size = size;
     }
 }
 
@@ -154,6 +169,7 @@ void Serverconfig::addDirective(const Directive& directive)
 {
     std::map<std::string, void(Serverconfig::*)(const std::vector<std::string>&)>::const_iterator it;
     it = _directiveHandler.find(directive.getName());
+
     if (it != _directiveHandler.end())
     {
         (this->*(it->second))(directive.getArgs());
