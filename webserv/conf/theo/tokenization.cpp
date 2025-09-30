@@ -41,6 +41,11 @@ void display(const Block& block)
     }
 }
 
+void displayConfig(const Config& config)
+{
+    
+}
+
 void display_list(std::vector<std::string> list)
 {
        size_t i = 0;
@@ -110,5 +115,6 @@ int main(int ac, char **av)
     block = createBlock(token_list, &i);
     display(block);
     config = checkConfig(block);
+    displayConfig(config);
     return (0);
 }

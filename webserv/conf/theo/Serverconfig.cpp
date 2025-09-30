@@ -21,6 +21,13 @@ Serverconfig::Serverconfig()
 {
     _flags = 0;
     initStatics();
+
+    //  _listen = ;
+    // _server_name = ;
+    _root = "Default";
+    // _error_pages = ;
+    _client_max_body_size = 0;
+    // _locations = ;
 }
 
 Serverconfig::Serverconfig(const Serverconfig& obj)
