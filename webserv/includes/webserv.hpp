@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/26 16:24:26 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/30 11:07:40 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,5 +42,6 @@
 // function
 void	throwErrno(std::string const &reason);
 void	throwGaiError(std::string const &reason, int code);
+int		setNonBlocking(int fd);
 
 #endif

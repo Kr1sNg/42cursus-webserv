@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/26 15:59:34 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/30 11:55:34 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,51 +18,88 @@
 // #include "../../includes/server/EpollLoop.hpp"
 #include "../../includes/server/PollLoop.hpp"
 
-Server::Server(char *hostname, char *port): _hostname(hostname), _port(port)
+// Server::Server(char *hostname, char *port): _hostname(hostname), _port(port)
+// {
+// 	_listeners = new Listener(this, _hostname, _port);
+// 	_loop.addHandler(_listener, POLLIN);
+// }
+
+Server::Server(void): _listener(NULL)
 {
-	_loop = PollLoop();
-	_listeners = Listener(_loop, _hostname, _port);
 }
 
 Server::~Server()
 {
+	if (_listener)
+	{
+		_loop.removeHandler(_listener->getFd());
+		delete _listener;
+	}
+
+	// close and delete all connections
+	for (std::map<int, Connection *>::iterator it = _connects.begin(); it != _connects.end(); ++it)
+	{
+		int fd = it->first;
+		_loop.removeHandler(fd);
+		delete it->second;
+	}
+	_connects.clear();
+}
+
+void	Server::start(char *hostname, char *port)
+{
+	_listener = new Listener(this, hostname, port);
+	_loop.addHandler(_listener, POLLIN);
+}
+
+void	Server::markForClose(int clientFd)
+{
+	if (clientFd <= 0)
+		return ;
+	_fdToClose.push_back(clientFd);
+}
+
+void	Server::setFdEvents(int fd, uint32_t events)
+{
+	std::map<int, Connection *>::iterator it = _connects.find(fd);
+	if (it == _connects.end())
+		return ;
+	_loop.modHandler(it->second, events);
 }
 
 void	Server::run(void)	// create poll, listener, connection
 {
-	_loop.run();
-	
-	
-	
-	// Listener	listener(_hostname, _port);
-	
-	// int	socket;
-	// if ((socket = listener.getListenerFd()) == -1)
-	// 	throw std::runtime_error("server: error getting listener socket");
-	
-	// add_to_poll(socket);
-	// std::cout << "Server: waiting for connections ..." << std::endl;
-	
-	// while (true) //need to change to signal
-	// {
-	// 	int	poll_count = poll(&_pfds[0], _pfds.size(), -1);
-	// 	if (poll_count < 0)
-	// 		throw std::runtime_error("server: poll: error");
+	while (1) // or signal!!!
+	{
+		// perform the signle poll iteration
+		_loop.run();
+		
+		// process removals requested during handlers
+		if (!_fdToClose.empty())
+		{
+			for (size_t i = 0; i < _fdToClose.size(); ++i)
+			{
+				int fd = _fdToClose[i];
+				std::map<int, Connection *>::iterator it = _connects.find(fd);
+				if (it != _connects.end())
+				{
+					_loop.removeHandler(fd);
+					delete it->second;
+					_connects.erase(it);
+				}
+			}
+			_fdToClose.clear();
+		}
+	}
+}
 
-	// 	for (int i = 0; i < _pfds.size(); ++i) // check if there's fd is ready to read
-	// 	{
-	// 		if (_pfds[i].revents != 0)
-	// 		{
-	// 			if (_pfds[i].fd == socket)	// new connection
-	// 			{
-	// 				add_to_poll(socket);
-	// 				std::cout << "new connection on socket [" << socket << "]" << std::endl;
-	// 			}
-	// 			else
-	// 				Connection connect(socket, _pfds[i].revents);
-	// 		}
-	// 	}
-			
-	// }
-
+void	Server::acceptNewConnection(int clientFd)
+{
+	if (clientFd < 0)
+		return ;
+	// create connection object and register with the loop
+	Connection	*c = new Connection(this, clientFd);
+	_connects[clientFd] = c;
+	_loop.addHandler(c, POLLIN);
+	std::cout << "New connection accepted through fd=[" << clientFd << "]..." << std::endl;
 }
