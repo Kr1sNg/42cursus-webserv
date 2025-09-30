@@ -24,28 +24,28 @@ class Locationconfig
         };
 
         int _flags;
-        const std::map<std::string, _directiveFlag> _validDirective;
-
+        static const std::map<std::string, _directiveFlag> _validDirective;
+        static const std::map<std::string, void(Locationconfig::*)(const std::vector<std::string>&)> _directiveHandler;
     public :
         Locationconfig();
         ~Locationconfig();
         Locationconfig(const Locationconfig& obj);
         Locationconfig& operator=(const Locationconfig& obj);
 
-        void setRoot(const std::string& root);
+        void setRoot(const std::vector<std::string>& root);
         const std::string& getRoot(void) const;
-        void setIndex(const std::string& index);
+        void setIndex(const std::vector<std::string>& index);
         const std::string& getIndex(void) const;
-        void setAutoindex(const bool& autoindex);
+        void setAutoindex(const std::vector<std::string>& autoindex);
         const bool& getAutoindex(void) const;
-        void setMethod(const std::vector<std::string>& methods);
+        void setMethods(const std::vector<std::string>& methods);
         const std::vector<std::string>& getMethods(void) const;
         void setCgi_pass(const std::string& cgi_pass);
         const std::string& getCgi_pass(void) const;
         void setRedirect(const std::string& redirect);
         const std::string& getRedirect(void) const;
 
-        bool Locationconfig::validDirective(const std::string& directive) const;
+        void addDirective(const Directive& directive);
 };
 
 #endif

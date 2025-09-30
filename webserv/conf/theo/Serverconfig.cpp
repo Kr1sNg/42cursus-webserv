@@ -68,8 +68,8 @@ const std::vector<int>& Serverconfig::getListen(void) const
 
 void Serverconfig::setServer_name(const std::vector<std::string>& server_name)
 {
-     if (server_name.size() > 1)
-        //error
+    //  if (server_name.size() > 1)
+    //     //error
     _server_name.push_back(server_name[0]);
 }
 
@@ -80,8 +80,8 @@ const std::vector<std::string>& Serverconfig::getServer_name(void) const
 
 void Serverconfig::setRoot(const std::vector<std::string>& root)
 {
-    if (root.size() > 1)
-        //error
+    // if (root.size() > 1)
+    //     //error
     if (_flags & _validDirective.at("root"))
     {
         std::cout << "Error : root directive already defined in this location" << std::endl;
@@ -101,8 +101,8 @@ const std::string& Serverconfig::getRoot(void) const
 void Serverconfig::addError_page(const std::vector<std::string>& error_page)
 {
     int index = std::stoi(error_page[0]);
-    if (error_page.size() != 2)
-        //error
+    // if (error_page.size() != 2)
+    //     //error
     if (_error_pages.find(index) != _error_pages.end())
     {
         std::cout << "Error : Page" << index << "already defined in this location" << std::endl;
@@ -122,8 +122,8 @@ const std::map<int, std::string>& Serverconfig::getError_pages(void) const
 
 void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max_body_size)
 {
-     if (client_max_body_size.size() != 1)
-        //error
+    //  if (client_max_body_size.size() != 1)
+    //     //error
     if (_flags & _validDirective.at("_client_max_body_size"))
     {
         std::cout << "Error : _client_max_body_size directive already defined in this location" << std::endl;
