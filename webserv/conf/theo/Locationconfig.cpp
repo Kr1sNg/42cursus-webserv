@@ -1,36 +1,43 @@
 #include "generalTest.hpp"
 
-const std::map<std::string, Locationconfig::_directiveFlag> Locationconfig::_validDirective = {
-    {"index", Locationconfig::INDEX},
-    {"root", Locationconfig::ROOT},
-    {"autoindex", Locationconfig::AUTOINDEX},
-    {"methods", Locationconfig::METHODS},
-    {"cgipass", Locationconfig::CGIPASS},
-    {"redirect", Locationconfig::REDIRECT}
-};
+std::map<std::string, Locationconfig::_directiveFlag> Locationconfig::_validDirective;
+std::map<std::string, void(Locationconfig::*)(const std::vector<std::string>&)> Locationconfig::_directiveHandler;
 
-const std::map<std::string, void(Locationconfig::*)(const std::vector<std::string>&)> Locationconfig::_directiveHandler = {
-    {"index", &Locationconfig::setIndex},
-    {"root", &Locationconfig::setRoot},
-    {"autoindex", &Locationconfig::setAutoindex},
-    {"methods", &Locationconfig::setMethods},
-    {"cgipass", &Locationconfig::setCgi_pass},
-    {"redirect", &Locationconfig::setRedirect},
-};
+void Locationconfig::initStatics()
+{
+    _validDirective["index"] = INDEX;
+    _validDirective["root"] = ROOT;
+    _validDirective["autoindex"] = AUTOINDEX;
+    _validDirective["methods"] = METHODS;
+    _validDirective["cgipass"] = CGIPASS;
+    _validDirective["redirect"] = REDIRECT;
+
+    _directiveHandler["index"] = &Locationconfig::setIndex;
+    _directiveHandler["root"] = &Locationconfig::setRoot;
+    _directiveHandler["autoindex"] = &Locationconfig::setAutoindex;
+    _directiveHandler["methods"] = &Locationconfig::setMethods;
+    _directiveHandler["cgipass"] = &Locationconfig::setCgi_pass;
+    _directiveHandler["redirect"] = &Locationconfig::setRedirect;
+}
 
 Locationconfig::Locationconfig()
 {
-
+    initStatics();
+    _flags = 0;
 }
 
 Locationconfig::Locationconfig(const Locationconfig& obj)
 {
+    initStatics();
+
     _root = obj._root;
     _index = obj._index;
     _autoindex = obj._autoindex;
     _methods = obj._methods;
     _cgi_pass = obj._cgi_pass;
     _redirect = obj._redirect;
+
+    _flags = 0;
 }
 
 Locationconfig& Locationconfig::operator=(const Locationconfig& obj)
@@ -139,7 +146,7 @@ const std::vector<std::string>& Locationconfig::getMethods(void) const
     return (_methods);
 }
 
-void Locationconfig::setCgi_pass(const std::string& cgi_pass)
+void Locationconfig::setCgi_pass(const std::vector<std::string>& cgi_pass)
 {
     if (_flags & _validDirective.at("cgi_pass"))
     {
@@ -148,7 +155,7 @@ void Locationconfig::setCgi_pass(const std::string& cgi_pass)
     else
     {
         _flags |= _validDirective.at("cgi_pass");
-        _cgi_pass = cgi_pass;
+        _cgi_pass = cgi_pass[1];
     }
 }
 
@@ -158,7 +165,7 @@ const std::string& Locationconfig::getCgi_pass(void) const
 }
 
 
-void Locationconfig::setRedirect(const std::string& redirect)
+void Locationconfig::setRedirect(const std::vector<std::string>& redirect)
 {
     if (_flags & _validDirective.at("redirect"))
     {
@@ -167,9 +174,9 @@ void Locationconfig::setRedirect(const std::string& redirect)
     else
     {
         _flags |= _validDirective.at("redirect");
-        _redirect = redirect;
+        _redirect = redirect[0];
     }
-    _redirect = redirect;
+    _redirect = redirect[0];
 }
 
 const std::string& Locationconfig::getRedirect(void) const

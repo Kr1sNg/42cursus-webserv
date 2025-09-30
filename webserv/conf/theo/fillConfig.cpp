@@ -1,27 +1,36 @@
 #include "generalTest.hpp"
 
+void directiveLocation(const Block& block, Locationconfig locationconfig)
+{
+    size_t i = 0;
+
+    if (i < block.getDirectives().size())
+    {
+        locationconfig.addDirective(block.getDirectives()[i]);
+        i++;
+    }
+}
+
 void directiveServer(const Block& block, Serverconfig serverconfig)
 {
     size_t i = 0;
 
     while (i < block.getDirectives().size())
     {
-        if (serverconfig.validDirective(block.getDirectives()[i].getName()));
-        {
-            
-        }
+        serverconfig.addDirective(block.getDirectives()[i]);
         i++;
     }
 }
 
 Locationconfig checkLocation(const Block& block)
 {
-    size_t i = 0;
-
-    while (i < block.getBlocks().size())
-    {
-        i++;
-    }
+    Locationconfig locationconfig;
+    // if (block.getBlocks().size() != 0)
+    // {
+    //     //error
+    // }
+    directiveLocation(block, locationconfig);
+    return (locationconfig);
 }
 
 Serverconfig checkServer(const Block& block)
@@ -38,8 +47,8 @@ Serverconfig checkServer(const Block& block)
         
         i++;
     }
-    if (block.getBlocks().size() != 0)
-        //return error
+    // if (block.getBlocks().size() != 0)
+    //     //return error
     directiveServer(block, serverconfig);
     return (serverconfig);
 }
@@ -58,8 +67,9 @@ Config checkConfig(const Block& block)
             config.addServer(checkServer(block.getBlocks()[i]));
         i++;
     }
-    if (i != block.getBlocks().size())
-        //return error
-    if (block.getDirectives().size() != 0)
-        //return error
+    // if (i != block.getBlocks().size())
+    //     //return error
+    // if (block.getDirectives().size() != 0)
+    //     //return error
+    return (config);
 }
