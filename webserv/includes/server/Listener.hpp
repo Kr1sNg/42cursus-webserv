@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 14:52:04 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/26 15:58:35 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/30 11:22:24 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,21 @@
 # include "ILoop.hpp"
 # include "Connection.hpp"
 
+class Server;
+
 class Listener: public IEventHandler
 {
 	private:
-		PollLoop	*_loop;				// poll or epoll from class Server
-		char	*_hostname;			// e.g. localhost // 127.0.0.1
-		char	*_port;				// e.g. 8080
 		int		_listenerFd;	
+		Server	*_server;	// non-owning pointer
 	
-		
+		Listener	&operator=(Listener const &rhs);
 	public:
 		Listener(void);
-		Listener(PollLoop &loop, char *hostname, char *port);
+		Listener(Server *server, char *hostname, char *port);
 		Listener(Listener const &src);
-		Listener	&operator=(Listener const &rhs);
-		virtual ~Listener();
+		
+		virtual ~Listener();	// to be able to be called by PollLoop
 
 		virtual int		getFd(void) const;
 		virtual void	handleEvent(uint32_t events);

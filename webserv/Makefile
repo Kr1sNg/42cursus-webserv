@@ -6,7 +6,7 @@
 #    By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/26 17:42:09 by tat-nguy          #+#    #+#              #
-#    Updated: 2025/09/26 14:24:00 by tat-nguy         ###   ########.fr        #
+#    Updated: 2025/09/30 12:26:08 by tat-nguy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,6 +25,7 @@ NAME 		= webserv
 SRCS     	= src/main.cpp src/exception.cpp \
 				src/server/Server.cpp src/server/PollLoop.cpp \
 				src/server/Connection.cpp src/server/Listener.cpp \
+				src/HTTP/Request.cpp src/HTTP/Response.cpp \
 
 # Object Files
 OBJS = $(SRCS:.cpp=.o)

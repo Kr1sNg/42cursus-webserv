@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:34 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/26 15:57:51 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/09/30 11:47:23 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int main(int ac, char *av[])
 			
 		// run server here
 		
-		Server serv
+		Server serv;
 		serv.start(av[1], av[2]);
 		std::cout << "Server listening on port " << av[2] << std::endl;
 		serv.run();

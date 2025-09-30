@@ -29,8 +29,18 @@ class PollLoop
 		PollLoop	&operator=(PollLoop const &rhs);
 		~PollLoop();
 
+		// add handler and start monitoring events (POLLIN | POLLOUT flags)
 		void	addHandler(IEventHandler *handler, uint32_t events);
+
+		// change interest mask for an fd already registered
+		void	modHandler(IEventHandler *handler, uint32_t events);
+
+		// remove handler from poll and handlers map
 		void	removeHandler(int fd);
+
+		// execute ONE poll() iteration and dispatch events to handlers
+		// this method returns after dispatch so caller (Server) can process removals safely
+		// single iteration, call repeatedly from Server::sun()
 		void	run();
 		
 };

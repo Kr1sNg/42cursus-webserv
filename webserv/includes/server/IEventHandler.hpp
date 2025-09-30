@@ -15,6 +15,8 @@
 #ifndef _IEVENTHANDLER_HPP_
 # define _IEVENTHANDLER_HPP_
 
+# include "../webserv.hpp"
+
 class IEventHandler
 {
 	public:
