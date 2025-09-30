@@ -24,6 +24,12 @@ Locationconfig::Locationconfig()
 {
     initStatics();
     _flags = 0;
+    _root = "Default";
+    _index = "Default";
+    _autoindex = false;
+    // _methods = ;
+    _cgi_pass = "Default";
+    _redirect = "Default";
 }
 
 Locationconfig::Locationconfig(const Locationconfig& obj)
