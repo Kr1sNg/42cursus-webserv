@@ -36,13 +36,13 @@ Locationconfig::~Locationconfig()
 
 void Locationconfig::setRoot(const std::string& root)
 {
-    if (_flags & _validDirectives.at("root"))
+    if (_flags & _validDirective.at("root"))
     {
         std::cout << "Error : root directive already defined in this location" << std::endl;
     }
     else
     {
-        _flags |= _validDirectives.at("root");
+        _flags |= _validDirective.at("root");
         _root = root;
     }
 }
@@ -54,13 +54,13 @@ const std::string& Locationconfig::getRoot(void) const
 
 void Locationconfig::setIndex(const std::string& index)
 {
-    if (_flags & _validDirectives.at("index"))
+    if (_flags & _validDirective.at("index"))
     {
         std::cout << "Error : index directive already defined in this location" << std::endl;
     }
     else
     {
-        _flags |= _validDirectives.at("index");
+        _flags |= _validDirective.at("index");
         _index = index;
     }
 }
@@ -72,13 +72,13 @@ const std::string& Locationconfig::getIndex(void) const
 
 void Locationconfig::setAutoindex(const bool& autoindex)
 {
-    if (_flags & _validDirectives.at("autoindex"))
+    if (_flags & _validDirective.at("autoindex"))
     {
         std::cout << "Error : autoindex directive already defined in this location" << std::endl;
     }
     else
     {
-        _flags |= _validDirectives.at("autoindex");
+        _flags |= _validDirective.at("autoindex");
         _autoindex = autoindex;
     }
 }
@@ -90,13 +90,13 @@ const bool& Locationconfig::getAutoindex(void) const
 
 void Locationconfig::setMethod(const std::vector<std::string>& methods)
 {
-    if (_flags & _validDirectives.at("methods"))
+    if (_flags & _validDirective.at("methods"))
     {
         std::cout << "Error : methods directive already defined in this location" << std::endl;
     }
     else
     {
-        _flags |= _validDirectives.at("methods");
+        _flags |= _validDirective.at("methods");
         _methods = methods;
     }
 }
@@ -108,13 +108,13 @@ const std::vector<std::string>& Locationconfig::getMethods(void) const
 
 void Locationconfig::setCgi_pass(const std::string& cgi_pass)
 {
-    if (_flags & _validDirectives.at("cgi_pass"))
+    if (_flags & _validDirective.at("cgi_pass"))
     {
         std::cout << "Error : cgi_pass directive already defined in this location" << std::endl;
     }
     else
     {
-        _flags |= _validDirectives.at("cgi_pass");
+        _flags |= _validDirective.at("cgi_pass");
         _cgi_pass = cgi_pass;
     }
 }
@@ -127,13 +127,13 @@ const std::string& Locationconfig::getCgi_pass(void) const
 
 void Locationconfig::setRedirect(const std::string& redirect)
 {
-    if (_flags & _validDirectives.at("redirect"))
+    if (_flags & _validDirective.at("redirect"))
     {
         std::cout << "Error : redirect directive already defined in this location" << std::endl;
     }
     else
     {
-        _flags |= _validDirectives.at("redirect");
+        _flags |= _validDirective.at("redirect");
         _redirect = redirect;
     }
     _redirect = redirect;
@@ -146,7 +146,7 @@ const std::string& Locationconfig::getRedirect(void) const
 
 bool Locationconfig::validDirective(const std::string& directive) const
 {
-    if (_validDirectives.find(directive) == _validDirectives.end())
+    if (_validDirective.find(directive) == _validDirective.end())
     {
         std::cout << "Directive " << directive << " is invalid." << std::endl;
         return (true);

@@ -1,14 +1,23 @@
 #include "generalTest.hpp"
 
+const std::map<std::string, Serverconfig::_directiveFlag> Serverconfig::_validDirective = {
+    {"listen", Serverconfig::LISTEN},
+    {"root", Serverconfig::ROOT},
+    {"client_max_body_size", Serverconfig::CLIENT_MAX_BODY_SIZE},
+    {"error_page", Serverconfig::ERROR_PAGE}
+};
+
+const std::map<std::string, void(Serverconfig::*)(const std::vector<std::string>&)> Serverconfig::_directiveHandler = {
+    {"listen", &Serverconfig::setListen},
+    {"server_name", &Serverconfig::setServer_name},
+    {"root", &Serverconfig::setRoot},
+    {"error_page", &Serverconfig::addError_page},
+    {"client_max_body_size", &Serverconfig::setClient_max_size}
+};
+
 Serverconfig::Serverconfig()
 {
     _flags = 0;
-    const std::map<std::string, _directiveFlag> _validDirectives = {
-        {"listen", LISTEN},
-        {"root", ROOT},
-        {"client_max_body_size", CLIENT_MAX_BODY_SIZE},
-        {"error_page", ERROR_PAGE}
-    };
 }
 
 Serverconfig::Serverconfig(const Serverconfig& obj)
@@ -43,9 +52,9 @@ Serverconfig::~Serverconfig()
 
 void Serverconfig::setListen(const int& listen)
 {
-    if (!(_flags & _validDirectives.at("listen")))
+    if (!(_flags & _validDirective.at("listen")))
     {
-        _flags |= _validDirectives.at("listen");
+        _flags |= _validDirective.at("listen");
     }
     _listen.push_back(listen);
 }
@@ -67,13 +76,13 @@ const std::vector<std::string>& Serverconfig::getServer_name(void) const
 
 void Serverconfig::setRoot(const std::string& root)
 {
-    if (_flags & _validDirectives.at("root"))
+    if (_flags & _validDirective.at("root"))
     {
         std::cout << "Error : root directive already defined in this location" << std::endl;
     }
     else
     {
-        _flags |= _validDirectives.at("root");
+        _flags |= _validDirective.at("root");
         _root = root;
     }
 }
@@ -83,7 +92,7 @@ const std::string& Serverconfig::getRoot(void) const
     return (_root);
 }
 
-void Serverconfig::addError_pages(const int& index, const std::string& error_pages)
+void Serverconfig::addError_page(const int& index, const std::string& error_page)
 {
     if (_error_pages.find(index) != _error_pages.end())
     {
@@ -92,8 +101,8 @@ void Serverconfig::addError_pages(const int& index, const std::string& error_pag
     else
     {
         if (index == 404)
-            _flags |= _validDirectives.at("error_page");
-        _error_pages[index] = error_pages;
+            _flags |= _validDirective.at("error_page");
+        _error_pages[index] = error_page;
     }
 }
 
@@ -104,13 +113,13 @@ const std::map<int, std::string>& Serverconfig::getError_pages(void) const
 
 void Serverconfig::setClient_max_size(const size_t& client_max_body_size)
 {
-    if (_flags & _validDirectives.at("_client_max_body_size"))
+    if (_flags & _validDirective.at("_client_max_body_size"))
     {
         std::cout << "Error : _client_max_body_size directive already defined in this location" << std::endl;
     }
     else
     {
-        _flags |= _validDirectives.at("_client_max_body_size");
+        _flags |= _validDirective.at("_client_max_body_size");
         _client_max_body_size = client_max_body_size;
     }
 }
@@ -132,11 +141,16 @@ const std::vector<Locationconfig>& Serverconfig::getlocations(void) const
 
 bool Serverconfig::validDirective(const std::string& directive) const
 {
-    if (_validDirectives.find(directive) == _validDirectives.end())
+    if (_validDirective.find(directive) == _validDirective.end())
     {
         std::cout << "Directive " << directive << " is invalid." << std::endl;
         return (true);
     }
     else
         return (false);
+}
+
+void Serverconfig::addDirective(const std::vector& directive)
+{
+    _directiveHandle
 }

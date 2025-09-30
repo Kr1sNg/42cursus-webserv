@@ -13,7 +13,7 @@ class Config
         Config(const Config& obj);
         Config& operator=(const Config& obj);
 
-        void setServer(const Serverconfig& server);
+        void addServer(const Serverconfig& server);
         const std::vector<Serverconfig>& getServers(void) const;
 };
 

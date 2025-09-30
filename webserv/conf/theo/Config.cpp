@@ -24,7 +24,7 @@ Config::~Config()
 
 }
 
-void Config::setServer(const Serverconfig& server)
+void Config::addServer(const Serverconfig& server)
 {
     _servers.push_back(server);
 }

@@ -24,7 +24,7 @@ class Locationconfig
         };
 
         int _flags;
-        const std::map<std::string, _directiveFlag> _validDirectives;
+        const std::map<std::string, _directiveFlag> _validDirective;
 
     public :
         Locationconfig();
