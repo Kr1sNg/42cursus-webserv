@@ -1,6 +1,6 @@
 #include "generalTest.hpp"
 
-void directiveLocation(const Block& block, Locationconfig locationconfig)
+void directiveLocation(const Block& block, Locationconfig& locationconfig)
 {
     size_t i = 0;
 
@@ -11,7 +11,7 @@ void directiveLocation(const Block& block, Locationconfig locationconfig)
     }
 }
 
-void directiveServer(const Block& block, Serverconfig serverconfig)
+void directiveServer(const Block& block, Serverconfig& serverconfig)
 {
     size_t i = 0;
 
@@ -43,7 +43,7 @@ Serverconfig checkServer(const Block& block)
             break;
             //return error
         else
-            checkLocation(block.getBlocks()[i]);
+           checkLocation(block.getBlocks()[i]);
         
         i++;
     }

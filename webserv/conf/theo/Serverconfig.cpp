@@ -167,7 +167,7 @@ void Serverconfig::addlocation(const Locationconfig& location)
     _locations.push_back(location);
 }
 
-const std::vector<Locationconfig>& Serverconfig::getlocations(void) const
+const std::vector<Locationconfig>& Serverconfig::getLocations(void) const
 {
     return (_locations);
 }
