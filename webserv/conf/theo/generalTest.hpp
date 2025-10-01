@@ -20,4 +20,6 @@ Block  createBlock(std::vector<std::string> list, size_t *i);
 void display(const Block& block);
 void displayInfos(const Block& block);
 Config checkConfig(const Block& block);
+Block createMain(std::vector<std::string> list, size_t *i);
+
 #endif
