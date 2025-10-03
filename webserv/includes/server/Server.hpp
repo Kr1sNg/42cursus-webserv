@@ -46,7 +46,7 @@ class Server
 		~Server();
 
 		// create listener and register it
-		void	start(char *hostname, char *port);
+		void	start(const char *hostname, const char *port);
 		
 		// mark a client fd to be removed after current dispatch iteration
 		void	markForClose(int clientFd);

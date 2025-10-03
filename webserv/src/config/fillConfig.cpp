@@ -1,4 +1,5 @@
-#include "generalTest.hpp"
+#include "../../includes/config/generalconfig.hpp"
+#include "../../includes/webserv.hpp"
 
 void directiveLocation(const Block& block, Locationconfig& locationconfig)
 {

@@ -1,4 +1,4 @@
-#include "generalTest.hpp"
+#include "../../includes/webserv.hpp"
 
 std::map<std::string, Locationconfig::_directiveFlag> Locationconfig::_validDirective;
 std::map<std::string, void(Locationconfig::*)(const std::vector<std::string>&)> Locationconfig::_directiveHandler;
@@ -9,14 +9,14 @@ void Locationconfig::initStatics()
     _validDirective["root"] = ROOT;
     _validDirective["autoindex"] = AUTOINDEX;
     _validDirective["methods"] = METHODS;
-    _validDirective["cgi_pass"] = CGIPASS;
+    _validDirective["cgipass"] = CGIPASS;
     _validDirective["redirect"] = REDIRECT;
 
     _directiveHandler["index"] = &Locationconfig::setIndex;
     _directiveHandler["root"] = &Locationconfig::setRoot;
     _directiveHandler["autoindex"] = &Locationconfig::setAutoindex;
     _directiveHandler["methods"] = &Locationconfig::setMethods;
-    _directiveHandler["cgi_pass"] = &Locationconfig::setCgi_pass;
+    _directiveHandler["cgipass"] = &Locationconfig::setCgi_pass;
     _directiveHandler["redirect"] = &Locationconfig::setRedirect;
 }
 
@@ -42,6 +42,13 @@ Locationconfig::Locationconfig(const Locationconfig& obj)
     _methods = obj._methods;
     _cgi_pass = obj._cgi_pass;
     _redirect = obj._redirect;
+
+    _root = "Default";
+    _index = "Default";
+    _autoindex = false;
+    // _methods = ;
+    _cgi_pass = "Default";
+    _redirect = "Default";
 
     _flags = 0;
 }

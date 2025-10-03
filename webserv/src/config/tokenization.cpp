@@ -1,4 +1,4 @@
-#include "generalTest.hpp"
+#include "../../includes/webserv.hpp"
 
 void displayInfos(const Block& block)
 {
@@ -130,21 +130,20 @@ void tokenization(std::vector<std::string> &token_list, std::string &token)
     }
 }
 
-int main(int ac, char **av)
+Config configfile(char *name)
 {
     std::vector<std::string> token_list;
-    std::ifstream file(av[1]);
+    std::ifstream file(name);
     std::string line;
     std::string token;
     size_t i;
     Block block;
     Config config;
-    if (ac != 2)
-        std::cout << "Eroor : not enough arguments" << std::endl;
+
     if (!file.is_open())
     {
         std::cout << "Error : failed open file" << std::endl;
-        return (1);
+        return (config);
     }
     while (std::getline(file, line))
     {
@@ -177,6 +176,6 @@ int main(int ac, char **av)
     block = createMain(token_list, &i);
     // display(block);
     config = checkConfig(block);
-    displayConfig(config);
-    return (0);
+    // displayConfig(config);
+    return (config);
 }

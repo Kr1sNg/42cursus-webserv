@@ -38,6 +38,7 @@
 # include "Response.hpp"
 # include "Request.hpp"
 
+# include "config/generalconfig.hpp" 
 
 // function
 void	throwErrno(std::string const &reason);

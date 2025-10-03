@@ -46,7 +46,7 @@ Server::~Server()
 	_connects.clear();
 }
 
-void	Server::start(char *hostname, char *port)
+void	Server::start(const char *hostname, const char *port)
 {
 	_listener = new Listener(this, hostname, port);
 	_loop.addHandler(_listener, POLLIN);

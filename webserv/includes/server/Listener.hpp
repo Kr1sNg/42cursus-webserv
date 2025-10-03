@@ -29,7 +29,7 @@ class Listener: public IEventHandler
 		Listener	&operator=(Listener const &rhs);
 	public:
 		Listener(void);
-		Listener(Server *server, char *hostname, char *port);
+		Listener(Server *server, const char *hostname, const char *port);
 		Listener(Listener const &src);
 		
 		virtual ~Listener();	// to be able to be called by PollLoop
