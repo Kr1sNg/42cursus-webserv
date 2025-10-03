@@ -15,7 +15,7 @@
 #include "../../includes/server/Connection.hpp"
 #include "../../includes/server/Server.hpp"
 
-static int	make_listen_socket(char *hostname, char *port)
+static int	make_listen_socket(const char *hostname, const char *port)
 {
 	int	status;
 	int listenerFd = -1;
@@ -69,7 +69,7 @@ Listener::Listener(void)
 {
 }
 
-Listener::Listener(Server *server, char *hostname, char *port):
+Listener::Listener(Server *server, const char *hostname, const char *port):
 			_listenerFd(-1),
 			_server(server)
 {

@@ -17,16 +17,21 @@ int main(int ac, char *av[])
 {
 	try
 	{
+
 		// if (ac != 2)
 		// 	throw std::length_error("Usage: ./webserv [configuration file]");
 		
-		if (ac != 3)
-			throw std::length_error("Usage: ./webserv [hostname] [PORT]");
+		if (ac != 2)
+			throw std::length_error("Usage: ./webserv [.config]");
 			
 		// run server here
 		
-		Server serv;
-		serv.start(av[1], av[2]);
+		Server serv; 
+		Config config;
+
+		config = configfile(av[1]);
+
+		serv.start(config.getServers()[0].getServer_name()[0].c_str(), config.getServers()[0].getListen()[0].c_str());
 		std::cout << "Server listening on port " << av[2] << std::endl;
 		serv.run();
 		
