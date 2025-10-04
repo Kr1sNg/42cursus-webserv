@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/30 11:47:07 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/04 18:18:52 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,28 +25,32 @@ The server also owns removal of connections
 # include "Listener.hpp"
 # include "ILoop.hpp"
 # include "Connection.hpp"
+# include "../config/Config.hpp"
 
 class Server
 {
 	private:
-		char	*_hostname;	//from file.conf
-		char	*_port;		//from file.conf
+		// char	*_hostname;	//from file.conf
+		// char	*_port;		//from file.conf
+		Config		_config;
+		
 		PollLoop	_loop;
 		Listener	*_listener; // owned by server
 		std::map<int, Connection *> _connects;	// active connections
 		std::vector<int>	_fdToClose; // fds requested to close (processed after poll dispatch)
-
-
 		
+		
+
+		Server(void);
 		Server(Server const &src);
 		Server	&operator=(Server const &rhs);
 		
 	public:
-		Server(void);
+		Server(Config &config);
 		~Server();
 
-		// create listener and register it
-		void	start(const char *hostname, const char *port);
+		// // create listener and register it
+		// void	start(const char *hostname, const char *port);
 		
 		// mark a client fd to be removed after current dispatch iteration
 		void	markForClose(int clientFd);
