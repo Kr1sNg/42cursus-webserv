@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:34 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/30 11:47:23 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/04 18:19:41 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,22 +17,13 @@ int main(int ac, char *av[])
 {
 	try
 	{
-
-		// if (ac != 2)
-		// 	throw std::length_error("Usage: ./webserv [configuration file]");
-		
+		(void)av;
 		if (ac != 2)
-			throw std::length_error("Usage: ./webserv [.config]");
-			
-		// run server here
+			throw std::length_error("Usage: ./webserv [configuration file]");
 		
-		Server serv; 
-		Config config;
-
-		config = configfile(av[1]);
-
-		serv.start(config.getServers()[0].getServer_name()[0].c_str(), config.getServers()[0].getListen()[0].c_str());
-		std::cout << "Server listening on port " << av[2] << std::endl;
+		Config config = configfile(av[1]);
+		Server serv(config);
+	
 		serv.run();
 		
 	}

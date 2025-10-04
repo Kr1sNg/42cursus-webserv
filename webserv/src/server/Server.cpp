@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/30 11:55:34 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/04 18:17:38 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,13 @@
 #include "../../includes/server/Server.hpp"
 #include "../../includes/webserv.hpp"
 #include "../../includes/server/Listener.hpp"
-// #include "../../includes/server/EpollLoop.hpp"
 #include "../../includes/server/PollLoop.hpp"
+#include "../../includes/config/Config.hpp"
 
-// Server::Server(char *hostname, char *port): _hostname(hostname), _port(port)
-// {
-// 	_listeners = new Listener(this, _hostname, _port);
-// 	_loop.addHandler(_listener, POLLIN);
-// }
-
-Server::Server(void): _listener(NULL)
+Server::Server(Config &config): _config(config)
 {
+	_listener = new Listener(this, config.getServers()[0].getServer_name()[0].c_str(), config.getServers()[0].getListen()[0].c_str());
+	_loop.addHandler(_listener, POLLIN);
 }
 
 Server::~Server()
@@ -46,11 +42,11 @@ Server::~Server()
 	_connects.clear();
 }
 
-void	Server::start(const char *hostname, const char *port)
-{
-	_listener = new Listener(this, hostname, port);
-	_loop.addHandler(_listener, POLLIN);
-}
+// void	Server::start(const char *hostname, const char *port)
+// {
+// 	_listener = new Listener(this, hostname, port);
+// 	_loop.addHandler(_listener, POLLIN);
+// }
 
 void	Server::markForClose(int clientFd)
 {
