@@ -17,14 +17,20 @@
 # include <map>
 # include <iostream>
 
-struct Response {
-	std::string	version; //HTTP v1.1
-	int 		status; //200, 404, 500
-	std::string	reason; //"OK", "Not Found"
-	std::map<std::string, std::string> headers; // key/value : "Content-type/length"
-	std::string	body; //Body for the HTTP POST mode.
+class Response {
+	private:
+		std::string	_version; //HTTP v1.1
+		int 		_status; //200, 404, 500
+		std::string	_reason; //"OK", "Not Found"
+		std::map<std::string, std::string> _headers; // key/value : "Content-type/length"
+		std::string	_body; //Body for the HTTP POST mode.
 
-	Response();
+		Response(const Response &cpy);
+		Response	&operator=(const Response &other);
+
+	public:
+		Response();
+		~Response();
 
 	std::string toString() const;
 };
