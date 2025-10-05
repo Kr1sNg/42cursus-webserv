@@ -26,14 +26,19 @@
 */
 
 
-struct Request {
-	std::string method; //GET, POST, DELETE
-	std::string uri; //ressources path
-	std::string version; //ex : (HTTP/1.1)
-	std::map<std::string, std::string> headers; //check explanation
-	std::string body; // body of the http request POST
+class Request {
+	private:
+		std::string _method; //GET, POST, DELETE
+		std::string _uri; //ressources path
+		std::string _version; //ex : (HTTP/1.1)
+		std::map<std::string, std::string> _headers; //check explanation
+		std::string _body; // body of the http request POST
+		Request(const Request &cpy);
+		Request &operator=(const Request &other);
 
-	Request();
+	public:
+		Request();
+		~Request();
 };
 
 Request	parseHTTPRequest(const std::string &rawRequest);

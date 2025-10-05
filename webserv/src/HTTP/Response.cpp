@@ -1,34 +1,24 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Response.cpp                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/18 13:03:16 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/09/26 13:40:44 by cfiachet         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "../../includes/webserv.hpp"
+#include "../includes/Response.hpp"
 
 Response::Response()
-	: version("HTTP/1.1"),
-	status(200),
-	reason("OK"),
-	headers(),
-	body() {
+    : _version("HTTP/1.1"), _status(200), _reason("OK"),
+    _headers("", ""), _body("") {
 }
 
-std::string Response::toString() const {
-	std::ostringstream oss;
+Response::Response(const Response &cpy)
+    : _version(cpy._version), _status(cpy._status), _reason(cpy._reason),
+    _headers(cpy._headers), _body(cpy._body) {
+}
 
-	oss << version << " " << status << " " << reason << "\r\n";
-	std::map<std::string, std::string>::const_iterator it;
-	for (it = headers.begin(); it != headers.end(); ++it)
-		oss << it->first << ": " << it->second << "\r\n";
-	oss << "\r\n";
-	oss << body;
+Response &Response::operator=(const Response &other) {
+    if (this != &other) {
+        _version = other._version;
+        _status = other._status;
+        _reason = other._reason;
+        _headers = other._headers;
+        _body = other._body;
+    }
+}
 
-	return oss.str();
+Response::~Response() {
 }

@@ -39,7 +39,7 @@ int		Connection::getFd(void) const
 	return (_clientFd);	
 }
 
-bool	Connection::recvIntoBuffer(void)
+bool	Connection::recvIntoBuffer(void) //receive 
 {
 	char buf[4096];
 
@@ -55,7 +55,7 @@ bool	Connection::recvIntoBuffer(void)
 	return true;
 }
 
-bool	Connection::flushOutBuffer(void)
+bool	Connection::flushOutBuffer(void) //send
 {
 	while (!_outBuf.empty())
 	{
