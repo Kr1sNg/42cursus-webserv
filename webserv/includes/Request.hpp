@@ -33,14 +33,29 @@ class Request {
 		std::string _version; //ex : (HTTP/1.1)
 		std::map<std::string, std::string> _headers; //check explanation
 		std::string _body; // body of the http request POST
-		Request(const Request &cpy);
-		Request &operator=(const Request &other);
 
 	public:
 		Request();
 		~Request();
+		Request(const Request &cpy);
+		Request &operator=(const Request &other);
+
+	/*getter*/
+	const std::string &getMethod() const;
+	const std::string &getUri() const;
+	const std::string &getVersion() const;
+	const std::map<std::string, std::string> &getHeaders() const;
+	const std::string &getBody() const;
+
+	/*setter*/
+	void setMethod(const std::string &method);
+	void setUri(const std::string &uri);
+	void setVersion(const std::string &version);
+	void setHeaders(const std::map<std::string, std::string> &headers);
+	void setBody(const std::string &body);
+
+	Request	parserForRequest(const std::string &ogRequest);
 };
 
-Request	parseHTTPRequest(const std::string &rawRequest);
 
 #endif
