@@ -72,6 +72,7 @@ Serverconfig::~Serverconfig()
 void Serverconfig::setListen(const std::vector<std::string>& listen)
 {
     size_t i = 0;
+    size_t pos;
 
     if (listen.size() > 1)
         //error
@@ -81,12 +82,25 @@ void Serverconfig::setListen(const std::vector<std::string>& listen)
     }
     while (i < listen.size())
     {
-        _listen.push_back(listen[i]);
+        pos = listen[i].find(':');
+        std::pair<const char *, const char *> id;
+    
+        if (pos != std::string::npos)
+        {
+            id.first = listen[i].substr(0, pos).c_str();
+            id.second = listen[i].substr(pos + 1).c_str();
+        }
+        else
+        {
+            id.first = "127.0.0.1";
+            id.second = listen[i].c_str();
+        }
+        _listen.push_back(id);
         i++;
     } 
 }
 
-const std::vector<std::string>& Serverconfig::getListen(void) const
+const std::vector<std::pair<const char *, const char *> >& Serverconfig::getListen(void) const
 {
     return (_listen);
 }

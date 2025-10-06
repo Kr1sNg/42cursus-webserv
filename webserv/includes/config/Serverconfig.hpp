@@ -6,7 +6,7 @@
 class Serverconfig
 {
     private :
-        std::vector<std::string> _listen;
+        std::vector<std::pair<const char *, const char *> > _listen;
         std::vector<std::string> _server_name;
         std::string _root;
         std::map<int, std::string> _error_pages;
@@ -32,7 +32,7 @@ class Serverconfig
 
         void initStatics();
         void setListen(const std::vector<std::string>& listen);
-        const std::vector<std::string>& getListen(void) const;
+        const std::vector<std::pair<const char *, const char *> >& getListen(void) const;
         void setServer_name(const std::vector<std::string>& server_name);
         const std::vector<std::string>& getServer_name(void) const;
         void setRoot(const std::vector<std::string>& root);

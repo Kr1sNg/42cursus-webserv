@@ -9,14 +9,14 @@ void Locationconfig::initStatics()
     _validDirective["root"] = ROOT;
     _validDirective["autoindex"] = AUTOINDEX;
     _validDirective["methods"] = METHODS;
-    _validDirective["cgipass"] = CGIPASS;
+    _validDirective["cgi_pass"] = CGIPASS;
     _validDirective["redirect"] = REDIRECT;
 
     _directiveHandler["index"] = &Locationconfig::setIndex;
     _directiveHandler["root"] = &Locationconfig::setRoot;
     _directiveHandler["autoindex"] = &Locationconfig::setAutoindex;
     _directiveHandler["methods"] = &Locationconfig::setMethods;
-    _directiveHandler["cgipass"] = &Locationconfig::setCgi_pass;
+    _directiveHandler["cgi_pass"] = &Locationconfig::setCgi_pass;
     _directiveHandler["redirect"] = &Locationconfig::setRedirect;
 }
 
@@ -168,7 +168,7 @@ void Locationconfig::setCgi_pass(const std::vector<std::string>& cgi_pass)
     else
     {
         _flags |= _validDirective.at("cgi_pass");
-        _cgi_pass = cgi_pass[1];
+        _cgi_pass = cgi_pass[0];
     }
 }
 
