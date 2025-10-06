@@ -55,6 +55,7 @@ class Request {
 	void setBody(const std::string &body);
 
 	Request	parserForRequest(const std::string &ogRequest);
+	void addHeader(const std::string &key, const std::string &val);
 };
 
 
