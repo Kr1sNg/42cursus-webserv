@@ -31,8 +31,24 @@ class Response {
 	public:
 		Response();
 		~Response();
+		Response(const Response &cpy);
+		Response	&operator=(const Response &other);
 
-	std::string toString() const;
+	// std::string toString() const;
+	/*getters*/
+	std::string	getVersion() const;
+	int			getStatus() const;
+	std::string	getReason() const;
+	std::map<std::string, std::string> getHeaders() const;
+	std::string	getBody() const;
+
+	/*setters*/
+	void	setVersion(const std::string &version);
+	void	setStatus(const int &statut);
+	void	setReason(const std::string &reason);
+	void	setHeaders(const std::map<std::string, std::string> &headers);
+	void	setBody(const std::string &body);
+	
 };
 
 #endif

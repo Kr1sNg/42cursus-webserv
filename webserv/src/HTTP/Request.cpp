@@ -25,3 +25,45 @@ Request &Request::operator=(const Request &other) {
 
 Request::~Request() {
 }
+
+/*getters*/
+const std::string &Request::getMethod() const {
+    return _method;
+}
+
+const std::string &Request::getUri() const {
+    return _uri;
+}
+
+const std::string &Request::getVersion() const {
+    return _version;
+}
+
+const std::map<std::string, std::string> &Request::getHeaders() const {
+    return _headers;
+}
+
+const std::string &Request::getBody() const {
+    return _body;
+}
+
+/*setters*/
+void Request::setMethod(const std::string &method) {
+    _method = method;
+}
+
+void Request::setUri(const std::string &uri) {
+    _uri = uri;
+}
+
+void Request::setVersion(const std::string &version) {
+    _version = version;
+}
+
+void Request::setHeaders(const std::map<std::string, std::string> &headers) {
+    _headers = headers;
+}
+
+void Request::setBody(const std::string &body) {
+    _body = body;
+}

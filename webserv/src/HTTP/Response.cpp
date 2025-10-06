@@ -22,3 +22,45 @@ Response &Response::operator=(const Response &other) {
 
 Response::~Response() {
 }
+
+/*getters*/
+std::string	Response::getVersion() const {
+    return _version;
+}
+
+int			Response::getStatus() const {
+    return _status;
+}
+
+std::string	Response::getReason() const {
+    return _reason;
+}
+
+std::map<std::string, std::string> Response::getHeaders() const {
+    return _headers;
+}
+
+std::string	Response::getBody() const {
+    return _body;
+}
+
+/*setters*/
+void	Response::setVersion(const std::string &version) {
+    _version = version;
+}
+
+void	Response::setStatus(const int &statut) {
+    _status = statut;
+}
+
+void    Response::setReason(const std::string &reason) {
+    _reason = reason;
+}
+
+void	Response::setHeaders(const std::map<std::string, std::string> &headers) {
+    _headers = headers;
+}
+
+void	Response::setBody(const std::string &body) {
+    _body = body;
+}
