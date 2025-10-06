@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/30 13:45:34 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:59:54 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 #include "../../includes/server/Connection.hpp"
 #include "../../includes/server/PollLoop.hpp"
 #include "../../includes/server/Server.hpp"
-#include "../../includes/Request.hpp"
-#include "../../includes/Response.hpp"
+// #include "../../includes/Request.hpp"
+// #include "../../includes/Response.hpp"
 
 Connection::Connection(void) {}
 

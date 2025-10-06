@@ -74,8 +74,8 @@ void Serverconfig::setListen(const std::vector<std::string>& listen)
     size_t i = 0;
     size_t pos;
 
-    if (listen.size() > 1)
-        //error
+    // if (listen.size() > 1)
+    //     //error
     if (!(_flags & _validDirective.at("listen")))
     {
         _flags |= _validDirective.at("listen");
@@ -83,26 +83,28 @@ void Serverconfig::setListen(const std::vector<std::string>& listen)
     while (i < listen.size())
     {
         pos = listen[i].find(':');
-        std::pair<const char *, const char *> id;
+        std::pair<std::string, std::string> id;
     
         if (pos != std::string::npos)
         {
-            id.first = listen[i].substr(0, pos).c_str();
-            id.second = listen[i].substr(pos + 1).c_str();
+            id.first = listen[i].substr(0, pos);
+            id.second = listen[i].substr(pos + 1);
         }
         else
         {
             id.first = "127.0.0.1";
-            id.second = listen[i].c_str();
+            id.second = listen[i];
         }
         _listen.push_back(id);
         i++;
-    } 
+    }
 }
 
-const std::vector<std::pair<const char *, const char *> >& Serverconfig::getListen(void) const
+const std::pair<std::string, std::string>& Serverconfig::getListen(size_t index) const
 {
-    return (_listen);
+    if ((index >= 0) && (index < _listen.size()))
+        return (_listen[index]);
+    throw std::length_error("Serverconfig: ListenSize: Out of range");
 }
 
 void Serverconfig::setServer_name(const std::vector<std::string>& server_name)
@@ -112,9 +114,11 @@ void Serverconfig::setServer_name(const std::vector<std::string>& server_name)
     _server_name.push_back(server_name[0]);
 }
 
-const std::vector<std::string>& Serverconfig::getServer_name(void) const
+const std::string& Serverconfig::getServer_name(size_t index) const
 {
-    return (_server_name);
+    if ((index >= 0) && (index < _server_name.size()))
+        return (_server_name[index]);
+    throw std::length_error("Serverconfig: Server_name: Out of range");
 }
 
 void Serverconfig::setRoot(const std::vector<std::string>& root)
@@ -207,4 +211,9 @@ void Serverconfig::addDirective(const Directive& directive)
     {
         std::cout << "Directive " << directive.getName() << " is invalid." << std::endl;
     }
+}
+
+size_t  Serverconfig::getListenSize(void) const
+{
+    return (_listen.size());
 }

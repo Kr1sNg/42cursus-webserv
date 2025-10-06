@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/04 18:18:52 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:55:55 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,14 @@ The server also owns removal of connections
 # include "ILoop.hpp"
 # include "Connection.hpp"
 # include "../config/Config.hpp"
+# include "../config/Serverconfig.hpp"
 
 class Server
 {
 	private:
 		// char	*_hostname;	//from file.conf
 		// char	*_port;		//from file.conf
-		Config		_config;
+		Serverconfig		_ServerConfig;
 		
 		PollLoop	_loop;
 		Listener	*_listener; // owned by server
@@ -46,7 +47,7 @@ class Server
 		Server	&operator=(Server const &rhs);
 		
 	public:
-		Server(Config &config);
+		Server(Serverconfig const &serverconfig);
 		~Server();
 
 		// // create listener and register it

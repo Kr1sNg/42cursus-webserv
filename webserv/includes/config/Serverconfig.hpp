@@ -6,7 +6,7 @@
 class Serverconfig
 {
     private :
-        std::vector<std::pair<const char *, const char *> > _listen;
+        std::vector<std::pair<std::string, std::string> > _listen;
         std::vector<std::string> _server_name;
         std::string _root;
         std::map<int, std::string> _error_pages;
@@ -32,9 +32,14 @@ class Serverconfig
 
         void initStatics();
         void setListen(const std::vector<std::string>& listen);
-        const std::vector<std::pair<const char *, const char *> >& getListen(void) const;
+        // const std::vector<std::pair<const char *, const char *> >& getListen(void) const;
+        std::pair<std::string, std::string> const &getListen(size_t index) const;
+        size_t  getListenSize(void) const;
+
         void setServer_name(const std::vector<std::string>& server_name);
-        const std::vector<std::string>& getServer_name(void) const;
+        // const std::vector<std::string>& getServer_name(void) const;
+        const std::string& getServer_name(size_t index) const;
+
         void setRoot(const std::vector<std::string>& root);
         const std::string& getRoot(void) const;
         void addError_page(const std::vector<std::string>& error_page);
@@ -45,6 +50,7 @@ class Serverconfig
         const std::vector<Locationconfig>& getLocations(void) const;
 
         void addDirective(const Directive& directive);
+
 };
 
 #endif
