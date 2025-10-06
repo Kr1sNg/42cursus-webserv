@@ -67,3 +67,7 @@ void Request::setHeaders(const std::map<std::string, std::string> &headers) {
 void Request::setBody(const std::string &body) {
     _body = body;
 }
+
+void Request::addHeader(const std::string &key, const std::string &val) {
+    _headers[key] = val;
+}
