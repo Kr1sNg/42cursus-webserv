@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/30 11:07:40 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:58:33 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@
 // # include <sys/epoll.h>
 # include <cstdlib>
 
-# include "Response.hpp"
-# include "Request.hpp"
+// # include "Response.hpp"
+// # include "Request.hpp"
 
 # include "config/generalconfig.hpp" 
 

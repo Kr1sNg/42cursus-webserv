@@ -1,4 +1,6 @@
 #include "../../includes/webserv.hpp"
+#include "../../includes/config/Config.hpp"
+#include "../../includes/config/Serverconfig.hpp"
 
 Config::Config()
 {
@@ -32,4 +34,17 @@ void Config::addServer(const Serverconfig& server)
 const std::vector<Serverconfig>& Config::getServers(void) const
 {
     return (_servers);
+}
+
+size_t  Config::getServersSize(void) const
+{
+    return (_servers.size());
+}
+
+Serverconfig const  &Config::getServerConfig(size_t index) const
+{
+    if ((index >= 0) && (index < _servers.size()))
+        return (_servers[index]);
+    else
+        throw std::length_error("Config: getServerConfig: Out of range");
 }

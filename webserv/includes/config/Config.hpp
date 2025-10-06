@@ -2,6 +2,7 @@
 # define CONFIG_H
 
 #include "generalconfig.hpp"
+#include "Serverconfig.hpp"
 
 class Config
 {
@@ -15,6 +16,9 @@ class Config
 
         void addServer(const Serverconfig& server);
         const std::vector<Serverconfig>& getServers(void) const;
+
+        size_t getServersSize(void) const;
+        Serverconfig const  &getServerConfig(size_t index) const;
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/04 18:17:38 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/06 18:54:25 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,16 @@
 #include "../../includes/server/PollLoop.hpp"
 #include "../../includes/config/Config.hpp"
 
-Server::Server(Config &config): _config(config)
+Server::Server(Serverconfig const &serverconfig): _ServerConfig(serverconfig)
 {
-	_listener = new Listener(this, config.getServers()[0].getServer_name()[0].c_str(), config.getServers()[0].getListen()[0].c_str());
-	_loop.addHandler(_listener, POLLIN);
+	size_t size = _ServerConfig.getListenSize();
+	
+	for (size_t i = 0; i < size; ++i)
+	{
+		_listener = new Listener(this, _ServerConfig.getListen(i).first.c_str(), _ServerConfig.getListen(i).second.c_str());
+		_loop.addHandler(_listener, POLLIN);
+	}
+	
 }
 
 Server::~Server()
