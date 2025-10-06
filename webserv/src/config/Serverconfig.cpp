@@ -114,11 +114,9 @@ void Serverconfig::setServer_name(const std::vector<std::string>& server_name)
     _server_name.push_back(server_name[0]);
 }
 
-const std::string& Serverconfig::getServer_name(size_t index) const
+const std::string& Serverconfig::getServer_name(void) const
 {
-    if ((index >= 0) && (index < _server_name.size()))
-        return (_server_name[index]);
-    throw std::length_error("Serverconfig: Server_name: Out of range");
+    return (_server_name[0]);
 }
 
 void Serverconfig::setRoot(const std::vector<std::string>& root)

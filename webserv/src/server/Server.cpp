@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/06 18:54:25 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/06 19:53:53 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,32 @@
 #include "../../includes/server/PollLoop.hpp"
 #include "../../includes/config/Config.hpp"
 
-Server::Server(Serverconfig const &serverconfig): _ServerConfig(serverconfig)
+// Server::Server(Serverconfig const &serverconfig): _ServerConfig(serverconfig)
+// {
+// 	size_t size = _ServerConfig.getListenSize();
+	
+// 	for (size_t i = 0; i < size; ++i)
+// 	{
+// 		_listener = new Listener(this, _ServerConfig.getListen(i).first.c_str(), _ServerConfig.getListen(i).second.c_str());
+// 		_loop.addHandler(_listener, POLLIN);
+// 	}
+	
+// }
+
+Server::Server(Config const &config): _config(config)
 {
-	size_t size = _ServerConfig.getListenSize();
+	size_t noofservers = _config.getServersSize();
 	
-	for (size_t i = 0; i < size; ++i)
+	for (size_t i = 0; i < noofservers; ++i)
 	{
-		_listener = new Listener(this, _ServerConfig.getListen(i).first.c_str(), _ServerConfig.getListen(i).second.c_str());
-		_loop.addHandler(_listener, POLLIN);
+		Serverconfig servconf = _config.getServerConfig(i);
+		size_t nooflistens = servconf.getListenSize();
+		for (size_t j = 0; j < nooflistens; ++j)
+		{
+			_listener = new Listener(this, servconf.getListen(j).first.c_str(), servconf.getListen(j).second.c_str());
+			_loop.addHandler(_listener, POLLIN);
+		}
 	}
-	
 }
 
 Server::~Server()
