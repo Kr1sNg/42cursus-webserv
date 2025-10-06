@@ -38,7 +38,7 @@ class Serverconfig
 
         void setServer_name(const std::vector<std::string>& server_name);
         // const std::vector<std::string>& getServer_name(void) const;
-        const std::string& getServer_name(size_t index) const;
+        const std::string& getServer_name(void) const;
 
         void setRoot(const std::vector<std::string>& root);
         const std::string& getRoot(void) const;
