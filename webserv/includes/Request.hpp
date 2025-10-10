@@ -60,6 +60,7 @@ class Request {
 	std::string getHeader(const std::string &keyword) const;
 	int verCheck(const std::string &version);
 	int methodCheck(const std::string &met);
+	void  parseFirstLine(std::string &line, Request &req);
 };
 
 
