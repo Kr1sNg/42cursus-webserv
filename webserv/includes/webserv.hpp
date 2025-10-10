@@ -35,8 +35,8 @@
 // # include <sys/epoll.h>
 # include <cstdlib>
 
-// # include "Response.hpp"
-// # include "Request.hpp"
+# include "Response.hpp"
+# include "Request.hpp"
 
 # include "config/generalconfig.hpp" 
 
@@ -44,5 +44,6 @@
 void	throwErrno(std::string const &reason);
 void	throwGaiError(std::string const &reason, int code);
 int		setNonBlocking(int fd);
+
 
 #endif

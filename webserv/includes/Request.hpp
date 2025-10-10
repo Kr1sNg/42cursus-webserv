@@ -56,6 +56,10 @@ class Request {
 
 	Request	parserForRequest(const std::string &ogRequest);
 	void addHeader(const std::string &key, const std::string &val);
+	void ContentLengthParser(Request &request);
+	std::string getHeader(const std::string &keyword) const;
+	int verCheck(const std::string &version);
+	int methodCheck(const std::string &met);
 };
 
 

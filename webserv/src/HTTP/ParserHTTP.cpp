@@ -1,5 +1,16 @@
 #include "../includes/webserv.hpp"
 
+int Request::methodCheck(const std::string &met) {
+    if (met != "GET" && met != "POST" && met != "DELETE")
+        return (0);
+    return (1);
+}
+
+int Request::verCheck(const std::string &version) {
+    if (version != "HTTP/1.1" && version != "HTTP/1.0")
+        return (0);
+    return (1);
+}
 
 const std::string trimSpace(const std::string &str) {
     size_t start = 0;
@@ -13,6 +24,13 @@ const std::string trimSpace(const std::string &str) {
     while (end > start && isspace(str[end]))
         end--;
     return (str.substr(start, end - start + 1));
+}
+
+std::string Request::getHeader(const std::string &search) const {
+    std::map<std::string, std::string>::const_iterator iterator = _headers.find(search);
+    if (iterator != _headers.end())
+        return iterator->second; // second here point the value of the key we are searching for
+    return "";
 }
 
 static void  parseFirstLine(std::string &line, Request &req) {
@@ -51,6 +69,22 @@ static void parsingForHeader(const std::string &line, Request &req) {
     req.addHeader(before, after);
 }
 
+void Request::ContentLengthParser(Request &request) {
+    // rechercher Request-Header dans le std::map
+    std::string existing_CL = request.getHeader("Content-Length");
+    // verifier si l'entête existe et que sa valeur n'est pas nulle
+    if (existing_CL.empty())
+        return ; // Content-Length not found
+    // Convertir sa valeur (string) en int
+    size_t contentLen = std::atoi(existing_CL.c_str()); // c_str convert the std::string in a const char *
+    std::string bodyCheck = request.getBody();
+    // Vérifier que sa valeur est bien un nombre valide (pas nul/correspondant au bodylen)
+    if (bodyCheck.size() < contentLen)
+        std::cerr << "Error: body is too short" << std::endl;
+    else if (bodyCheck.size() > contentLen)
+        request.setBody(bodyCheck.substr(0, contentLen));
+}
+
 Request	Request::parserForRequest(const std::string &ogRequest) {
     size_t start = 0;
     Request request;
@@ -72,6 +106,7 @@ Request	Request::parserForRequest(const std::string &ogRequest) {
             parsingForHeader(line, request);
         start = index + 2;
     }
+    ContentLengthParser(request);
 
     return request;
 
