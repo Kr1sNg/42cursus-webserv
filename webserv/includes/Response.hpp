@@ -26,8 +26,9 @@ class Response {
 		std::map<std::string, std::string> _headers; // key/value : "Content-type/length"
 		std::string	_body; //Body for the HTTP POST mode.
 
-		// bool _isChunked;
-		// bool _keepAlive;
+		bool _needChunked;
+		bool _keepAlive;
+		std::vector<std::string> _cookie;
 
 		Response(const Response &cpy);
 		Response	&operator=(const Response &other);
@@ -42,6 +43,10 @@ class Response {
 	void setReason(const std::string &reason);
 	void setHeader(const std::string &key, const std::string &val);
 	void setBody(const std::string &body);
+	void setKeepAlive(bool keep);
+	void MoreCookie(const std::string &cookie);
+	void setChunked(bool needchunk);
+
 
 	/*getter*/
 	const std::string &getVersion() const;
@@ -49,6 +54,9 @@ class Response {
 	const std::string &getReason() const;
 	const std::map<std::string, std::string> &getHeaders() const;
 	const std::string &getBody() const;
+	bool getKeepAlive() const;
+	const std::vector<std::string> EatCookie() const;
+	bool getChunked() const;
 
 
 
