@@ -1,8 +1,8 @@
-#include "../includes/Response.hpp"
+#include "../../includes/Response.hpp"
 
 Response::Response()
-    : _version("HTTP/1.1"), _status(200), _reason("OK"),
-    _headers("", ""), _body("") {
+    : _version("HTTP/1.1"), _status(200), _reason("OK"), _body("") {
+        _headers[""] = "";
 }
 
 Response::Response(const Response &cpy)
@@ -18,6 +18,7 @@ Response &Response::operator=(const Response &other) {
         _headers = other._headers;
         _body = other._body;
     }
+    return *this;
 }
 
 Response::~Response() {
