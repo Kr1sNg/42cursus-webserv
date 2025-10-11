@@ -54,13 +54,13 @@ class Request {
 	void setHeaders(const std::map<std::string, std::string> &headers);
 	void setBody(const std::string &body);
 
-	Request	parserForRequest(const std::string &ogRequest);
+	static Request	parserForRequest(const std::string &ogRequest);
 	void addHeader(const std::string &key, const std::string &val);
-	void ContentLengthParser(Request &request);
+	static void ContentLengthParser(Request &req);
 	std::string getHeader(const std::string &keyword) const;
-	int verCheck(const std::string &version);
-	int methodCheck(const std::string &met);
-	void  parseFirstLine(std::string &line, Request &req);
+	static int verCheck(const std::string &version);
+	static int methodCheck(const std::string &met);
+	static void  parseFirstLine(std::string &line, Request &req);
 };
 
 

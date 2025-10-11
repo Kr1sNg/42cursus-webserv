@@ -1,10 +1,10 @@
-#include "../includes/Request.hpp"
+#include "../../includes/Request.hpp"
 
 //waiting for adding the good _uri (source path)
 
 Request::Request()
-    : _method("GET"), _uri("/index"), _version("HTTP/1.1"),
-    _headers("User-Agent", ""), _body("") {
+    : _method("GET"), _uri("/index"), _version("HTTP/1.1"), _body("") {
+    _headers["User-Agent"] = "";
 }
 
 Request::Request(const Request &cpy) 

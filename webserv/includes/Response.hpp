@@ -31,8 +31,8 @@ class Response {
 	public:
 		Response();
 		~Response();
-		Response(const Response &cpy);
-		Response	&operator=(const Response &other);
+		// Response(const Response &cpy);
+		// Response	&operator=(const Response &other);
 
 	// std::string toString() const;
 	/*getters*/

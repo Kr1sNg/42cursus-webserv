@@ -1,4 +1,4 @@
-#include "../includes/webserv.hpp"
+#include "../../includes/webserv.hpp"
 
 int Request::methodCheck(const std::string &met) {
     if (met != "GET" && met != "POST" && met != "DELETE")
