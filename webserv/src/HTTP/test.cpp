@@ -1,4 +1,5 @@
 #include "../../includes/webserv.hpp"
+# include "../../includes/Response.hpp"
 #include <iostream>
 
 void printRequest(const Request &req) {
@@ -16,7 +17,7 @@ void printRequest(const Request &req) {
 	std::cout << "-----------------------------" << std::endl;
 }
 
-int main() {
+/*int main() {
 	std::string req1 =
 		"GET /index.html HTTP/1.1\r\n"
 		"Host: localhost\r\n"
@@ -49,4 +50,14 @@ int main() {
 	printRequest(r3);
 
 	return 0;
+}*/
+int main() {
+	Response res;
+
+    res.setCode(404);
+    res.setReason("Not Found");
+    res.setHeader("Content-Type", "text/html");
+    res.setBody("<html><body><h1>404 Not Found</h1></body></html>");
+
+    std::cout << res.getString() << std::endl;
 }
