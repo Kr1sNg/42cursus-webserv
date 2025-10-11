@@ -59,5 +59,8 @@ int main() {
     res.setHeader("Content-Type", "text/html");
     res.setBody("<html><body><h1>404 Not Found</h1></body></html>");
 
+	res.MoreCookie("sessionid=abc42; Http; Path=/index");
+    res.MoreCookie("theme=dark; Path=/index");
+
     std::cout << res.getString() << std::endl;
 }
