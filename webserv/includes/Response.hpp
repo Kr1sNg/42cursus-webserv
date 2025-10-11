@@ -15,6 +15,7 @@
 
 # include <string>
 # include <map>
+# include <sstream>
 # include <iostream>
 
 class Response {
@@ -25,30 +26,33 @@ class Response {
 		std::map<std::string, std::string> _headers; // key/value : "Content-type/length"
 		std::string	_body; //Body for the HTTP POST mode.
 
+		// bool _isChunked;
+		// bool _keepAlive;
+
 		Response(const Response &cpy);
 		Response	&operator=(const Response &other);
 
 	public:
 		Response();
 		~Response();
-		// Response(const Response &cpy);
-		// Response	&operator=(const Response &other);
 
-	// std::string toString() const;
-	/*getters*/
-	std::string	getVersion() const;
-	int			getStatus() const;
-	std::string	getReason() const;
-	std::map<std::string, std::string> getHeaders() const;
-	std::string	getBody() const;
+	/*setter*/
+	void setVersion(const std::string &version);
+	void setCode(int code);
+	void setReason(const std::string &reason);
+	void setHeader(const std::string &key, const std::string &val);
+	void setBody(const std::string &body);
 
-	/*setters*/
-	void	setVersion(const std::string &version);
-	void	setStatus(const int &statut);
-	void	setReason(const std::string &reason);
-	void	setHeaders(const std::map<std::string, std::string> &headers);
-	void	setBody(const std::string &body);
-	
+	/*getter*/
+	const std::string &getVersion() const;
+	int	getCode() const;
+	const std::string &getReason() const;
+	const std::map<std::string, std::string> &getHeaders() const;
+	const std::string &getBody() const;
+
+
+
+	std::string getString() const;
 };
 
 #endif
