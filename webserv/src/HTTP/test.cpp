@@ -63,4 +63,10 @@ int main() {
     res.MoreCookie("theme=dark; Path=/index");
 
     std::cout << res.getString() << std::endl;
+
+	Response error404 = Response::buildError(404, "Not Found");
+	std::cout << error404.getString() << std::endl;	
+
+	Response redirect302 = Response::buildRedirect("/index.html", 302);
+	std::cout << redirect302.getString() << std::endl;
 }

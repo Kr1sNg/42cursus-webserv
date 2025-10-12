@@ -30,12 +30,12 @@ class Response {
 		bool _keepAlive;
 		std::vector<std::string> _cookie;
 
-		Response(const Response &cpy);
-		Response	&operator=(const Response &other);
 
 	public:
 		Response();
 		~Response();
+		Response(const Response &cpy);
+		Response	&operator=(const Response &other);
 
 	/*setter*/
 	void setVersion(const std::string &version);
@@ -58,8 +58,8 @@ class Response {
 	const std::vector<std::string> EatCookie() const;
 	bool getChunked() const;
 
-
-
+	static Response buildError(int code, const std::string &reason);
+	static Response buildRedirect(const std::string &location, int code);
 	std::string getString() const;
 };
 
