@@ -72,14 +72,14 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 		// _response.setReason("OK");
 		// _response.setHeader("Content-Type", "text/plain");
 		// _response.setBody("Hello from server!\n");
-		std::cout << "inside reponse" << std::endl;
 		// convert response to text
 		// _outBuf = _response.getString();
-		_outBuf =
-            "<html><body><h1>File Uploaded Successfully!</h1></body></html>";
 
-		_responseReady = true;
-		_requestReady = false;
+		_outBuf =
+					"HTTP/1.1 404 Not Found\r\n"
+					"Content-Type: text/html\r\n"
+					"Connection: close\r\n\r\n"
+					"<html><body><h1>404 - File Not Found</h1></body></html>";
 	}
 		_responseReady = true;
 		_requestReady = false;
@@ -89,7 +89,6 @@ void	Connection::flushOutBuffer(void) //send
 {
 	if (_outBuf.empty())
 		return ;
-
 	ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
 	if (n < 0)
 	{
@@ -117,8 +116,10 @@ void	Connection::handleEvent(uint32_t events)
 	}
 
 	if (events & POLLIN)
+	{
 		recvIntoBuffer();
-	
+		flushOutBuffer();
+	}
 	if (events & POLLOUT)
 		flushOutBuffer();
 }
