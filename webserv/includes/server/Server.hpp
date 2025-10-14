@@ -23,7 +23,6 @@ The server also owns removal of connections
 
 # include "../webserv.hpp"
 # include "Listener.hpp"
-# include "ILoop.hpp"
 # include "Connection.hpp"
 # include "../config/Config.hpp"
 # include "../config/Serverconfig.hpp"
@@ -37,12 +36,10 @@ class Server
 		Config		_config;
 		
 		PollLoop	_loop;
-		Listener	*_listener; // owned by server
+		std::vector<Listener *>	_listeners; // owned by server
 		std::map<int, Connection *> _connects;	// active connections
 		std::vector<int>	_fdToClose; // fds requested to close (processed after poll dispatch)
 		
-		
-
 		Server(void);
 		Server(Server const &src);
 		Server	&operator=(Server const &rhs);
