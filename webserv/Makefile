@@ -30,7 +30,7 @@ SRCS     	= src/main.cpp src/exception.cpp \
 				src/config/Locationconfig.cpp src/config/parsing.cpp \
 				src/config/tokenization.cpp src/config/Serverconfig.cpp\
 				src/HTTP/Request.cpp src/HTTP/Response.cpp src/HTTP/ParserHTTP.cpp \
-				# src/HTTP/ErrorHTTP.cpp
+				src/HTTP/ErrorHTTP.cpp
 
 # Object Files
 OBJS = $(SRCS:.cpp=.o)

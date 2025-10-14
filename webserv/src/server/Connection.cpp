@@ -72,12 +72,20 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 		// _response.setReason("OK");
 		// _response.setHeader("Content-Type", "text/plain");
 		// _response.setBody("Hello from server!\n");
-
+		std::cout << "inside reponse" << std::endl;
 		// convert response to text
-		_outBuf = _response.getString();
+		// _outBuf = _response.getString();
+		_outBuf =
+            "<html><body><h1>File Uploaded Successfully!</h1></body></html>";
+
 		_responseReady = true;
 		_requestReady = false;
 	}
+	std::cout << "inside reponse" << std::endl;
+	_outBuf =
+            "<html><body><h1>File Uploaded Successfully!</h1></body></html>";
+		_responseReady = true;
+		_requestReady = false;
 }
 
 void	Connection::flushOutBuffer(void) //send
