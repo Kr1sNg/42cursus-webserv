@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+         #
+#    By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/26 17:42:09 by tat-nguy          #+#    #+#              #
-#    Updated: 2025/09/30 12:26:08 by tat-nguy         ###   ########.fr        #
+#    Updated: 2025/10/14 15:44:04 by tbahin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,8 +29,8 @@ SRCS     	= src/main.cpp src/exception.cpp \
 				src/config/Directive.cpp src/config/fillConfig.cpp \
 				src/config/Locationconfig.cpp src/config/parsing.cpp \
 				src/config/tokenization.cpp src/config/Serverconfig.cpp\
-				#src/HTTP/Request.cpp src/HTTP/Response.cpp src/HTTP/ParserHTTP.cpp \
-				src/HTTP/ErrorHTTP.cpp
+				# src/HTTP/Request.cpp src/HTTP/Response.cpp src/HTTP/ParserHTTP.cpp \
+				# src/HTTP/ErrorHTTP.cpp
 
 # Object Files
 OBJS = $(SRCS:.cpp=.o)
