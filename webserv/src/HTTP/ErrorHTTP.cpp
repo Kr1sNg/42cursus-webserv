@@ -50,8 +50,11 @@ Response Response::buildRedirect(const std::string &location, int code) {
     rep.setCode(code);
     rep.setReason(reason);
     rep.setHeader("Location", location);
-    std::string Redirectbody = "<html><head><title>" + std::to_string(code) + " " + reason +
-         "</title></head>" "<body><h1>" + std::to_string(code) + " " + reason +
+    std::ostringstream oss;
+    oss << code; 
+    std::string code_str = oss.str();
+    std::string Redirectbody = "<html><head><title>" + code_str + " " + reason +
+         "</title></head>" "<body><h1>" + code_str + " " + reason +
             "</h1><p>Redirecting to <a href=\"" + location + "\">" +
                 location + "</a></p></body></html>";
     rep.setBody(Redirectbody);

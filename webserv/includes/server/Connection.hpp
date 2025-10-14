@@ -39,8 +39,8 @@ class Connection: public IEventHandler
 	private:
 		Server	*_server; // non-owning pointer back to server for marking close/mod events	
 		int		_clientFd;
-		std::string	_inBuf;
-		std::string	_outBuf;
+		std::string	_inBuf;	// recevive
+		std::string	_outBuf; // send
 
 		// bool	_isClosed;
 	
