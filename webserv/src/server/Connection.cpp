@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/14 16:47:37 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/10/14 20:18:32 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,10 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 		return;
 	}
 	_inBuf.append(buf, n);
-	std::cout << "[RECV] from fd[" << _clientFd << "]: " << buf << std::endl;
+	std::cout << "Size " << n << " [RECV] from fd[" << _clientFd << "]: " << buf << std::endl;
 
 	// detect a complete HTTP request by "\r\n\r\n"
-	size_t pos = _inBuf.find("\r\n\r\r");
+	size_t pos = _inBuf.find("\r\n\r\n");
 	if (pos != std::string::npos)
 	{
 		// Parse HTTP request
@@ -81,9 +81,6 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 		_responseReady = true;
 		_requestReady = false;
 	}
-	std::cout << "inside reponse" << std::endl;
-	_outBuf =
-            "<html><body><h1>File Uploaded Successfully!</h1></body></html>";
 		_responseReady = true;
 		_requestReady = false;
 }

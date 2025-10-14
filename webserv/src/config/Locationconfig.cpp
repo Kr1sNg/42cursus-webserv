@@ -137,7 +137,6 @@ void Locationconfig::setMethods(const std::vector<std::string>& methods)
 {
     size_t i = 0;
 
-	std::cout << "Methods: " << methods[i] << std::endl;
     if (_flags & _validDirective.at("methods"))
     {
     	throw std::out_of_range("Config: getLocationConfig: methods directive already defined in this location");
@@ -145,11 +144,9 @@ void Locationconfig::setMethods(const std::vector<std::string>& methods)
     else
     {
         _flags |= _validDirective.at("methods");
-		std::cout << "Methods: " << methods[i] << std::endl;
         while (methods[i] == "GET" || methods[i] == "POST" || methods[i] == "DELETE")
         {
             _methods.push_back(methods[i]);
-			std::cout << "Methods: " << methods[i] << std::endl;
             i++;
         }
 		

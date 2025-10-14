@@ -174,8 +174,8 @@ Config configfile(char *name)
     }
     i = 0;
     block = createMain(token_list, &i);
-    display(block);
+    // display(block);
     config = checkConfig(block);
-    displayConfig(config);
+    // displayConfig(config);
     return (config);
 }
