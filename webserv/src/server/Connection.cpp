@@ -14,8 +14,8 @@
 #include "../../includes/server/Connection.hpp"
 #include "../../includes/server/PollLoop.hpp"
 #include "../../includes/server/Server.hpp"
-// #include "../../includes/Request.hpp"
-// #include "../../includes/Response.hpp"
+#include "../../includes/Request.hpp"
+#include "../../includes/Response.hpp"
 
 Connection::Connection(void) {}
 
@@ -24,7 +24,8 @@ Connection::Connection(Server *server, int cfd):
 			_clientFd(cfd),
 			_inBuf(),
 			_outBuf(),
-			_hasActiveRequest(false)
+			_requestReady(false),
+			_responseReady(false)
 {
 	setNonBlocking(_clientFd);
 }
@@ -39,73 +40,80 @@ int		Connection::getFd(void) const
 	return (_clientFd);	
 }
 
-bool	Connection::recvIntoBuffer(void) //receive 
+void	Connection::recvIntoBuffer(void) //receive !!!!
 {
 	char buf[4096];
 
-	ssize_t n = recv(_clientFd, buf, sizeof(buf) - 1, 0);
-	if (n > 0)
+	ssize_t n = recv(_clientFd, buf, sizeof(buf), 0);
+	if (n <= 0)
 	{
-		buf[n] = '\0';
-		_inBuf += buf;
+		_server->markForClose(_clientFd);
+		return;
 	}
-	else 
-		return false;
+	_inBuf.append(buf, n);
 	std::cout << "[RECV] from fd[" << _clientFd << "]: " << buf << std::endl;
-	return true;
-}
 
-bool	Connection::flushOutBuffer(void) //send
-{
-	while (!_outBuf.empty())
+	// detect a complete HTTP request by "\r\n\r\n"
+	size_t pos = _inBuf.find("\r\n\r\r");
+	if (pos != std::string::npos)
 	{
-		ssize_t n = send(_clientFd, _outBuf.data(), _outBuf.size(), MSG_NOSIGNAL);
-		if (n > 0)
-		{
-			std::cout << "[SEND] server sent to client: " << _outBuf << std::endl;
-			_outBuf.erase(0, n);
-		}
-		else
-		{
-			std::cout << "[SEND] can't sent to client _outBuf: " << _outBuf << std::endl;
-			break ;
-		}
+		// Parse HTTP request
+		_request = Request::parserForRequest(_inBuf);
+		_requestReady = true;
+		_inBuf.erase(0, pos + 4);
 	}
-	return _outBuf.empty();
+
+	// if a full request is ready, build a response
+	if (_requestReady)
+	{
+		_response = Response();
+		// _response.setVersion("HTTP/1.1");
+		// _response.setCode(200);
+		// _response.setReason("OK");
+		// _response.setHeader("Content-Type", "text/plain");
+		// _response.setBody("Hello from server!\n");
+
+		// convert response to text
+		_outBuf = _response.getString();
+		_responseReady = true;
+		_requestReady = false;
+	}
 }
 
-void	Connection::queueResponse(std::string const &s)
+void	Connection::flushOutBuffer(void) //send
 {
-	_outBuf += s;
+	if (_outBuf.empty())
+		return ;
+
+	ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
+	if (n < 0)
+	{
+		if (errno != EWOULDBLOCK && errno != EAGAIN)
+			_server->markForClose(_clientFd);
+		return ;
+	}
+	_outBuf.erase(0, n);
+
+	if (_outBuf.empty())
+	{
+		// response fully sent!
+		if (!_response.getKeepAlive())
+			_server->markForClose(_clientFd);
+	}
 }
+
 
 void	Connection::handleEvent(uint32_t events)
 {
 	if (events & POLLERR || events & POLLHUP || events & POLLNVAL)
 	{
 		_server->markForClose(_clientFd);
-		std::cout << "Connection: socket closed fd[" << _clientFd << "]." << std::endl;
 		return ;
 	}
 
 	if (events & POLLIN)
-	{
-		if (!recvIntoBuffer())
-		{
-			queueResponse("sent to client");
-			_server->markForClose(_clientFd);
-			return ;
-		}
-	}
+		recvIntoBuffer();
 	
 	if (events & POLLOUT)
-	{
-		if (!flushOutBuffer())
-		{
-			std::cout << "_outBuf is send! " << std::endl;
-			// stop watching POLLOUT; let server set only POLLIN
-			_server->setFdEvents(_clientFd, POLLIN);
-			return ;
-		}
-	}
+		flushOutBuffer();
 }

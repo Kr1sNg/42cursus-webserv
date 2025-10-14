@@ -18,17 +18,6 @@
 #include "../../includes/server/PollLoop.hpp"
 #include "../../includes/config/Config.hpp"
 
-// Server::Server(Serverconfig const &serverconfig): _ServerConfig(serverconfig)
-// {
-// 	size_t size = _ServerConfig.getListenSize();
-	
-// 	for (size_t i = 0; i < size; ++i)
-// 	{
-// 		_listener = new Listener(this, _ServerConfig.getListen(i).first.c_str(), _ServerConfig.getListen(i).second.c_str());
-// 		_loop.addHandler(_listener, POLLIN);
-// 	}
-	
-// }
 
 Server::Server(Config const &config): _config(config)
 {
@@ -36,22 +25,23 @@ Server::Server(Config const &config): _config(config)
 	
 	for (size_t i = 0; i < noofservers; ++i)
 	{
-		Serverconfig servconf = _config.getServerConfig(i);
+		Serverconfig servconf = _config.getServerConfig(i);	//get ServerConfig information with indicator(i)
 		size_t nooflistens = servconf.getListenSize();
 		for (size_t j = 0; j < nooflistens; ++j)
 		{
-			_listener = new Listener(this, servconf.getListen(j).first.c_str(), servconf.getListen(j).second.c_str());
-			_loop.addHandler(_listener, POLLIN);
+			Listener *l = new Listener(this, servconf.getListen(j).first.c_str(), servconf.getListen(j).second.c_str());
+			_loop.addHandler(l, POLLIN);
+			_listeners.push_back(l);
 		}
 	}
 }
 
 Server::~Server()
 {
-	if (_listener)
+	for (size_t i = 0; i < _listeners.size(); ++i)
 	{
-		_loop.removeHandler(_listener->getFd());
-		delete _listener;
+		_loop.removeHandler(_listeners[i]->getFd());
+		delete _listeners[i];
 	}
 
 	// close and delete all connections
@@ -105,6 +95,7 @@ void	Server::run(void)	// create poll, listener, connection
 					delete it->second;
 					_connects.erase(it);
 				}
+				std::cout << "Connection: socket closed fd[" << fd << "]." << std::endl;
 			}
 			_fdToClose.clear();
 		}

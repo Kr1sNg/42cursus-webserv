@@ -10,13 +10,27 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/* What a connection does:
+	- parse HTTP requests from _inBuffer
+	- build a Request object once a full HTTP request is received
+	- create and serialize a Response object using your Response class;
+	- send back the response through _outBuffer
+
+	Socket <=> 	Connection 	<=> Request
+							<=> Response
+
+*/
+
+
+
 #ifndef _CONNECTION_HPP_
 # define _CONNECTION_HPP_
 
 # include "../webserv.hpp"
 # include "IEventHandler.hpp"
-# include "ILoop.hpp"
 # include "PollLoop.hpp"
+# include "../Request.hpp"
+# include "../Response.hpp"
 
 class Server;
 
@@ -27,9 +41,14 @@ class Connection: public IEventHandler
 		int		_clientFd;
 		std::string	_inBuf;
 		std::string	_outBuf;
-		bool	_hasActiveRequest;
+
+		// bool	_isClosed;
 	
-		
+		Request		_request;
+		Response	_response;
+		bool		_requestReady;
+		bool		_responseReady;
+
 		Connection	&operator=(Connection const &rhs);
 		Connection(Connection const &src);
 	
@@ -37,16 +56,13 @@ class Connection: public IEventHandler
 		Connection(void);
 		Connection(Server *server, int cfd);
 		
-		virtual ~Connection();
+		~Connection();
 
-		virtual int		getFd(void) const;
-		virtual void	handleEvent(uint32_t events);
+		int		getFd(void) const;
+		void	handleEvent(uint32_t events);
 
-		bool	recvIntoBuffer(void);
-		bool	flushOutBuffer(void);
-
-		// for Request and Response
-		void	queueResponse(std::string const &s);
+		void	recvIntoBuffer(void);
+		void	flushOutBuffer(void);
 };
 
 #endif

@@ -15,7 +15,6 @@
 
 # include "../webserv.hpp"
 # include "IEventHandler.hpp"
-# include "ILoop.hpp"
 # include "Connection.hpp"
 
 class Server;
