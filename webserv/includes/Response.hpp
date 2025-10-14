@@ -63,7 +63,7 @@ class Response {
 	static Response buildError(int code, const std::string &reason);
 	static Response buildRedirect(const std::string &location, int code);
 	std::string getString() const;
-	static std::string Response::convertFileToString(const std::string &path);
+	static std::string convertFileToString(const std::string &path);
 };
 
 #endif
