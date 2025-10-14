@@ -43,7 +43,7 @@ size_t  Config::getServersSize(void) const
 
 Serverconfig const  &Config::getServerConfig(size_t index) const
 {
-    if ((index >= 0) && (index < _servers.size()))
+    if (index < _servers.size())
         return (_servers[index]);
     else
         throw std::length_error("Config: getServerConfig: Out of range");

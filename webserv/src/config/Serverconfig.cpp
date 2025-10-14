@@ -102,7 +102,7 @@ void Serverconfig::setListen(const std::vector<std::string>& listen)
 
 const std::pair<std::string, std::string>& Serverconfig::getListen(size_t index) const
 {
-    if ((index >= 0) && (index < _listen.size()))
+    if (index < _listen.size())
         return (_listen[index]);
     throw std::length_error("Serverconfig: ListenSize: Out of range");
 }
