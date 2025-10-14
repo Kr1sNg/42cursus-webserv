@@ -1,5 +1,5 @@
 #include "../../includes/Request.hpp"
-
+#include "../../includes/webserv.hpp"
 //waiting for adding the good _uri (source path)
 
 Request::Request()
