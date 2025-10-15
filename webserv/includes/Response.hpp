@@ -38,6 +38,7 @@ class Response {
 		~Response();
 		Response(const Response &cpy);
 		Response	&operator=(const Response &other);
+		Response(const Request &req);
 
 	/*setter*/
 	void setVersion(const std::string &version);
@@ -64,6 +65,7 @@ class Response {
 	static Response buildRedirect(const std::string &location, int code);
 	std::string getString() const;
 	static std::string convertFileToString(const std::string &path);
+	std::string    Response::BuildFromRequest(const Request &req);
 };
 
 #endif

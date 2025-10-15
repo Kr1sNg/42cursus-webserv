@@ -50,11 +50,61 @@ std::string Response::getString() const {
     return (fd.str());
 }
 
+Response::Response(const Request &req)
+    : _version(req.getVersion()),
+      _status(200),
+      _reason("OK"),
+      _body(""),
+      _keepAlive(true),
+      _needChunked(false)
+{
+    _headers["Server"] = "Webserv/1.0";
+    std::string connection = req.getHeader("Connection");
+    if (connection == "close")
+        _keepAlive = false;
+    else if (connection == "keep-alive")
+        _keepAlive = true;
+/* fonction pour get le type de contenue à faire
+    _headers["Content-Type"] = getType(req.getUri());
+*/
+}
 
+std::string    Response::BuildFromRequest(const Request &req) {
+    std::ostringstream len;
+
+    std::string path = req.getUri();
+    std::string content;
+    
+    if (req.getMethod() == "POST") {
+        content = req.getBody();
+        _body = content;
+        _status = 200;
+        _reason = "OK";
+        _needChunked = true;
+    }
+    else {
+        content = convertFileToString(path);
+        if (content.empty()) {
+            Response err_resp = Response::buildError(404, "Not Found");
+            *this = err_resp;
+            return _body;
+        }
+        _body = content;
+        _status = 200;
+        _reason = "OK";
+    }
+    /* content type (to do)
+    _headers["Content-Type"] = getType(path); */
+    len << _body.size();
+    _headers["Content-Len"] = len.str();
+
+    return content;
+}
 
 Response::Response()
     : _version("HTTP/1.1"), _status(200), _reason("OK"), _body(""), _keepAlive(true) {
-        _headers[""] = "";
+        _headers["Server"] = "Webserv/1.0";
+        _headers["Content-Type"] = "text/html; charset=utf-8";
 }
 
 Response::Response(const Response &cpy)
