@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/14 20:18:32 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/10/15 18:14:15 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ Connection::Connection(Server *server, int cfd):
 			_clientFd(cfd),
 			_inBuf(),
 			_outBuf(),
+			_events(POLLIN),
 			_requestReady(false),
 			_responseReady(false)
 {
@@ -38,6 +39,11 @@ Connection::~Connection()
 int		Connection::getFd(void) const
 {
 	return (_clientFd);	
+}
+
+uint32_t	Connection::getEvents(void) const
+{
+	return (_events);
 }
 
 void	Connection::recvIntoBuffer(void) //receive !!!!
@@ -81,6 +87,9 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 					"Connection: close\r\n\r\n"
 					"<html><body><h1>404 - File Not Found</h1></body></html>";
 	}
+		_events = POLLIN | POLLOUT;
+		_server->setFdEvents(_clientFd, _events);
+		
 		_responseReady = true;
 		_requestReady = false;
 }
@@ -89,6 +98,7 @@ void	Connection::flushOutBuffer(void) //send
 {
 	if (_outBuf.empty())
 		return ;
+		
 	ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
 	if (n < 0)
 	{
@@ -100,9 +110,9 @@ void	Connection::flushOutBuffer(void) //send
 
 	if (_outBuf.empty())
 	{
-		// response fully sent!
-		if (!_response.getKeepAlive())
-			_server->markForClose(_clientFd);
+		// Done sending, stop watching POLLOUT
+		_events = POLLIN;
+		_server->setFdEvents(_clientFd, _events);
 	}
 }
 
@@ -118,7 +128,6 @@ void	Connection::handleEvent(uint32_t events)
 	if (events & POLLIN)
 	{
 		recvIntoBuffer();
-		flushOutBuffer();
 	}
 	if (events & POLLOUT)
 		flushOutBuffer();

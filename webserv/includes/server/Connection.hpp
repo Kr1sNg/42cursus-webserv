@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/30 13:35:22 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:07:26 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,12 @@ class Server;
 class Connection: public IEventHandler
 {
 	private:
-		Server	*_server; // non-owning pointer back to server for marking close/mod events	
+		Server	*_server; // non-owning pointer back to server for marking close/update events	
 		int		_clientFd;
 		std::string	_inBuf;	// recevive
 		std::string	_outBuf; // send
+
+		uint32_t	_events;
 
 		// bool	_isClosed;
 	
@@ -63,6 +65,8 @@ class Connection: public IEventHandler
 
 		void	recvIntoBuffer(void);
 		void	flushOutBuffer(void);
+
+		uint32_t	getEvents(void) const;
 };
 
 #endif

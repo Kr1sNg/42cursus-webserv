@@ -33,13 +33,15 @@ int poll(struct pollfd fds[],	// array of pollfd with information (which sockets
 struct	pollfd
 {
 	int		fd;			// socket fd
-	short	events;		// bitmap of events we're interested in (requested events)
-	short	revents;	// on return, bitmap of events that occurred
+	short	events;		// what we WANT to watch (POLLIN | POLLOUT) both
+	short	revents;	// what actually HAPPENED after poll() (POLLIN or POLLOUT or nothing or else)
 }
 ```
 
-- `POLLIN`: there's data which is ready to `recv()` on this socket
-- `POLLOUT`: we can `send()` data to this socket
+So, `POLLIN`, `POLLOUT` are the value of `events` (what we ask poll() to watch) or `revents` (what `poll()` returns in `pollfd`):
+
+- `POLLIN`: there's data which is ready to `recv()` on this socket (means that client has sent data to us (REQUEST))
+- `POLLOUT`: the socket is ready for us to `send()` data to client (RESPONSE) 
 - `POLLHUP` (only returned in `revents`): the remote (client) closed this connection.
 
 `poll()` returns the numbers of elements in `fds` array for which events have occurred.
