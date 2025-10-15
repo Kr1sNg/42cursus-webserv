@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 21:28:48 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/30 11:45:59 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:10:32 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,20 +51,15 @@ void	PollLoop::addHandler(IEventHandler *handler, uint32_t events)
 	_handlers[fd] = handler;
 }
 
-void	PollLoop::modHandler(IEventHandler *handler, uint32_t events)
+void	PollLoop::modHandler(IEventHandler *handler, uint32_t newEvents)
 {
 	int	fd = handler->getFd();
 	for (size_t i = 0; i < _pollFds.size(); ++i)
 	{
 		if (_pollFds[i].fd == fd)
 		{
-			short ev = 0;
-			if (events & POLLIN)
-				ev |= POLLIN;
-			if (events & POLLOUT)
-				ev |= POLLOUT;
-			_pollFds[i].events = ev;
-			break ;
+			_pollFds[i].events = newEvents;
+			return ;
 		}
 	}
 	// ensure map has pointer
