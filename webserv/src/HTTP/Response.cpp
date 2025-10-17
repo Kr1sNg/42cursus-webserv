@@ -55,8 +55,9 @@ Response::Response(const Request &req)
       _status(200),
       _reason("OK"),
       _body(""),
-      _keepAlive(true),
-      _needChunked(false)
+   
+      _needChunked(false),
+         _keepAlive(true)
 {
     _headers["Server"] = "Webserv/1.0";
     std::string connection = req.getHeader("Connection");
@@ -75,30 +76,26 @@ std::string    Response::BuildFromRequest(const Request &req) {
     std::string path = req.getUri();
     std::string content;
     
+    content = convertFileToString( + req.getUri);
+    if (content.empty())
+    {
+        content = convertFileToString("www/error_pages/404_notfound.html");
+    }
     if (req.getMethod() == "POST") {
-        content = req.getBody();
-        _body = content;
-        _status = 200;
-        _reason = "OK";
-        _needChunked = true;
+        Response::setBody(req.getBody() + content);
+        Response::setCode(200);
+        Response::setReason("OK");
+        Response::setChunked(true);
     }
     else {
-        content = convertFileToString(path);
-        if (content.empty()) {
-            Response err_resp = Response::buildError(404, "Not Found");
-            *this = err_resp;
-            return _body;
-        }
-        _body = content;
-        _status = 200;
-        _reason = "OK";
+        Response::setBody(content);
+        Response::setCode(200);
+        Response::setReason("OK");
     }
     /* content type (to do)
     _headers["Content-Type"] = getType(path); */
-    len << _body.size();
-    _headers["Content-Len"] = len.str();
 
-    return content;
+    return (getString() + Response::getBody());
 }
 
 Response::Response()

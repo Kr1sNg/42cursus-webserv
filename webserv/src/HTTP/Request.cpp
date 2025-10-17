@@ -2,7 +2,7 @@
 #include "../../includes/webserv.hpp"
 //waiting for adding the good _uri (source path)
 
-Request::Request()
+Request::Request(serverConfig)
     : _method("GET"), _uri("/index"), _version("HTTP/1.1"), _body("") {
     _headers["User-Agent"] = "";
 }
