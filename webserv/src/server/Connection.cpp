@@ -72,7 +72,7 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 	// if a full request is ready, build a response
 	if (_requestReady)
 	{
-		_response = Response();
+		 _outBuf = _response.BuildFromRequest(_request);
 		// _response.setVersion("HTTP/1.1");
 		// _response.setCode(200);
 		// _response.setReason("OK");
@@ -81,11 +81,6 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 		// convert response to text
 		// _outBuf = _response.getString();
 
-		_outBuf =
-					"HTTP/1.1 404 Not Found\r\n"
-					"Content-Type: text/html\r\n"
-					"Connection: close\r\n\r\n"
-					"<html><body><h1>404 - File Not Found</h1></body></html>";
 	}
 		_events = POLLIN | POLLOUT;
 		_server->setFdEvents(_clientFd, _events);
@@ -98,7 +93,9 @@ void	Connection::flushOutBuffer(void) //send
 {
 	if (_outBuf.empty())
 		return ;
-		
+	std::cout << "///////" << std::endl;
+	std::cout << _outBuf << std::endl;
+	std::cout << "///////" << std::endl;
 	ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
 	if (n < 0)
 	{
