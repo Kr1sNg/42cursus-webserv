@@ -19,9 +19,10 @@
 
 Connection::Connection(void) {}
 
-Connection::Connection(Server *server, int cfd):
+Connection::Connection(Server *server, int cfd, Serverconfig const &conf):
 			_server(server),
 			_clientFd(cfd),
+			_servConf(conf),
 			_inBuf(),
 			_outBuf(),
 			_events(POLLIN),
@@ -29,6 +30,7 @@ Connection::Connection(Server *server, int cfd):
 			_responseReady(false)
 {
 	setNonBlocking(_clientFd);
+	std::cout << "Connection: servConf: server_name: " << _servConf.getServer_name() << std::endl;
 }
 
 Connection::~Connection()
@@ -112,7 +114,6 @@ void	Connection::flushOutBuffer(void) //send
 		_server->setFdEvents(_clientFd, _events);
 	}
 }
-
 
 void	Connection::handleEvent(uint32_t events)
 {

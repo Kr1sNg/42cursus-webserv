@@ -16,10 +16,12 @@
 # define _IEVENTHANDLER_HPP_
 
 # include "../webserv.hpp"
+# include "../config/Serverconfig.hpp"
 
 class IEventHandler
-{
+{	
 	public:
+
 		virtual ~IEventHandler() {};
 		
 		virtual int		getFd(void) const = 0;
