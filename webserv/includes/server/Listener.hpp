@@ -16,19 +16,22 @@
 # include "../webserv.hpp"
 # include "IEventHandler.hpp"
 # include "Connection.hpp"
+# include "../config/Serverconfig.hpp"
 
 class Server;
 
 class Listener: public IEventHandler
 {
 	private:
-		int		_listenerFd;	
-		Server	*_server;	// non-owning pointer
+		int				_listenerFd;	
+		Server			*_server;	// non-owning pointer
+		Serverconfig	_servConf;
 	
 		Listener	&operator=(Listener const &rhs);
 	public:
 		Listener(void);
-		Listener(Server *server, const char *hostname, const char *port);
+		Listener(Server *server, const char *hostname, const char *port, Serverconfig const &conf);
+		// Listener(Server *server, Serverconfig const &conf);
 		Listener(Listener const &src);
 		
 		virtual ~Listener();	// to be able to be called by PollLoop

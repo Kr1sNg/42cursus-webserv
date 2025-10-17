@@ -29,7 +29,7 @@ Server::Server(Config const &config): _config(config)
 		size_t nooflistens = servconf.getListenSize();
 		for (size_t j = 0; j < nooflistens; ++j)
 		{
-			Listener *l = new Listener(this, servconf.getListen(j).first.c_str(), servconf.getListen(j).second.c_str());
+			Listener *l = new Listener(this, servconf.getListen(j).first.c_str(), servconf.getListen(j).second.c_str(), servconf);
 			_loop.addHandler(l, POLLIN);
 			_listeners.push_back(l);
 		}
@@ -102,12 +102,12 @@ void	Server::run(void)	// create poll, listener, connection
 	}
 }
 
-void	Server::acceptNewConnection(int clientFd)
+void	Server::acceptNewConnection(int clientFd, Serverconfig const &conf)
 {
 	if (clientFd < 0)
 		return ;
 	// create connection object and register with the loop
-	Connection	*c = new Connection(this, clientFd);
+	Connection	*c = new Connection(this, clientFd, conf);
 	_connects[clientFd] = c;
 	_loop.addHandler(c, POLLIN);
 	std::cout << "New connection accepted through fd=[" << clientFd << "]..." << std::endl;
