@@ -76,7 +76,7 @@ std::string    Response::BuildFromRequest(const Request &req) {
     std::string path = req.getUri();
     std::string content;
     
-    content = convertFileToString( + req.getUri);
+    content = convertFileToString("www" +req.getUri() + "index.html");
     if (content.empty())
     {
         content = convertFileToString("www/error_pages/404_notfound.html");
