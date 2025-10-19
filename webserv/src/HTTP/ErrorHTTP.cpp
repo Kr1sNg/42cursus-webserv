@@ -1,10 +1,31 @@
 #include "../../includes/webserv.hpp"
 
+static std::string getReasonPhrase(int code) {
+    switch (code) {
+        case 200: return "OK";
+        case 201: return "Created";
+        case 204: return "No Content";
+        case 400: return "Bad Request";
+        case 403: return "Forbidden";
+        case 404: return "Not Found";
+        case 405: return "Method Not Allowed";
+        case 413: return "Payload Too Large";
+        case 500: return "Internal Server Error";
+        case 502: return "Bad Gateway";
+        case 503: return "Service Unavailable";
+        default:  return "Error";
+    }
+}
+
 Response Response::buildError(int code, const std::string &reason) {
     Response rep;
 
     rep.setCode(code);
     rep.setReason(reason);
+    if (reason == "Error" || reason.empty())
+        rep.setReason(getReasonPhrase(code));
+    else
+        rep.setReason(reason);
     rep.setHeader("Content-Type", "text/html; charset=utf-8");
     rep.setHeader("Connection", "close");
 
