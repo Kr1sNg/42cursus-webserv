@@ -47,6 +47,10 @@ const std::string &Request::getBody() const {
     return _body;
 }
 
+const Serverconfig *Request::getConfig() const {
+    return _conf;
+}
+
 /*setters*/
 void Request::setMethod(const std::string &method) {
     _method = method;
@@ -66,6 +70,10 @@ void Request::setHeaders(const std::map<std::string, std::string> &headers) {
 
 void Request::setBody(const std::string &body) {
     _body = body;
+}
+
+void Request::setConfig(const Serverconfig &conf) {
+    _conf = &conf;
 }
 
 void Request::addHeader(const std::string &key, const std::string &val) {
