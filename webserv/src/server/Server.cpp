@@ -25,7 +25,7 @@ Server::Server(Config const &config): _config(config)
 	
 	for (size_t i = 0; i < noofservers; ++i)
 	{
-		Serverconfig servconf = _config.getServerConfig(i);	//get ServerConfig information with indicator(i)
+		const Serverconfig &servconf = _config.getServerConfig(i);	//get ServerConfig information with indicator(i)
 		size_t nooflistens = servconf.getListenSize();
 		for (size_t j = 0; j < nooflistens; ++j)
 		{
@@ -102,7 +102,7 @@ void	Server::run(void)	// create poll, listener, connection
 	}
 }
 
-void	Server::acceptNewConnection(int clientFd, Serverconfig const &conf)
+void	Server::acceptNewConnection(int clientFd, const Serverconfig &conf)
 {
 	if (clientFd < 0)
 		return ;
