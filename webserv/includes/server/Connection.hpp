@@ -21,8 +21,6 @@
 
 */
 
-
-
 #ifndef _CONNECTION_HPP_
 # define _CONNECTION_HPP_
 

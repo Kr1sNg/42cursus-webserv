@@ -14,6 +14,7 @@
 #include "../../includes/server/Listener.hpp"
 #include "../../includes/server/Connection.hpp"
 #include "../../includes/server/Server.hpp"
+#include "../../includes/config/Serverconfig.hpp"
 
 static Serverconfig dummy_conf;
 
