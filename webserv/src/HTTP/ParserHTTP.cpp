@@ -104,7 +104,7 @@ void Request::ContentLengthParser(Request &request) {
         request.setBody(bodyCheck.substr(0, contentLen));
 }
 
-Request	Request::parserForRequest(const std::string &ogRequest, const Serverconfig &conf) {
+Request	Request::parserForRequest(const std::string &ogRequest, const Serverconfig &conf) { //to do : check conf
     size_t start = 0;
     Request request;
 
@@ -133,4 +133,25 @@ Request	Request::parserForRequest(const std::string &ogRequest, const Serverconf
 
     return request;
 
+}
+
+bool fileExists(const std::string &path)
+{
+    struct stat s;
+    return (stat(path.c_str(), &s) == 0);
+}
+
+int Request::CompareConfig(const Serverconfig &conf) const {
+    if (this->getBody().size() > conf.getClient_max_size())
+        return 413;
+    
+    // Version simplifiée pour verifier la methode, à modifier avec la location
+    const std::string &method = this->getMethod();
+    if (method != "GET" && method != "POST" && method != "DELETE")
+        return 405;
+    
+    std::string path = conf.getRoot() + this->getUri();
+    if (!fileExists(path))
+        return 404;
+    return 200;
 }

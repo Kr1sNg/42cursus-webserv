@@ -17,6 +17,7 @@
 # include <iostream>
 # include <map>
 # include <cctype>
+# include <sys/stat.h>
 
 /* std::map<string, string> variable ; explanation.
 ** it tooks 2 strings, the result will be something like that
@@ -61,6 +62,7 @@ class Request {
 	static int verCheck(const std::string &version);
 	static int methodCheck(const std::string &met);
 	static void  parseFirstLine(std::string &line, Request &req);
+	int CompareConfig(const Serverconfig &conf) const;
 };
 
 

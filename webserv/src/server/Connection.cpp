@@ -67,6 +67,11 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 	{
 		// Parse HTTP request
 		_request = Request::parserForRequest(_inBuf, _servConfig);
+		int code = _request.CompareConfig(_servConfig);
+		if (code != 200)
+			_response = Response::buildError(code, "Error");
+		else
+			_outBuf = _response.BuildFromRequest(_request);
 		_requestReady = true;
 		_inBuf.erase(0, pos + 4);
 	}
@@ -74,7 +79,7 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 	// if a full request is ready, build a response
 	if (_requestReady)
 	{
-		 _outBuf = _response.BuildFromRequest(_request);
+		//  _outBuf = _response.BuildFromRequest(_request);
 		// _response.setVersion("HTTP/1.1");
 		// _response.setCode(200);
 		// _response.setReason("OK");
@@ -83,12 +88,11 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 		// convert response to text
 		// _outBuf = _response.getString();
 
-	}
 		_events = POLLIN | POLLOUT;
-		_server->setFdEvents(_clientFd, _events);
-		
+		_server->setFdEvents(_clientFd, _events);	
 		_responseReady = true;
 		_requestReady = false;
+	}
 }
 
 void	Connection::flushOutBuffer(void) //send
