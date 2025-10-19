@@ -130,7 +130,7 @@ Request	Request::parserForRequest(const std::string &ogRequest, const Serverconf
         start = index + 2;
     }
     ContentLengthParser(request);
-
+    request.setConfig(conf);
     return request;
 
 }
