@@ -24,11 +24,12 @@ class Listener: public IEventHandler
 	private:
 		int		_listenerFd;	
 		Server	*_server;	// non-owning pointer
+		Serverconfig &_servConfig;		
 	
 		Listener	&operator=(Listener const &rhs);
 	public:
 		Listener(void);
-		Listener(Server *server, const char *hostname, const char *port);
+		Listener(Server *server, const char *hostname, const char *port, const Serverconfig &conf);
 		Listener(Listener const &src);
 		
 		virtual ~Listener();	// to be able to be called by PollLoop

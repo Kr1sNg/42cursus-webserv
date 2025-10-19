@@ -32,7 +32,7 @@ class Server
 	private:
 		// char	*_hostname;	//from file.conf
 		// char	*_port;		//from file.conf
-		// Serverconfig		_ServerConfig;
+		Serverconfig		_ServerConfig;
 		Config		_config;
 		
 		PollLoop	_loop;
@@ -60,7 +60,7 @@ class Server
 		// main loop
 		void	run(void);
 
-		void	acceptNewConnection(int clientFd);
+		void	acceptNewConnection(int clientFd, const Serverconfig &conf);
 };
 
 #endif

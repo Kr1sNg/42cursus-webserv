@@ -17,11 +17,12 @@
 #include "../../includes/Request.hpp"
 #include "../../includes/Response.hpp"
 
-Connection::Connection(void) {}
+// Connection::Connection(void) {}
 
-Connection::Connection(Server *server, int cfd):
+Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_server(server),
 			_clientFd(cfd),
+			_servConfig(conf),
 			_inBuf(),
 			_outBuf(),
 			_events(POLLIN),
@@ -64,7 +65,7 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 	if (pos != std::string::npos)
 	{
 		// Parse HTTP request
-		_request = Request::parserForRequest(_inBuf);
+		_request = Request::parserForRequest(_inBuf, _servConfig);
 		_requestReady = true;
 		_inBuf.erase(0, pos + 4);
 	}

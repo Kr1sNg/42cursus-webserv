@@ -104,7 +104,7 @@ void Request::ContentLengthParser(Request &request) {
         request.setBody(bodyCheck.substr(0, contentLen));
 }
 
-Request	Request::parserForRequest(const std::string &ogRequest) {
+Request	Request::parserForRequest(const std::string &ogRequest, const Serverconfig &conf) {
     size_t start = 0;
     Request request;
 

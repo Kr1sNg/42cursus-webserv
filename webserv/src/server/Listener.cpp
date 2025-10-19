@@ -15,6 +15,8 @@
 #include "../../includes/server/Connection.hpp"
 #include "../../includes/server/Server.hpp"
 
+static Serverconfig dummy_conf;
+
 static int	make_listen_socket(const char *hostname, const char *port)
 {
 	int	status;
@@ -65,13 +67,15 @@ static int	make_listen_socket(const char *hostname, const char *port)
 	return (listenerFd);
 }
 
-Listener::Listener(void)
-{
-}
+// Listener::Listener(void)
+// 	: _server(NULL), _servConfig(dummy_conf),
+// {
+// }
 
-Listener::Listener(Server *server, const char *hostname, const char *port):
+Listener::Listener(Server *server, const char *hostname, const char *port, const Serverconfig &conf):
 			_listenerFd(-1),
-			_server(server)
+			_server(server),
+			_servConfig(_servConfig)
 {
 	_listenerFd = make_listen_socket(hostname, port);
 	if (_listenerFd < 0)
@@ -81,7 +85,8 @@ Listener::Listener(Server *server, const char *hostname, const char *port):
 
 Listener::Listener(Listener const &src):
 			_listenerFd(src._listenerFd),
-			_server(src._server)
+			_server(src._server),
+			_servConfig(src._servConfig)
 {
 }
 
@@ -123,7 +128,7 @@ void	Listener::handleEvent(uint32_t events)
 			setNonBlocking(clientFd);
 			
 			//forward to server to register and own the connection
-			_server->acceptNewConnection(clientFd);
+			_server->acceptNewConnection(clientFd, _servConfig);
 		}
 	}
 	if (events & (POLLERR | POLLHUP | POLLNVAL))

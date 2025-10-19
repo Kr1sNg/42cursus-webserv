@@ -38,6 +38,7 @@ class Connection: public IEventHandler
 {
 	private:
 		Server	*_server; // non-owning pointer back to server for marking close/update events	
+		const Serverconfig &_servConfig;
 		int		_clientFd;
 		std::string	_inBuf;	// recevive
 		std::string	_outBuf; // send
@@ -56,8 +57,8 @@ class Connection: public IEventHandler
 	
 	public:
 		Connection(void);
-		Connection(Server *server, int cfd);
-		
+		Connection(Server *server, int cfd, const Serverconfig &conf);
+	
 		~Connection();
 
 		int		getFd(void) const;

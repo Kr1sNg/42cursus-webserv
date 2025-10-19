@@ -76,7 +76,7 @@ std::string    Response::BuildFromRequest(const Request &req) {
     std::string path = req.getUri();
     std::string content;
     
-    content = convertFileToString("www" +req.getUri() + "indx.html");
+    content = convertFileToString("www" +req.getUri() + "index.html");
     if (content.empty())
     {
        // Response::setBody(req.getBody() + content);
@@ -84,7 +84,7 @@ std::string    Response::BuildFromRequest(const Request &req) {
         Response::setReason("Not-Found");
         Response::setChunked(true);
         content = convertFileToString("www/error_pages/404_notfound.html");
-        Response::setBody(content);
+        Response::setBody(req.getBody() + content);
     }
     else if (req.getMethod() == "POST") {
         Response::setBody(req.getBody() + content);
@@ -100,7 +100,7 @@ std::string    Response::BuildFromRequest(const Request &req) {
     /* content type (to do)
     _headers["Content-Type"] = getType(path); */
 
-    return (getString() + Response::getBody());
+    return (getString() /* + Response::getBody() */);
 }
 
 Response::Response()

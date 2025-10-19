@@ -54,7 +54,7 @@ class Request {
 	void setHeaders(const std::map<std::string, std::string> &headers);
 	void setBody(const std::string &body);
 
-	static Request	parserForRequest(const std::string &ogRequest);
+	static Request	parserForRequest(const std::string &ogRequest, const Serverconfig &conf);
 	void addHeader(const std::string &key, const std::string &val);
 	static void ContentLengthParser(Request &req);
 	std::string getHeader(const std::string &keyword) const;
