@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/06 19:49:56 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/22 22:15:48 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class Server
 	private:
 		// char	*_hostname;	//from file.conf
 		// char	*_port;		//from file.conf
-		Serverconfig		_ServerConfig;
+		// Serverconfig		_ServerConfig;
 		Config		_config;
 		
 		PollLoop	_loop;
