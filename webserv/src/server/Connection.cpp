@@ -67,10 +67,10 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 	{
 		// Parse HTTP request
 		_request = Request::parserForRequest(_inBuf, _servConfig);
-		int code = _request.CompareConfig(_servConfig);
-		if (code != 200)
-			_response = Response::buildError(code, "Error");
-		else
+		// int code = _request.CompareConfig(_servConfig);
+		// if (code != 200)
+		// 	_response = Response::buildError(code, "Error");
+		// else
 			_outBuf = _response.BuildFromRequest(_request);
 		_requestReady = true;
 		_inBuf.erase(0, pos + 4);
