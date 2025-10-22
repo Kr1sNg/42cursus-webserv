@@ -16,7 +16,7 @@
 #include "../../includes/server/Server.hpp"
 #include "../../includes/config/Serverconfig.hpp"
 
-static Serverconfig dummy_conf;
+// static Serverconfig dummy_conf;
 
 static int	make_listen_socket(const char *hostname, const char *port)
 {
