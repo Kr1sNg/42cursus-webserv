@@ -25,7 +25,7 @@ class Listener: public IEventHandler
 	private:
 		int		_listenerFd;	
 		Server	*_server;	// non-owning pointer
-		Serverconfig &_servConfig;		
+		const Serverconfig &_servConfig;		
 	
 		Listener	&operator=(Listener const &rhs);
 	public:

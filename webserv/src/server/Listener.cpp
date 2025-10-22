@@ -76,7 +76,7 @@ static int	make_listen_socket(const char *hostname, const char *port)
 Listener::Listener(Server *server, const char *hostname, const char *port, const Serverconfig &conf):
 			_listenerFd(-1),
 			_server(server),
-			_servConfig(_servConfig)
+			_servConfig(conf)
 {
 	_listenerFd = make_listen_socket(hostname, port);
 	if (_listenerFd < 0)

@@ -21,8 +21,8 @@
 
 Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_server(server),
-			_clientFd(cfd),
 			_servConfig(conf),
+			_clientFd(cfd),
 			_inBuf(),
 			_outBuf(),
 			_events(POLLIN),
@@ -30,7 +30,7 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_responseReady(false)
 {
 	setNonBlocking(_clientFd);
-	std::cout << "Connection: servConf: server_name: " << _servConf.getServer_name() << std::endl;
+	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name() << std::endl;
 }
 
 Connection::~Connection()
