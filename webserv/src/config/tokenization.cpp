@@ -45,7 +45,7 @@ void displayLocation(const Locationconfig& location)
 {
 	size_t i = 0;
 
-	std::cout << "	Location {" << std::endl;
+	std::cout << "	Location "<<  location.getArg() << " {" << std::endl;
 	std::cout << "		Root : " << location.getRoot() << std::endl;
 	std::cout << "		Index : " << location.getIndex() << std::endl;
     std::cout << "		Autoindex : ";

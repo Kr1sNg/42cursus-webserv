@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+         #
+#    By: theo <theo@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/26 17:42:09 by tat-nguy          #+#    #+#              #
-#    Updated: 2025/10/14 19:43:41 by tbahin           ###   ########.fr        #
+#    Updated: 2025/10/23 00:32:29 by theo             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ RESET = \033[0m
 NAME 		= webserv
 
 # Source Files
-SRCS     	= src/main.cpp src/exception.cpp \
+SRCS     	= src/main.cpp src/exception.cpp  src/server/cgiHandle.cpp\
 				src/server/Server.cpp src/server/PollLoop.cpp \
 				src/server/Connection.cpp src/server/Listener.cpp \
 				src/config/Block.cpp src/config/Config.cpp \

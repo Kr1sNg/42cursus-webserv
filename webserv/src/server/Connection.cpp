@@ -30,7 +30,7 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_responseReady(false)
 {
 	setNonBlocking(_clientFd);
-	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name() << std::endl;
+	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
 }
 
 Connection::~Connection()
@@ -71,7 +71,7 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 		// if (code != 200)
 		// 	_response = Response::buildError(code, "Error");
 		// else
-			_outBuf = _response.BuildFromRequest(_request);
+			_outBuf = _response.BuildFromRequest(_request, _servConfig);
 		_requestReady = true;
 		_inBuf.erase(0, pos + 4);
 	}

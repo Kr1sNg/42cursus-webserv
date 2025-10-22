@@ -10,6 +10,9 @@ void directiveLocation(const Block& block, Locationconfig& locationconfig)
         locationconfig.addDirective(block.getDirectives()[i]);
         i++;
     }
+    locationconfig.setArg(block.getArgs()[0]);
+    if (block.getArgs().size() != 1)
+        std::cout << "Error Location : You need de declare only one argument" << std::endl;
 }
 
 void directiveServer(const Block& block, Serverconfig& serverconfig)

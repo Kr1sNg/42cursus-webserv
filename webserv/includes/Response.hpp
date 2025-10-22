@@ -22,6 +22,7 @@
 # include "config/generalconfig.hpp"
 # include "webserv.hpp"
 // # include "Request.hpp"
+
 class Request;
 
 
@@ -69,7 +70,7 @@ class Response {
 	static Response buildRedirect(const std::string &location, int code);
 	std::string getString() const;
 	static std::string convertFileToString(const std::string &path);
-	std::string	BuildFromRequest(const Request &req);
+	std::string	BuildFromRequest(const Request &req, const Serverconfig& serverconfig);
 };
 
 #endif
