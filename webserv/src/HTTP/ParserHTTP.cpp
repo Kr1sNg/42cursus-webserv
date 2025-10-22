@@ -12,7 +12,7 @@ int Request::verCheck(const std::string &version) {
     return (1);
 }
 
-std::string trimSpace(const std::string &str) {
+std::string Request::trimSpace(const std::string &str) {
     size_t start = 0;
     size_t end = 0;
 
@@ -33,7 +33,8 @@ std::string Request::getHeader(const std::string &search) const {
     return "";
 }
 
-void  Request::parseFirstLine(std::string &line, Request &req) {
+void  Request::parseFirstLine(std::string &line)
+{
     //each time there are a space it's a new category of the line
     //method, and uri, and after version.
     size_t first = line.find(' ');
@@ -58,12 +59,12 @@ void  Request::parseFirstLine(std::string &line, Request &req) {
         std::cerr << "error: Version incorrect." << std::endl;
         return ;
     }
-    req.setMethod(met);
-    req.setUri(link);
-    req.setVersion(ver);
+    _method = met;
+    _uri = link;
+    _version = ver;
 }
 
-static void parsingForHeader(const std::string &line, Request &req) {
+void Request::parsingForHeader(const std::string &line) {
     size_t cmn;
 
     cmn = line.find(":");
@@ -85,55 +86,55 @@ static void parsingForHeader(const std::string &line, Request &req) {
         std::cerr << "error: value can't be empty" << std::endl;
         return ;
     }
-    req.addHeader(before, after);
+    _headers[before] = after;
 }
 
-void Request::ContentLengthParser(Request &request) {
+void Request::ContentLengthParser(void) {
     // rechercher Request-Header dans le std::map
-    std::string existing_CL = request.getHeader("Content-Length");
+    std::string existing_CL = _headers["Content-Length"];
     // verifier si l'entête existe et que sa valeur n'est pas nulle
     if (existing_CL.empty())
         return ; // Content-Length not found
     // Convertir sa valeur (string) en int
     size_t contentLen = std::atoi(existing_CL.c_str()); // c_str convert the std::string in a const char *
-    std::string bodyCheck = request.getBody();
+    std::string bodyCheck = _body;
     // Vérifier que sa valeur est bien un nombre valide (pas nul/correspondant au bodylen)
     if (bodyCheck.size() < contentLen)
         std::cerr << "Error: body is too short" << std::endl;
     else if (bodyCheck.size() > contentLen)
-        request.setBody(bodyCheck.substr(0, contentLen));
+        _body = bodyCheck.substr(0, contentLen);
 }
 
-Request	Request::parserForRequest(const std::string &ogRequest, const Serverconfig &conf) { //to do : check conf
-    size_t start = 0;
-    Request request;
+// Request	Request::parserForRequest(const std::string &ogRequest, const Serverconfig &conf) { //to do : check conf
+//     size_t start = 0;
+//     Request request;
 
-    if (ogRequest.empty()) {
-        std::cerr << "error: empty request" << std::endl;
-        return request;
-    }
-    while (start < ogRequest.size()) {
-        size_t index = ogRequest.find("\r\n", start);
-        if (index == std::string::npos)
-            break ;
-        std::string line = ogRequest.substr(start, index - start);
-        if (start == 0)
-            parseFirstLine(line, request);
-        else if (line.empty()) {
-            size_t bodypart = index + 2;
-            request.setBody(trimSpace(ogRequest.substr(bodypart)));
-            break;
-            //end of headers, go to body
-        }
-        else
-            parsingForHeader(line, request);
-        start = index + 2;
-    }
-    ContentLengthParser(request);
-    request.setConfig(conf);
-    return request;
+//     if (ogRequest.empty()) {
+//         std::cerr << "error: empty request" << std::endl;
+//         return request;
+//     }
+//     while (start < ogRequest.size()) {
+//         size_t index = ogRequest.find("\r\n", start);
+//         if (index == std::string::npos)
+//             break ;
+//         std::string line = ogRequest.substr(start, index - start);
+//         if (start == 0)
+//             parseFirstLine(line, request);
+//         else if (line.empty()) {
+//             size_t bodypart = index + 2;
+//             request.setBody(trimSpace(ogRequest.substr(bodypart)));
+//             break;
+//             //end of headers, go to body
+//         }
+//         else
+//             parsingForHeader(line, request);
+//         start = index + 2;
+//     }
+//     ContentLengthParser(request);
+//     request.setConfig(conf);
+//     return request;
 
-}
+// }
 
 bool fileExists(const std::string &path)
 {

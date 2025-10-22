@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cfiachet <cfiachet@student.42perpignan.    +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 12:58:08 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/09/26 13:56:33 by cfiachet         ###   ########.fr       */
+/*   Updated: 2025/10/22 22:08:37 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@
 class Request;
 
 
-class Response {
+class Response
+{
 	private:
 		std::string	_version; //HTTP v1.1
 		int 		_status; //200, 404, 500
@@ -46,25 +47,25 @@ class Response {
 		Response	&operator=(const Response &other);
 		Response(const Request &req);
 
-	/*setter*/
-	void setVersion(const std::string &version);
-	void setCode(int code);
-	void setReason(const std::string &reason);
-	void setHeader(const std::string &key, const std::string &val);
-	void setBody(const std::string &body);
-	void setKeepAlive(bool keep);
-	void MoreCookie(const std::string &cookie);
-	void setChunked(bool needchunk);
+		/*setter*/
+		void setVersion(const std::string &version);
+		void setCode(int code);
+		void setReason(const std::string &reason);
+		void setHeader(const std::string &key, const std::string &val);
+		void setBody(const std::string &body);
+		void setKeepAlive(bool keep);
+		void MoreCookie(const std::string &cookie);
+		void setChunked(bool needchunk);
 
-	/*getter*/
-	const std::string &getVersion() const;
-	int	getCode() const;
-	const std::string &getReason() const;
-	const std::map<std::string, std::string> &getHeaders() const;
-	const std::string &getBody() const;
-	bool getKeepAlive() const;
-	const std::vector<std::string> EatCookie() const;
-	bool getChunked() const;
+		/*getter*/
+		const std::string &getVersion() const;
+		int	getCode() const;
+		const std::string &getReason() const;
+		const std::map<std::string, std::string> &getHeaders() const;
+		const std::string &getBody() const;
+		bool getKeepAlive() const;
+		const std::vector<std::string> EatCookie() const;
+		bool getChunked() const;
 
 	static Response buildError(int code, const std::string &reason);
 	static Response buildRedirect(const std::string &location, int code);

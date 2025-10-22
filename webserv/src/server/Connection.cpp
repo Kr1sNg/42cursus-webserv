@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/15 18:14:15 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/22 23:15:47 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,8 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 	if (pos != std::string::npos)
 	{
 		// Parse HTTP request
-		_request = Request::parserForRequest(_inBuf, _servConfig);
+		Request request(_inBuf, _servConfig);
+		// _request = Request::parserForRequest(_inBuf, _servConfig);
 		// int code = _request.CompareConfig(_servConfig);
 		// if (code != 200)
 		// 	_response = Response::buildError(code, "Error");

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/14 15:41:13 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/10/22 22:42:55 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,5 +47,7 @@ void	throwErrno(std::string const &reason);
 void	throwGaiError(std::string const &reason, int code);
 int		setNonBlocking(int fd);
 std::string cgiHandle(const Request& req, const Locationconfig& location);
+
+
 
 #endif
