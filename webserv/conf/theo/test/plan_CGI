@@ -102,8 +102,7 @@ std::string executeCgiScript(const std::string& scriptPath,
         return output;
     }
 }
-/////////////////////////////////////////
-
+////////////////////////////////////
 
 
 
