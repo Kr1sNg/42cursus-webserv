@@ -2,18 +2,45 @@
 #include "../../includes/webserv.hpp"
 //waiting for adding the good _uri (source path)
 
-Request::Request()
-    : _method("GET"), _uri("/index"), _version("HTTP/1.1"), _body("") {
-    _headers["User-Agent"] = "";
+// Request::Request(): _servConfig(NULL), _method("GET"), _uri("/index"), _version("HTTP/1.1"), _body("") {
+//     _headers["User-Agent"] = "";
+// }
+
+Request::Request(const std::string &ogRequest, const Serverconfig &conf): _servConfig(conf), _body("")
+{
+    size_t start = 0;
+
+    if (ogRequest.empty()) {
+        return ;
+    }
+    while (start < ogRequest.size()) {
+        size_t index = ogRequest.find("\r\n", start);
+        if (index == std::string::npos)
+            break ;
+        std::string line = ogRequest.substr(start, index - start);
+        if (start == 0)
+            parseFirstLine(line);
+        else if (line.empty()) {
+            size_t bodypart = index + 2;
+            _body = trimSpace(ogRequest.substr(bodypart));
+            break;
+            //end of headers, go to body
+        }
+        else
+            parsingForHeader(line);
+        start = index + 2;
+    }
+    ContentLengthParser();
 }
 
 Request::Request(const Request &cpy) 
-    : _method(cpy._method), _uri(cpy._uri), _version(cpy._version),
+    : _servConfig(cpy._servConfig), _method(cpy._method), _uri(cpy._uri), _version(cpy._version),
     _headers(cpy._headers), _body(cpy._body) {
 }
 
 Request &Request::operator=(const Request &other) {
     if (this != &other) {
+        _servConfig = other._servConfig;
         _method = other._method;
         _uri = other._uri;
         _version = other._version;
@@ -47,35 +74,35 @@ const std::string &Request::getBody() const {
     return _body;
 }
 
-const Serverconfig *Request::getConfig() const {
-    return _conf;
+const Serverconfig &Request::getConfig() const {
+    return _servConfig;
 }
 
-/*setters*/
-void Request::setMethod(const std::string &method) {
-    _method = method;
-}
+// /*setters*/
+// void Request::setMethod(const std::string &method) {
+//     _method = method;
+// }
 
-void Request::setUri(const std::string &uri) {
-    _uri = uri;
-}
+// void Request::setUri(const std::string &uri) {
+//     _uri = uri;
+// }
 
-void Request::setVersion(const std::string &version) {
-    _version = version;
-}
+// void Request::setVersion(const std::string &version) {
+//     _version = version;
+// }
 
-void Request::setHeaders(const std::map<std::string, std::string> &headers) {
-    _headers = headers;
-}
+// void Request::setHeaders(const std::map<std::string, std::string> &headers) {
+//     _headers = headers;
+// }
 
-void Request::setBody(const std::string &body) {
-    _body = body;
-}
+// void Request::setBody(const std::string &body) {
+//     _body = body;
+// }
 
-void Request::setConfig(const Serverconfig &conf) {
-    _conf = &conf;
-}
+// void Request::setConfig(const Serverconfig &conf) {
+//     _conf = &conf;
+// }
 
-void Request::addHeader(const std::string &key, const std::string &val) {
-    _headers[key] = val;
-}
+// void Request::addHeader(const std::string &key, const std::string &val) {
+//     _headers[key] = val;
+// }

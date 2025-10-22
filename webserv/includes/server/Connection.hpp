@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/15 18:07:26 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/22 23:15:36 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ class Connection: public IEventHandler
 {
 	private:
 		Server	*_server; // non-owning pointer back to server for marking close/update events	
-		const Serverconfig &_servConfig;
+		Serverconfig _servConfig;
+		
 		int		_clientFd;
 		std::string	_inBuf;	// recevive
 		std::string	_outBuf; // send
@@ -45,7 +46,7 @@ class Connection: public IEventHandler
 
 		// bool	_isClosed;
 	
-		Request		_request;
+		// Request		_request;
 		Response	_response;
 		bool		_requestReady;
 		bool		_responseReady;
