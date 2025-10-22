@@ -19,6 +19,8 @@
 # include <cctype>
 # include <sys/stat.h>
 
+# include "webserv.hpp"
+# include "config/generalconfig.hpp"
 /* std::map<string, string> variable ; explanation.
 ** it tooks 2 strings, the result will be something like that
 ** headers["Authorization"] = "token"; access in write and read

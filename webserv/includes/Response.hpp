@@ -19,6 +19,11 @@
 # include <fstream>
 # include <iostream>
 # include <stdexcept>
+# include "config/generalconfig.hpp"
+# include "webserv.hpp"
+// # include "Request.hpp"
+class Request;
+
 
 class Response {
 	private:
