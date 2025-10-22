@@ -22,6 +22,7 @@
 # include "config/generalconfig.hpp"
 # include "webserv.hpp"
 // # include "Request.hpp"
+
 class Request;
 
 
@@ -66,11 +67,11 @@ class Response
 		const std::vector<std::string> EatCookie() const;
 		bool getChunked() const;
 
-		static Response buildError(int code, const std::string &reason);
-		static Response buildRedirect(const std::string &location, int code);
-		std::string getString() const;
-		static std::string convertFileToString(const std::string &path);
-		std::string	BuildFromRequest(const Request &req);
+	static Response buildError(int code, const std::string &reason);
+	static Response buildRedirect(const std::string &location, int code);
+	std::string getString() const;
+	static std::string convertFileToString(const std::string &path);
+	std::string	BuildFromRequest(const Request &req, const Serverconfig& serverconfig);
 };
 
 #endif

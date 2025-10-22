@@ -35,15 +35,18 @@
 // # include <sys/epoll.h>
 # include <cstdlib>
 
+# include "config/generalconfig.hpp" 
+
 # include "Request.hpp"
 # include "Response.hpp"
 
-# include "config/generalconfig.hpp" 
+
 
 // function
 void	throwErrno(std::string const &reason);
 void	throwGaiError(std::string const &reason, int code);
 int		setNonBlocking(int fd);
+std::string cgiHandle(const Request& req, const Locationconfig& location);
 
 
 

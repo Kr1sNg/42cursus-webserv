@@ -22,32 +22,22 @@ Serverconfig::Serverconfig()
     _flags = 0;
     initStatics();
 
-    //  _listen = ;
-    // _server_name = ;
-    _root = "Default";
-    // _error_pages = ;
-    _client_max_body_size = 0;
-    // _locations = ;
+    // _listen[0] = "";
+    // _server_name[0] = "";
+    // _root = "Default";
+    _client_max_body_size = 10000;
 }
 
 Serverconfig::Serverconfig(const Serverconfig& obj)
 {
+    initStatics(); 
+    _flags = 0;
     _listen = obj._listen;
     _server_name = obj._server_name;
     _root = obj. _root;
     _error_pages = obj._error_pages;
     _client_max_body_size = obj._client_max_body_size;
     _locations = obj._locations;
-
-    //  _listen = ;
-    // _server_name = ;
-    _root = "Default";
-    // _error_pages = ;
-    _client_max_body_size = 0;
-    // _locations = ;
-    _flags = 0;
-
-    initStatics();
 }
 
 Serverconfig& Serverconfig::operator=(const Serverconfig& obj)
@@ -114,9 +104,9 @@ void Serverconfig::setServer_name(const std::vector<std::string>& server_name)
     _server_name.push_back(server_name[0]);
 }
 
-const std::string& Serverconfig::getServer_name(void) const
+const std::vector<std::string>& Serverconfig::getServer_name(void) const
 {
-    return (_server_name[0]);
+    return (_server_name);
 }
 
 void Serverconfig::setRoot(const std::vector<std::string>& root)

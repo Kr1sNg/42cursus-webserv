@@ -24,17 +24,19 @@ Locationconfig::Locationconfig()
 {
     initStatics();
     _flags = 0;
-    _root = "Default";
-    _index = "Default";
+    // _root = "";
+    // _index = "";
     _autoindex = false;
     // _methods = ;
-    _cgi_pass = "Default";
-    _redirect = "Default";
+    // _cgi_pass = "";
+    // _redirect = "";
 }
 
 Locationconfig::Locationconfig(const Locationconfig& obj)
 {
     initStatics();
+
+    _flags = 0;
 
     _root = obj._root;
     _index = obj._index;
@@ -42,15 +44,9 @@ Locationconfig::Locationconfig(const Locationconfig& obj)
     _methods = obj._methods;
     _cgi_pass = obj._cgi_pass;
     _redirect = obj._redirect;
+    _arg = obj._arg;
 
-    _root = "Default";
-    _index = "Default";
-    _autoindex = false;
-    // _methods = ;
-    _cgi_pass = "Default";
-    _redirect = "Default";
 
-    _flags = 0;
 }
 
 Locationconfig& Locationconfig::operator=(const Locationconfig& obj)
@@ -63,6 +59,7 @@ Locationconfig& Locationconfig::operator=(const Locationconfig& obj)
         _methods = obj._methods;
         _cgi_pass = obj._cgi_pass;
         _redirect = obj._redirect;
+        _arg = obj._arg;
     }
     return (*this);
 }
@@ -71,6 +68,17 @@ Locationconfig::~Locationconfig()
 {
 
 }
+
+void Locationconfig::setArg(std::string arg)
+{
+    _arg = arg;
+}
+
+const std::string& Locationconfig::getArg(void) const
+{
+    return (_arg);
+}
+
 
 void Locationconfig::setRoot(const std::vector<std::string>& root)
 {

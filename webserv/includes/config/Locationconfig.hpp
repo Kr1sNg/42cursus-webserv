@@ -6,6 +6,7 @@
 class Locationconfig
 {
     private :
+        std::string _arg;
         std::string _root;
         std::string _index;
         bool _autoindex;
@@ -33,6 +34,8 @@ class Locationconfig
         Locationconfig& operator=(const Locationconfig& obj);
 
         void initStatics();
+        void setArg(std::string arg);
+        const std::string& getArg(void) const;
         void setRoot(const std::vector<std::string>& root);
         const std::string& getRoot(void) const;
         void setIndex(const std::vector<std::string>& index);

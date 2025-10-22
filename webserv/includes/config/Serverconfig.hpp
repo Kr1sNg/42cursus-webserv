@@ -37,9 +37,8 @@ class Serverconfig
         size_t  getListenSize(void) const;
 
         void setServer_name(const std::vector<std::string>& server_name);
-        // const std::vector<std::string>& getServer_name(void) const;
-        const std::string& getServer_name(void) const;
-
+        const std::vector<std::string>& getServer_name(void) const;
+        // const std::string& getServer_name(void) const;
         void setRoot(const std::vector<std::string>& root);
         const std::string& getRoot(void) const;
         void addError_page(const std::vector<std::string>& error_page);

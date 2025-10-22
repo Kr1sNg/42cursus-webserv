@@ -70,12 +70,34 @@ Response::Response(const Request &req)
 */
 }
 
-std::string    Response::BuildFromRequest(const Request &req) {
+int matchLocation(std::string url, const Serverconfig& serverconfig)
+{
+    int     save = -1; 
+    size_t     i = 0;
+    size_t  bestLength = 0;
+
+    while (i < serverconfig.getLocations().size()) 
+    {
+        if (url.rfind(serverconfig.getLocations()[i].getArg(), 0) == 0 && bestLength < serverconfig.getLocations()[i].getArg().size())
+        {
+            bestLength = serverconfig.getLocations()[i].getArg().size();
+            save = i;
+        }
+        i++;
+    }
+    return (save);
+}
+
+std::string    Response::BuildFromRequest(const Request &req, const Serverconfig& serverconfig) {
     std::ostringstream len;
 
     std::string path = req.getUri();
     std::string content;
-    
+    int indexMatch = 0;
+
+    indexMatch = matchLocation(path, serverconfig);
+    if (indexMatch != -1 && serverconfig.getLocations()[indexMatch].getCgi_pass() != "")
+        return (cgiHandle(req, serverconfig.getLocations()[indexMatch]));
     content = convertFileToString("www" +req.getUri() + "index.html");
     if (content.empty())
     {
