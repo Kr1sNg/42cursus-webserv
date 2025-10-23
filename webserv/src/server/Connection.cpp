@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/22 23:15:47 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/23 10:24:06 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 		// if (code != 200)
 		// 	_response = Response::buildError(code, "Error");
 		// else
-			_outBuf = _response.BuildFromRequest(_request, _servConfig);
+			_outBuf = _response.BuildFromRequest(request, _servConfig);
 		_requestReady = true;
 		_inBuf.erase(0, pos + 4);
 	}
