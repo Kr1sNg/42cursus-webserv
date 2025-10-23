@@ -97,27 +97,35 @@ std::string    Response::BuildFromRequest(const Request &req, const Serverconfig
 
     indexMatch = matchLocation(path, serverconfig);
     if (indexMatch != -1 && serverconfig.getLocations()[indexMatch].getCgi_pass() != "")
-        return (cgiHandle(req, serverconfig.getLocations()[indexMatch]));
-    content = convertFileToString("www" +req.getUri() + "index.html");
-    if (content.empty())
     {
-       // Response::setBody(req.getBody() + content);
-        Response::setCode(404);
-        Response::setReason("Not-Found");
-        Response::setChunked(true);
-        content = convertFileToString("www/error_pages/404_notfound.html");
-        Response::setBody(req.getBody() + content);
-    }
-    else if (req.getMethod() == "POST") {
-        Response::setBody(req.getBody() + content);
-        Response::setCode(200);
-        Response::setReason("OK");
-        Response::setChunked(true);
-    }
-    else {
+        content = cgiHandle(req, serverconfig.getLocations()[indexMatch]);
         Response::setBody(content);
         Response::setCode(200);
         Response::setReason("OK");
+    }
+    else
+    {
+        content = convertFileToString("www" +req.getUri() + "index.html");
+        if (content.empty())
+        {
+        // Response::setBody(req.getBody() + content);
+            Response::setCode(404);
+            Response::setReason("Not-Found");
+            Response::setChunked(true);
+            content = convertFileToString("www/error_pages/404_notfound.html");
+            Response::setBody(req.getBody() + content);
+        }
+        else if (req.getMethod() == "POST") {
+            Response::setBody(req.getBody() + content);
+            Response::setCode(200);
+            Response::setReason("OK");
+            Response::setChunked(true);
+        }
+        else {
+            Response::setBody(content);
+            Response::setCode(200);
+            Response::setReason("OK");
+        }
     }
     /* content type (to do)
     _headers["Content-Type"] = getType(path); */
