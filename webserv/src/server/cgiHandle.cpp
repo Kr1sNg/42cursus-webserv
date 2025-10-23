@@ -36,17 +36,26 @@ char **cgiEnv(const Request& req, Locationconfig location)
 	env.push_back("REQUEST_METHOD=" + req.getMethod());
     env.push_back("QUERY_STRING=" + getQuery(req.getUri()));
 
-	std::map<std::string, std::string>::const_iterator it = req.getHeaders().find("contentLength");
+	std::map<std::string, std::string>::const_iterator it = req.getHeaders().find("Content-Length");
 
     env.push_back("CONTENT_LENGTH=" + it->second);
 
-	it = req.getHeaders().find("contentType");
-
-    env.push_back("CONTENT_TYPE=" + it->second);
+	it = req.getHeaders().find("Content-Type");
+    if (it != req.getHeaders().end() && !it->second.empty())
+        env.push_back("CONTENT_TYPE=" + it->second);
+    else
+        env.push_back("CONTENT_TYPE=");
     env.push_back("SCRIPT_FILENAME=" + location.getCgi_pass());
     env.push_back("GATEWAY_INTERFACE=CGI/1.1");
     env.push_back("SERVER_PROTOCOL=" + req.getVersion());
     env.push_back("REDIRECT_STATUS=200");
+
+    // size_t i = 0;
+    // while (i < env.size())
+    // {
+    //     std::cout << "env : " << env[i] << std::endl;
+    //     i++;
+    // }
 
     return (vectorToChar(env));
 }
@@ -93,11 +102,14 @@ char **cgiEnv(const Request& req, Locationconfig location)
 
 std::string cgiHandle(const Request& req, const Locationconfig& location)
 {
+    std::cout << location.getCgi_pass() << std::endl;
     int pipe_in[2];   // parent -> enfant (POST)
     int pipe_out[2];  // enfant -> parent (stdout CGI)
 
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1)
         return "";
+
+    char **env = cgiEnv(req, location); // ton environnement CGI
 
     pid_t pid = fork();
     if (pid < 0)
@@ -105,7 +117,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location)
 
     if (pid == 0) // enfant
     {
-        char **env = cgiEnv(req, location); // ton environnement CGI
+      
         char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), NULL};
 
         // Fermer les extrémités inutiles
