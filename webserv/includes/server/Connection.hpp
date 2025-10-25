@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/22 23:15:36 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/25 23:56:43 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ class Connection: public IEventHandler
 
 		// bool	_isClosed;
 	
-		// Request		_request;
+		Request		_request;
 		Response	_response;
 		bool		_requestReady;
 		bool		_responseReady;

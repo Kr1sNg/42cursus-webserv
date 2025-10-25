@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/23 10:24:06 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/26 00:08:41 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,12 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 	{
 		// Parse HTTP request
 		Request request(_inBuf, _servConfig);
-		// _request = Request::parserForRequest(_inBuf, _servConfig);
-		// int code = _request.CompareConfig(_servConfig);
-		// if (code != 200)
-		// 	_response = Response::buildError(code, "Error");
-		// else
-			_outBuf = _response.BuildFromRequest(request, _servConfig);
+		_request = request;
+		
+		Response response(request, _servConfig);
+		_response = response;
+		
+		_outBuf = _response.toString();
 		_requestReady = true;
 		_inBuf.erase(0, pos + 4);
 	}
@@ -80,15 +80,6 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 	// if a full request is ready, build a response
 	if (_requestReady)
 	{
-		//  _outBuf = _response.BuildFromRequest(_request);
-		// _response.setVersion("HTTP/1.1");
-		// _response.setCode(200);
-		// _response.setReason("OK");
-		// _response.setHeader("Content-Type", "text/plain");
-		// _response.setBody("Hello from server!\n");
-		// convert response to text
-		// _outBuf = _response.getString();
-
 		_events = POLLIN | POLLOUT;
 		_server->setFdEvents(_clientFd, _events);	
 		_responseReady = true;
@@ -113,8 +104,15 @@ void	Connection::flushOutBuffer(void) //send
 	_outBuf.erase(0, n);
 
 	if (_outBuf.empty())
-	{
-		// Done sending, stop watching POLLOUT
+	{	
+		// Done sending, 
+		if (!_response.getKeepAlive())
+		{
+			_server->markForClose(_clientFd);
+			return ;
+		}
+		
+		// Otherwise, stop watching POLLOUT and wait for next request
 		_events = POLLIN;
 		_server->setFdEvents(_clientFd, _events);
 	}

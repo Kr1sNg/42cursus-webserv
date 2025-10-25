@@ -26,13 +26,6 @@ std::string Request::trimSpace(const std::string &str) {
     return (str.substr(start, end - start + 1));
 }
 
-std::string Request::getHeader(const std::string &search) const {
-    std::map<std::string, std::string>::const_iterator iterator = _headers.find(search);
-    if (iterator != _headers.end())
-        return iterator->second; // second here point the value of the key we are searching for
-    return "";
-}
-
 void  Request::parseFirstLine(std::string &line)
 {
     //each time there are a space it's a new category of the line
