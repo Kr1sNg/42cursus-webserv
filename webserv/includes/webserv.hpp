@@ -6,12 +6,14 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/22 22:42:55 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/25 18:02:24 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef _WEBSERV_HPP_
 # define _WEBSERV_HPP_
+# define WWW "./www"
+
 
 # include <iostream>
 # include <string>

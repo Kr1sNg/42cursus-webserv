@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 17:45:07 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/10/22 23:11:35 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/26 00:05:20 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class Request
 		std::string _body; // body of the http request POST
 		
 	public:
-		// Request();
+		Request(void);
 		Request(const std::string &ogRequest, const Serverconfig &conf);
 		~Request();
 		Request(const Request &cpy);

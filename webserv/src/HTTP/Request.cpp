@@ -2,9 +2,10 @@
 #include "../../includes/webserv.hpp"
 //waiting for adding the good _uri (source path)
 
-// Request::Request(): _servConfig(NULL), _method("GET"), _uri("/index"), _version("HTTP/1.1"), _body("") {
-//     _headers["User-Agent"] = "";
-// }
+Request::Request(): _method("GET"), _uri(""), _version("HTTP/1.0"), _body("")
+{
+    _headers["Connection"] = "keep-alive";
+}
 
 Request::Request(const std::string &ogRequest, const Serverconfig &conf): _servConfig(conf), _body("")
 {
@@ -64,6 +65,14 @@ const std::string &Request::getUri() const {
 
 const std::string &Request::getVersion() const {
     return _version;
+}
+
+std::string Request::getHeader(const std::string &keyword) const
+{
+    std::map<std::string, std::string>::const_iterator it = _headers.find(keyword);
+    if (it != _headers.end())
+        return (it->second);
+    return ("");
 }
 
 const std::map<std::string, std::string> &Request::getHeaders() const {
