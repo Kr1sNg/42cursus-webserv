@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/26 00:08:41 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/26 00:30:58 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,22 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 {
 	char buf[4096];
 
-	ssize_t n = recv(_clientFd, buf, sizeof(buf), 0);
-	if (n <= 0)
+	while (true)
 	{
-		_server->markForClose(_clientFd);
-		return;
+		ssize_t n = recv(_clientFd, buf, sizeof(buf), 0);
+		if (n <= 0)
+		{
+			if (n < 0 || (errno == EAGAIN || errno == EWOULDBLOCK))
+				break ; // no more data for now (not an error)
+			_server->markForClose(_clientFd);
+			return;
+		}
+		_inBuf.append(buf, n);
+		std::cout << "Size " << n << " [RECV] from fd[" << _clientFd << "]: " << buf << std::endl;
+		
+		if (n < (ssize_t)sizeof(buf))
+			break ;
 	}
-	_inBuf.append(buf, n);
-	std::cout << "Size " << n << " [RECV] from fd[" << _clientFd << "]: " << buf << std::endl;
-
 	// detect a complete HTTP request by "\r\n\r\n"
 	size_t pos = _inBuf.find("\r\n\r\n");
 	if (pos != std::string::npos)
