@@ -37,20 +37,21 @@ Response::Response(Request const &req, Serverconfig const &conf):
             filePath += "index.html";
         
         if (fileExists(filePath))
-            buildFromFile(filePath);    // TO-DO
+            buildFromFile(filePath);
         else
-            buildError(404, "Not Found");   // TO-DO
+            buildError(404, "Not Found");
     }
     else if (req.getMethod() == "POST")
     {
-        
+        handleFileUpload(req); // TODO
+        buildFromFile("./www/notif/upload_success.html");
     }
     else if (req.getMethod() == "DELETE")
     {
 
     }
     else
-        buildError(405, "Method Not Allowed"); // TO-DO
+        buildError(405, "Method Not Allowed");
 }
 
 
@@ -388,3 +389,8 @@ std::string Response::getType(std::string const &path)
     return ("application/octet-stream");
 }
 
+void    Response::handleFileUpload(const Request &req)
+{
+    (void)req;
+    // receive file upload and save to ./www/uploads
+}

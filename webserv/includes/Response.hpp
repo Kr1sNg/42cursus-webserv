@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 12:58:08 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/10/26 00:03:44 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/26 09:54:00 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ class Response
 
 		std::string getType(std::string const &path);
 		
+		void    handleFileUpload(const Request &req);
 };
 
 #endif
