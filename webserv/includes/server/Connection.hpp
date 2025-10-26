@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/25 23:56:43 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/26 08:02:19 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,13 @@ class Connection: public IEventHandler
 	
 		Request		_request;
 		Response	_response;
-		bool		_requestReady;
-		bool		_responseReady;
+
+		bool	_headerComplete;
+		size_t	_headerEndPos;
+		size_t	_contentLength;
+		
+		// bool		_requestReady;
+		// bool		_responseReady;
 
 		Connection	&operator=(Connection const &rhs);
 		Connection(Connection const &src);
