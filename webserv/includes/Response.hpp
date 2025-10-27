@@ -82,9 +82,9 @@ class Response
 		//new add
 		std::string toString(void) const;
 		
+		void buildCGI(const std::string& content);
 		void buildFromFile(std::string const &path);
 		void buildError(int code, std::string const &reason);
-
 		std::string getType(std::string const &path);
 		
 		void    handleFileUpload(const Request &req);

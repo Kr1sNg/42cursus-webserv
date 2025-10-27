@@ -14,6 +14,31 @@ static bool fileExists(const std::string &path)
     return (stat(path.c_str(), &st) == 0 && S_ISREG(st.st_mode));
 }
 
+static std::string intToStr(int n)
+{
+    std::ostringstream  oss;
+    oss << n;
+    return (oss.str());
+}
+
+int matchLocation(std::string url, const Serverconfig& serverconfig)
+{
+    int     save = -1; 
+    size_t     i = 0;
+    size_t  bestLength = 0;
+
+    while (i < serverconfig.getLocations().size()) 
+    {
+        if (url.rfind(serverconfig.getLocations()[i].getArg(), 0) == 0 && bestLength < serverconfig.getLocations()[i].getArg().size())
+        {
+            bestLength = serverconfig.getLocations()[i].getArg().size();
+            save = i;
+        }
+        i++;
+    }
+    return (save);
+}
+
 Response::Response(Request const &req, Serverconfig const &conf):
         _version(req.getVersion()),
         _status(200),
@@ -29,8 +54,15 @@ Response::Response(Request const &req, Serverconfig const &conf):
         _keepAlive = false;
     else if (conn == "keep-alive")
         _keepAlive = true;
-    
-    if (req.getMethod() == "GET")
+    int indexMatch = matchLocation(req.getUri(), conf);
+    if (indexMatch != -1 && conf.getLocations()[indexMatch].getCgi_pass() != "")
+    {
+        std::string content = cgiHandle(req, conf.getLocations()[indexMatch]);
+        buildCGI(content);
+        setStatus(200, "OK");
+        setHeader("Content-Lenght", intToStr(content.size()));
+    }
+    else if (req.getMethod() == "GET")
     {
         std::string filePath = std::string(WWW) + req.getUri();
         if (filePath[filePath.size() - 1] == '/')
@@ -305,13 +337,43 @@ Response &Response::operator=(const Response &other) {
 //     return _needChunked;
 // }
 
-static std::string intToStr(int n)
+void    Response::buildCGI(const std::string& content)
 {
-    std::ostringstream  oss;
-    oss << n;
-    return (oss.str());
-}
+    std::istringstream  stream(content);
+    std::string         line;
 
+    while (std::getline(stream, line))
+    {
+        if (line == "\r")
+            break;
+    
+    size_t pos = content.find(":"); 
+
+    if (pos != std::string::npos)
+    {
+        if (content.substr(0, pos) == "Content-Type")
+        {
+            setHeader("Content-Type", content.substr(pos + 1));
+        }
+        else if (content.substr(0, pos) == "status")
+        {
+            int status;
+            size_t pos2 = content.substr(pos + 1).find(" ");
+            std::stringstream ss(content.substr(pos + 1));
+            ss >> status;
+            setStatus(status, content.substr(pos2 + 1));
+        }
+        else
+        {
+            setHeader(content.substr(0, pos), content.substr(pos + 1));
+        }
+    }
+    }
+    while (std::getline(stream, line))
+    {
+        _body += line + "\n";
+    }
+}
 
 void    Response::buildFromFile(std::string const &path)
 {
@@ -324,7 +386,7 @@ void    Response::buildFromFile(std::string const &path)
     std::string body = oss.str();
 
     setStatus(200, "OK");
-    setHeader("Content-Lenght", intToStr(body.size()));
+    setHeader("Content-Length", intToStr(body.size()));
     setHeader("Content-Type", getType(path));
     setBody(body);
 
