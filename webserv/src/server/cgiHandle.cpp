@@ -50,13 +50,6 @@ char **cgiEnv(const Request& req, Locationconfig location)
     env.push_back("SERVER_PROTOCOL=" + req.getVersion());
     env.push_back("REDIRECT_STATUS=200");
 
-    // size_t i = 0;
-    // while (i < env.size())
-    // {
-    //     std::cout << "env : " << env[i] << std::endl;
-    //     i++;
-    // }
-
     return (vectorToChar(env));
 }
 
@@ -103,28 +96,26 @@ char **cgiEnv(const Request& req, Locationconfig location)
 std::string cgiHandle(const Request& req, const Locationconfig& location)
 {
     std::cout << location.getCgi_pass() << std::endl;
-    int pipe_in[2];   // parent -> enfant (POST)
-    int pipe_out[2];  // enfant -> parent (stdout CGI)
+    int pipe_in[2];
+    int pipe_out[2];
 
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1)
         return "";
 
-    char **env = cgiEnv(req, location); // ton environnement CGI
+    char **env = cgiEnv(req, location);
 
     pid_t pid = fork();
     if (pid < 0)
         return "";
 
-    if (pid == 0) // enfant
+    if (pid == 0)
     {
       
         char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), NULL};
 
-        // Fermer les extrémités inutiles
         close(pipe_in[1]);
         close(pipe_out[0]);
 
-        // Rediriger stdin et stdout
         dup2(pipe_in[0], STDIN_FILENO);
         dup2(pipe_out[1], STDOUT_FILENO);
 
@@ -132,26 +123,24 @@ std::string cgiHandle(const Request& req, const Locationconfig& location)
         close(pipe_out[1]);
 
         execve(location.getCgi_pass().c_str(), argv, env);
-        exit(1); // si execve échoue
+        exit(1);
     }
-    else // parent
+    else
     {
-        close(pipe_in[0]);   // parent n'utilise pas l'entrée
-        close(pipe_out[1]);  // parent n'écrit pas sur pipe_out
+        close(pipe_in[0]);
+        close(pipe_out[1]);
 
-        // Envoyer le corps POST au CGI
         if (req.getMethod() == "POST" && !req.getBody().empty()) {
             ssize_t total = 0;
             const std::string& body = req.getBody();
             while (total < static_cast<ssize_t>(body.size())) {
                 ssize_t written = write(pipe_in[1], body.c_str() + total, body.size() - total);
-                if (written <= 0) break; // erreur ou pipe fermé
+                if (written <= 0)
                 total += written;
             }
         }
-        close(pipe_in[1]); // très important pour signaler EOF au CGI
+        close(pipe_in[1]);
 
-        // Lire la sortie du CGI
         std::string output;
         char buffer[4096];
         ssize_t bytesRead;
@@ -160,7 +149,6 @@ std::string cgiHandle(const Request& req, const Locationconfig& location)
         }
         close(pipe_out[0]);
 
-        // Attendre la fin de l'enfant
         waitpid(pid, NULL, 0);
 
         return output;
