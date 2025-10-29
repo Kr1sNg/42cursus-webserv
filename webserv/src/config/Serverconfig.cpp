@@ -149,9 +149,17 @@ void Serverconfig::addError_page(const std::vector<std::string>& error_page)
     }
 }
 
-const std::map<int, std::string>& Serverconfig::getError_pages(void) const
+// const std::map<int, std::string>& Serverconfig::getError_pages(void) const
+// {
+//     return (_error_pages); // c'est quoi cet logique ???
+// }
+
+std::string Serverconfig::getError_pages(int code) const   // it helps to get Error page location
 {
-    return (_error_pages);
+    std::map<int, std::string>::const_iterator it = _error_pages.find(code);
+    if (it != _error_pages.end())
+        return (_root + it->second);
+    return (_root);
 }
 
 void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max_body_size)
@@ -205,3 +213,27 @@ size_t  Serverconfig::getListenSize(void) const
 {
     return (_listen.size());
 }
+
+
+Locationconfig *Serverconfig::matchLocation(const std::string &url)
+{
+    int     index = -1; 
+    size_t  i = 0;
+    size_t  bestLength = 0;
+
+    while (i < _locations.size())
+    {
+        std::cout << "Serveconfig::matchLocation: _locations[i]: " << _locations[i].getArg() << std::endl;
+        if (url.rfind(_locations[i].getArg(), 0) == 0 && bestLength < _locations[i].getArg().size())
+        {
+            bestLength = _locations[i].getArg().size();
+            index = i;
+        }
+        i++;
+    }
+    if (index != -1)
+        return (&_locations[index]);
+    else
+        return (NULL);
+}
+

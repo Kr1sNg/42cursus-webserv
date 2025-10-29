@@ -4,15 +4,38 @@ Response::Response():
         _version("HTTP/1.1"),
         _status(200),
         _reason("OK"),
-        _keepAlive(true)
+        _keepAlive(true),    //"close" or "keep-alive"
+        _isBodyFromFile(false)
 {
 }
 
-static bool fileExists(const std::string &path)
+Response::~Response()
 {
-    struct stat  st;
-    return (stat(path.c_str(), &st) == 0 && S_ISREG(st.st_mode));
 }
+
+Response::Response(const Response &cpy)
+{
+    *this = cpy;
+}
+
+Response    &Response::operator=(const Response &other)
+{
+    if (this != &other)
+    {
+        _version = other._version;
+        _status = other._status;
+        _reason = other._reason;
+        _headers = other._headers;
+        _keepAlive = other._keepAlive;
+        _cookies = other._cookies;
+        _generatedBody = other._generatedBody;
+        _filePath = other._filePath;
+        _isBodyFromFile = other._isBodyFromFile;
+    }
+    return *this;
+}
+
+/* helpers */
 
 static std::string intToStr(int n)
 {
@@ -21,94 +44,7 @@ static std::string intToStr(int n)
     return (oss.str());
 }
 
-int matchLocation(std::string url, const Serverconfig& serverconfig)
-{
-    int     save = -1;
-    size_t     i = 0;
-    size_t  bestLength = 0;
-
-    while (i < serverconfig.getLocations().size())
-    {
-        if (url.rfind(serverconfig.getLocations()[i].getArg(), 0) == 0 && bestLength < serverconfig.getLocations()[i].getArg().size())
-        {
-            bestLength = serverconfig.getLocations()[i].getArg().size();
-            save = i;
-        }
-        i++;
-    }
-    return (save);
-}
-
-Response::Response(Request const &req, Serverconfig const &conf):
-        _version(req.getVersion()),
-        _status(200),
-        _reason("OK"),
-        _servConfig(conf),
-        _keepAlive(true)
-{
-    // set keepAlive
-    if (req.getVersion() == "HTTP/1.0")
-        _keepAlive = false;
-    std::string conn = req.getHeader("Connection");
-    if (conn == "close")
-        _keepAlive = false;
-    else if (conn == "keep-alive")
-        _keepAlive = true;
-    int indexMatch = matchLocation(req.getUri(), conf);
-    if (indexMatch != -1 && conf.getLocations()[indexMatch].getCgi_pass() != "")
-    {
-        std::string content = cgiHandle(req, conf.getLocations()[indexMatch], conf);
-        buildCGI(content);
-        setStatus(200, "OK");
-        setHeader("Content-Lenght", intToStr(content.size()));
-    }
-    else if (req.getMethod() == "GET")
-    {
-        std::string filePath = "";
-        if (indexMatch != -1 && conf.getLocations()[indexMatch].getRoot() != "")
-            filePath = conf.getLocations()[indexMatch].getRoot() + req.getUri();
-        else
-            filePath = conf.getRoot() + req.getUri();
-        if (filePath[filePath.size() - 1] == '/')
-        {
-            if (indexMatch != -1 && conf.getLocations()[indexMatch].getIndex() != "")
-            {
-                filePath += conf.getLocations()[indexMatch].getIndex();
-            }
-            // else if (indexMatch != -1 && conf.getLocations()[indexMatch].getAutoindex() == true)
-            // afficher liste du contenu du fichier
-            //else
-            //erreur 403 ou 404 a verifier
-        }
-        // if (filePath[filePath.size() - 1] == '/')
-        //     filePath += "index.html";
-        if (fileExists(filePath))
-            buildFromFile(filePath);
-        else
-            buildError(404, "Not Found");
-    }
-    else if (req.getMethod() == "POST")
-    {
-        handleFileUpload(req); // TODO
-        buildFromFile("./www/notif/upload_success.html");
-    }
-    else if (req.getMethod() == "DELETE")
-    {
-
-    }
-    else
-        buildError(405, "Method Not Allowed");
-}
-
-
-Response::~Response()
-{
-}
-
 /* setters */
-void Response::setVersion(const std::string &version) {
-    _version = version;
-}
 
 void Response::setStatus(int code, const std::string &reason) {
     _status = code;
@@ -119,19 +55,90 @@ void Response::setHeader(const std::string &key, const std::string &val) {
     _headers[key] = val;
 }
 
-void Response::setBody(const std::string &body) {
-    _body = body;
-}
-
 void Response::setKeepAlive(bool keep) {
     _keepAlive = keep;
+    if (_keepAlive)
+        _headers["Connection"] = "keep-alive";
+    else
+        _headers["Connection"] = "close";
+}
+
+void    Response::addCookie(const std::string &cookie)
+{
+    _cookies.push_back(cookie);
+}
+
+void    Response::setBody(const std::string &body)
+{
+    _generatedBody = body;
+    _isBodyFromFile = false; //this is a genrated body, not a file
+    _filePath.clear();
+
+    //Automaitclally set Content-length for generated bodies
+    setHeader("Content-Length", intToStr(body.length()));
+}
+
+void    Response::buildFromFile(std::string const &path, Serverconfig conf)
+{
+    std::ifstream   file(path.c_str(), std::ios::binary);
+    if (!file.is_open())
+        return (buildError(404, "Not Found", conf));
+
+    // std::ostringstream oss;
+    // oss << file.rdbuf();
+    // std::string body = oss.str();
+
+    // take only file size
+    file.seekg(0, std::ios::end);
+    long length = file.tellg();
+    file.close();
+
+    if (length == -1)
+        return (buildError(500, "Internal Server Error", conf));
+
+    _filePath = path;
+    _isBodyFromFile = true;
+    _generatedBody.clear();
+
+    setHeader("Content-Length", intToStr(length));
+    setHeader("Content-Type", getType(path));
+}
+
+void    Response::buildError(int code, std::string const &reason, Serverconfig conf)
+{
+    setStatus(code, reason);
+    setKeepAlive(false);
+
+    std::ostringstream path;
+    // path << "./www/error/" << code << ".html";
+    path << conf.getError_pages(code);
+
+    std::ifstream   file(path.str().c_str(), std::ios::binary);
+    std::string body;
+
+    if (file.is_open())
+    {
+        std::ostringstream oss;
+        oss << file.rdbuf();
+        body = oss.str();
+        file.close();
+    }
+    else
+    {
+        std::ostringstream oss;
+        oss << "<html><head><title>" << code << " " << reason
+            << "</title></head><body><h1>"
+            << code << " " << reason
+            << "</h1><p>The requested page could not be found.</p></body></html>";
+        body = oss.str();
+    }
+
+    setBody(body);
+    setHeader("Content-Type", "text/html");
+    setHeader("Content-Length", intToStr(body.size()));
 }
 
 /* getters */
-const std::string &Response::getVersion() const {
-    return _version;
-}
-
 int	Response::getStatus() const {
     return _status;
 }
@@ -140,55 +147,70 @@ const std::string &Response::getReason() const {
     return _reason;
 }
 
-const std::map<std::string, std::string> &Response::getHeaders() const {
-    return _headers;
-}
-
-const std::string &Response::getBody() const {
-    return _body;
-}
-
-bool Response::getKeepAlive() const {
+bool Response::getKeepAlive() const
+{
     return _keepAlive;
 }
 
-
-// void Response::setKeepAlive(bool keep) {
-//     _keepAlive = keep;
-// }
-
-// Response::Response(Request const &req, Serverconfig const &conf):
-//         _version(req.getVersion()),
-//         _status(0), // defaut code ?
-//         _reason(""), // defaut ?
-//         _body(""),
-//         _needChunked(false),
-//         _keepAlive(true),
-//         _cookie()
-// {
-//     std::string path = req.getUri();
-//     std::string content;
-//     int indexMatch = matchLocation(path, conf);
-//     if (indexMatch != -1 && conf.getLocations()[indexMatch].getCgi_pass() != "")
-//     {
-//         _body = cgiHandle(req, conf.getLocations()[indexMatch]);
-//         _status = 200;
-//         _reason = "OK"
-//         _
-
-//     }
-// }
-
-std::string Response::toString(void) const
+bool Response::isBodyFromFile() const
 {
-    std::ostringstream oss;
-    oss << _version << " " << _status << " " << _reason << "\r\n";
-    for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
-        oss << it->first << ": " << it->second << "\r\n";
-    oss << "\r\n";
-    oss << _body;
-    return (oss.str());
+    return _isBodyFromFile;
 }
+
+const std::string& Response::getFilePath() const
+{
+    return _filePath;
+}
+
+const std::string &Response::getBody() const {
+    return _generatedBody;
+}
+
+std::string Response::getHeaderString(void) const
+{
+    std::stringstream   ss;
+
+    //1. Status line
+    ss << _version << " " << _status << " " << _reason << "\r\n";
+
+    //2. Headers
+    for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
+        ss << it->first << ": " << it->second << "\r\n";
+    
+    //3. Cookies
+    for (std::vector<std::string>::const_iterator it = _cookies.begin(); it != _cookies.end(); ++it)
+        ss << "Set-Cookie: " << *it << "\r\n";
+
+    //4. Final CRLF
+    ss << "\r\n";
+
+    return (ss.str());
+}
+
+std::string Response::getType(std::string const &path)
+{
+    size_t dot = path.find_last_of('.');
+    if (dot == std::string::npos)
+        return ("application/octet-stream");
+
+    std::string ext = path.substr(dot + 1);
+    if (ext == "html" || ext == "htm")
+        return ("text/html");
+    if (ext == "css")
+        return ("text/css");
+    if (ext == "js")
+        return ("text/javascript");
+    if (ext == "png")
+        return ("image/png");
+    if (ext == "jpg" || ext == "jpeg")
+        return ("image/jpeg");
+    if (ext == "gif")
+        return ("image/gif");
+    if (ext == "txt")
+        return ("text/plain");
+    return ("application/octet-stream");
+}
+
 
 // std::string Response::convertFileToString(const std::string &path) {
 //     std::ifstream   fd(path.c_str());
@@ -307,30 +329,6 @@ std::string Response::toString(void) const
 // }
 
 
-Response::Response(const Response &cpy):
-        _version(cpy._version),
-        _status(cpy._status),
-        _reason(cpy._reason),
-        _headers(cpy._headers),
-        _body(cpy._body),
-        _servConfig(cpy._servConfig),
-        _keepAlive(cpy._keepAlive)
-{
-}
-
-Response &Response::operator=(const Response &other) {
-    if (this != &other) {
-        _version = other._version;
-        _status = other._status;
-        _reason = other._reason;
-        _headers = other._headers;
-        _body = other._body;
-        _servConfig = other._servConfig;
-        _keepAlive = other._keepAlive;
-    }
-    return *this;
-}
-
 
 // void Response::MoreCookie(const std::string &cookie) {
 //     _cookie.push_back(cookie);
@@ -351,156 +349,157 @@ Response &Response::operator=(const Response &other) {
 //     return _needChunked;
 // }
 
-void    Response::buildCGI(const std::string& content)
-{
-    std::istringstream  stream(content);
-    std::string         line;
-
-    while (std::getline(stream, line))
-    {
-        if (line == "\r")
-            break;
-
-    size_t pos = content.find(":");
-
-    if (pos != std::string::npos)
-    {
-        if (content.substr(0, pos) == "Content-Type")
-        {
-            setHeader("Content-Type", content.substr(pos + 1));
-        }
-        else if (content.substr(0, pos) == "status")
-        {
-            int status;
-            size_t pos2 = content.substr(pos + 1).find(" ");
-            std::stringstream ss(content.substr(pos + 1));
-            ss >> status;
-            setStatus(status, content.substr(pos2 + 1));
-        }
-        else
-        {
-            setHeader(content.substr(0, pos), content.substr(pos + 1));
-        }
-    }
-    }
-    while (std::getline(stream, line))
-    {
-        _body += line + "\n";
-    }
-}
-
-void    Response::buildFromFile(std::string const &path)
-{
-    std::ifstream   file(path.c_str(), std::ios::binary);
-    if (!file.is_open())
-        return (buildError(404, "Not Found"));
-
-    std::ostringstream oss;
-    oss << file.rdbuf();
-    std::string body = oss.str();
-
-    setStatus(200, "OK");
-    setHeader("Content-Length", intToStr(body.size()));
-    setHeader("Content-Type", getType(path));
-    setBody(body);
-
-    file.close();
-}
-
-// void    Response::buildAutoindex()
+// void    Response::buildCGI(const std::string& content)
 // {
-//     setVersion("HTTP/1.1");
-//     setStatus(code, reason);
+//     std::istringstream  stream(content);
+//     std::string         line;
 
-//     std::ostringstream path;
-//     path << "./www/errors/" << code << ".html";
-
-//     std::ifstream   file(path.str().c_str(), std::ios::binary);
-//     std::string body;
-
-//     if (file.is_open())
+//     while (std::getline(stream, line))
 //     {
-//         std::ostringstream oss;
-//         oss << file.rdbuf();
-//         body = oss.str();
-//         file.close();
-//     }
-//     else
-//     {
-//         std::ostringstream oss;
-//         oss << "<html><head><title>" << code << " " << reason
-//             << "</title></head><body><h1>"
-//             << code << " " << reason
-//             << "</h1><p>The requested page could not be found.</p></body></html>";
-//         body = oss.str();
-//     }
+//         if (line == "\r")
+//             break;
 
-//     setBody(body);
-//     setHeader("Content-Type", "text/html");
-//     setHeader("Content-Length", intToStr(body.size()));
-//     setKeepAlive(false);
+//     size_t pos = content.find(":");
+
+//     if (pos != std::string::npos)
+//     {
+//         if (content.substr(0, pos) == "Content-Type")
+//         {
+//             setHeader("Content-Type", content.substr(pos + 1));
+//         }
+//         else if (content.substr(0, pos) == "status")
+//         {
+//             int status;
+//             size_t pos2 = content.substr(pos + 1).find(" ");
+//             std::stringstream ss(content.substr(pos + 1));
+//             ss >> status;
+//             setStatus(status, content.substr(pos2 + 1));
+//         }
+//         else
+//         {
+//             setHeader(content.substr(0, pos), content.substr(pos + 1));
+//         }
+//     }
+//     }
+//     while (std::getline(stream, line))
+//     {
+//         _body += line + "\n";
+//     }
 // }
 
-void    Response::buildError(int code, std::string const &reason)
-{
-    setVersion("HTTP/1.1");
-    setStatus(code, reason);
 
-    std::ostringstream path;
-    path << "./www/errors/" << code << ".html";
 
-    std::ifstream   file(path.str().c_str(), std::ios::binary);
-    std::string body;
 
-    if (file.is_open())
-    {
-        std::ostringstream oss;
-        oss << file.rdbuf();
-        body = oss.str();
-        file.close();
-    }
-    else
-    {
-        std::ostringstream oss;
-        oss << "<html><head><title>" << code << " " << reason
-            << "</title></head><body><h1>"
-            << code << " " << reason
-            << "</h1><p>The requested page could not be found.</p></body></html>";
-        body = oss.str();
-    }
 
-    setBody(body);
-    setHeader("Content-Type", "text/html");
-    setHeader("Content-Length", intToStr(body.size()));
-    setKeepAlive(false);
-}
 
-std::string Response::getType(std::string const &path)
-{
-    size_t dot = path.find_last_of('.');
-    if (dot == std::string::npos)
-        return ("text/plain");
 
-    std::string ext = path.substr(dot + 1);
-    if (ext == "html" || ext == "htm")
-        return ("text/html");
-    if (ext == "css")
-        return ("text/css");
-    if (ext == "js")
-        return ("application/javascript");
-    if (ext == "png")
-        return ("image/png");
-    if (ext == "jpg" || ext == "jpeg")
-        return ("image/jpeg");
-    if (ext == "gif")
-        return ("image/gif");
-    if (ext == "txt")
-        return ("text/plain");
-    return ("application/octet-stream");
-}
+// static std::string getBoundary(const std::string &contentType)
+// {
+//     std::string key = "boundary=";
+//     size_t pos = contentType.find(key);
+//     if (pos == std::string::npos)
+//         return ("");
+//     std::string boundary = contentType.substr(pos + key.length());
 
-void    Response::handleFileUpload(const Request &req)
-{
-    (void)req;
-    // receive file upload and save to ./www/uploads
-}
+//     if (!boundary.empty() && boundary[0] == '"')
+//         boundary = boundary.substr(1, boundary.size() - 2);
+//     return ("--" + boundary);
+// }
+
+// static std::vector<std::string>    splitByBoundary(const std::string &body, const std::string &boundary)
+// {
+//     std::vector<std::string>    parts;
+//     size_t  start = 0;
+//     size_t  end;
+
+//     while (true)
+//     {
+//         start = body.find(boundary, start);
+//         if (start == std::string::npos)
+//             break ;
+
+//         start += boundary.length();
+
+//         if (body.substr(start, 2) == "\r\n")
+//             start += 2;
+
+//         end = body.find(boundary, start);
+//         if (end == std::string::npos)
+//             break ;
+        
+//         std::string part = body.substr(start, end - start);
+//         parts.push_back(part);
+//         start = end;
+//     }
+//     return (parts);
+// }
+
+// static std::string  extractFilename(const std::string &part)
+// {
+//     std::string key = "filename=\"";
+//     size_t  pos = part.find(key);
+//     if (pos == std::string::npos)
+//         return ("");
+//     size_t start = pos + key.length();
+//     size_t end = part.find("\"", start);
+//     if (end == std::string::npos)
+//         return ("");
+//     return (part.substr(start, end - start));
+// }
+
+// static std::string  extractFileContent(const std::string &part)
+// {
+//     size_t pos = part.find("\r\n\r\n");
+//     if (pos == std::string::npos)
+//         return ("");
+//     pos += 4;
+//     std::string content = part.substr(pos);
+
+//     if (content.size() >= 2 && content.substr(content.size() - 2) == "\r\n")
+//         content.erase(content.size() - 2);
+//     return (content);
+// }
+
+
+// void    Response::handleFileUpload(const Request &req)
+// {
+//     std::string contentType = req.getHeader("Content-Type");
+//     std::string boundary = getBoundary(contentType);
+//     std::string body = getBody();
+
+//     if (boundary.empty())
+//         return ;
+
+//     //take file content
+//     size_t  fileStart = body.find("\r\n\r\n");
+//     if (fileStart == std::string::npos)
+//         return ;
+//     fileStart += 4;
+
+//     size_t  fileEnd = body.find("--" + boundary, fileStart);
+//     if (fileEnd == std::string::npos)
+//         return ;
+
+//     std::string fileContent = body.substr(fileStart, fileEnd - fileStart);
+
+//     // take filename
+//     std::string fileName = "upload.bin";
+//     size_t  fnPos = body.find("filename=\"");
+//     if (fnPos != std::string::npos)
+//     {
+//         fnPos += 10;
+//         size_t fnEnd = body.find("\"", fnPos);
+//         fileName = body.substr(fnPos, fnEnd - fnPos);
+//     }
+
+//     //save to uploads
+//     std::ofstream   ofs("./www/uploads/" + fileName, std::ios::binary);
+//     if (ofs.is_open())
+//     {
+//         ofs.write(fileContent.c_str(), fileContent.size());
+//         ofs.close();
+//     }
+//     else
+//         std::cerr << "Failed to open upload directory or file" << std::endl;
+
+// }
