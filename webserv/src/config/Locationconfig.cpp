@@ -220,6 +220,7 @@ void Locationconfig::addDirective(const Directive& directive)
     }
     else
     {
+        throw  std::invalid_argument("Error locationconfig: invalid directive.");
         std::cout << "Directive " << directive.getName() << " is invalid." << std::endl;
     }
 }

@@ -5,14 +5,14 @@ void directiveLocation(const Block& block, Locationconfig& locationconfig)
 {
     size_t i = 0;
 
-    if (i < block.getDirectives().size())
+    while (i < block.getDirectives().size())
     {
         locationconfig.addDirective(block.getDirectives()[i]);
         i++;
     }
     locationconfig.setArg(block.getArgs()[0]);
     if (block.getArgs().size() != 1)
-        std::cout << "Error Location : You need de declare only one argument" << std::endl;
+        std::cout << "Error Location : You need to declare only one argument" << std::endl;
 }
 
 void directiveServer(const Block& block, Serverconfig& serverconfig)
@@ -44,15 +44,12 @@ Serverconfig checkServer(const Block& block)
     while (i < block.getBlocks().size())
     {
         if (block.getBlocks()[i].getName() != "location")
-            break;
-            //return error
+            throw  std::invalid_argument("Error locationconfig: invalid location name.");
         else
            serverconfig.addlocation(checkLocation(block.getBlocks()[i]));
         
         i++;
     }
-    // if (block.getBlocks().size() != 0)
-    //     //return error
     directiveServer(block, serverconfig);
     return (serverconfig);
 }
@@ -65,8 +62,7 @@ Config checkConfig(const Block& block)
     while (i < block.getBlocks().size())
     {
         if (block.getBlocks()[i].getName() != "server")
-            break;
-            //return error
+            throw  std::invalid_argument("Error serverconfig: invalid server name.");
         else
             config.addServer(checkServer(block.getBlocks()[i]));
         i++;

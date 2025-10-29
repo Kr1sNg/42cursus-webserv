@@ -267,11 +267,11 @@ std::string Response::getType(std::string const &path)
 
 // int matchLocation(std::string url, const Serverconfig& serverconfig)
 // {
-//     int     save = -1; 
+//     int     save = -1;
 //     size_t     i = 0;
 //     size_t  bestLength = 0;
 
-//     while (i < serverconfig.getLocations().size()) 
+//     while (i < serverconfig.getLocations().size())
 //     {
 //         if (url.rfind(serverconfig.getLocations()[i].getArg(), 0) == 0 && bestLength < serverconfig.getLocations()[i].getArg().size())
 //         {
@@ -349,7 +349,43 @@ std::string Response::getType(std::string const &path)
 //     return _needChunked;
 // }
 
+// void    Response::buildCGI(const std::string& content)
+// {
+//     std::istringstream  stream(content);
+//     std::string         line;
 
+//     while (std::getline(stream, line))
+//     {
+//         if (line == "\r")
+//             break;
+
+//     size_t pos = content.find(":");
+
+//     if (pos != std::string::npos)
+//     {
+//         if (content.substr(0, pos) == "Content-Type")
+//         {
+//             setHeader("Content-Type", content.substr(pos + 1));
+//         }
+//         else if (content.substr(0, pos) == "status")
+//         {
+//             int status;
+//             size_t pos2 = content.substr(pos + 1).find(" ");
+//             std::stringstream ss(content.substr(pos + 1));
+//             ss >> status;
+//             setStatus(status, content.substr(pos2 + 1));
+//         }
+//         else
+//         {
+//             setHeader(content.substr(0, pos), content.substr(pos + 1));
+//         }
+//     }
+//     }
+//     while (std::getline(stream, line))
+//     {
+//         _body += line + "\n";
+//     }
+// }
 
 
 
