@@ -72,6 +72,11 @@ class Connection: public IEventHandler
 		void	flushOutBuffer(void);
 
 		uint32_t	getEvents(void) const;
+
+		std::string trimSpace(const std::string &str);
+		bool	checkHostName(std::string ogRequest);
+		void	searchHost(const std::string &line, bool& check);
+		bool	compareHost(std::string hostname);
 };
 
 #endif

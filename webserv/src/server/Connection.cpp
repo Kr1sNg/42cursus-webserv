@@ -41,12 +41,73 @@ Connection::~Connection()
 
 int		Connection::getFd(void) const
 {
-	return (_clientFd);	
+	return (_clientFd);
 }
 
 uint32_t	Connection::getEvents(void) const
 {
 	return (_events);
+}
+
+std::string Connection::trimSpace(const std::string &str)
+{
+    size_t start = 0;
+    size_t end = 0;
+
+    while (start < str.size() && isspace(str[start]))
+        ++start;
+    if (str.size() == start)
+        return "";
+    end = str.size() - 1;
+    while (end > start && isspace(str[end]))
+        end--;
+    return (str.substr(start, end - start + 1));
+}
+
+bool	Connection::compareHost(std::string hostname)
+{
+	size_t i = 0;
+	while (i < _servConfig.getServer_name().size())
+	{
+		if (_servConfig.getServer_name()[i] == hostname)
+			return (true);
+		i++;
+	}
+	return (false);
+}
+
+void	Connection::searchHost(const std::string &line, bool& check)
+{
+    size_t cmn;
+
+    cmn = line.find(":");
+    std::string before = trimSpace(line.substr(0, cmn));
+	std::string after = trimSpace(line.substr(cmn + 1));
+	if (before == "Host")
+	{
+		cmn = after.find(":");
+		before = trimSpace(after.substr(0, cmn));
+		if (before == "127.0.0.1" || before == "0.0.0.0" || before == "localhost")
+			check = true;
+		else
+			check = compareHost(before);
+	}
+}
+
+bool	Connection::checkHostName(std::string ogRequest)
+{
+	size_t start = 0;
+	bool check= false;
+
+    while (start < ogRequest.size()) {
+        size_t index = ogRequest.find("\r\n", start);
+        if (index == std::string::npos)
+            break ;
+        std::string line = ogRequest.substr(start, index - start);
+		searchHost(line, check);
+        start = index + 2;
+    }
+	return (check);
 }
 
 void	Connection::recvIntoBuffer(void) //receive !!!!
@@ -64,12 +125,16 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 			return;
 		}
 		_inBuf.append(buf, n);
+		if (!checkHostName(_inBuf))
+		{
+			_server->markForClose(_clientFd);
+			return;
+		}
 		std::cout << "Size " << n << " [RECV] from fd[" << _clientFd << "]: " << buf << std::endl;
-		
+
 		if (n < (ssize_t)sizeof(buf))
 			break ;
 	}
-
 	// Check if we already got headers
 	// detect a complete HTTP request by "\r\n\r\n"
 	if (!_headerComplete)
@@ -105,12 +170,12 @@ void	Connection::recvIntoBuffer(void) //receive !!!!
 			//Build Response
 			Response response(request, _servConfig);
 			_response = response;
-		
+
 			_outBuf = _response.toString();
-			
+
 			_events = POLLIN | POLLOUT;
 			_server->setFdEvents(_clientFd, _events);
-			
+
 			_inBuf.erase(0, _headerEndPos + _contentLength);
 			_headerComplete = false;
 			_contentLength = 0;
@@ -135,14 +200,14 @@ void	Connection::flushOutBuffer(void) //send
 	_outBuf.erase(0, n);
 
 	if (_outBuf.empty())
-	{	
-		// Done sending, 
+	{
+		// Done sending,
 		if (!_response.getKeepAlive())
 		{
 			_server->markForClose(_clientFd);
 			return ;
 		}
-		
+
 		// Otherwise, stop watching POLLOUT and wait for next request
 		_events = POLLIN;
 		_server->setFdEvents(_clientFd, _events);
