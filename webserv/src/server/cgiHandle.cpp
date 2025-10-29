@@ -53,49 +53,8 @@ char **cgiEnv(const Request& req, Locationconfig location)
     return (vectorToChar(env));
 }
 
-// std::string cgiHandle(const Request& req, Locationconfig location)
-// {
-// 	char **env = cgiEnv(req, location);
-// 	char* tmp = NULL;
-// 	std::strcpy(tmp, location.getCgi_pass().c_str());
-// 	char* argv[] = {tmp, NULL};
-// 	int fd[2];
-// 	pid_t pid;
-
-//     pipe(fd);
-// 	pid = fork();
-// 	dup2(fd[0], STDIN_FILENO);
-// 	dup2(fd[1], STDOUT_FILENO);
-// 	if (pid == 0)
-// 	{
-// 		close(fd[1]);
-//         execve(location.getCgi_pass().c_str(), argv, env);
-// 		close(fd[0]);
-//         exit(1);
-// 	}
-// 	else
-// 	{
-//         close(fd[0]);
-// 		if (req.getMethod() == "POST") {
-//             write(fd[1], req.getBody().c_str(), req.getBody().size());
-//         }
-//         close(fd[0]);
-// 		waitpid(pid, nullptr, 0);
-
-//         char buffer[4096];
-//         std::string output;
-//         ssize_t bytesRead;
-//         while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0) {
-//             output.append(buffer, bytesRead);
-//         }
-// 		close(fd[1]);
-// 		return output;
-// 	}
-// }
-
-std::string cgiHandle(const Request& req, const Locationconfig& location)
+std::string cgiHandle(const Request& req, const Locationconfig& location, const Serverconfig& config)
 {
-    std::cout << location.getCgi_pass() << std::endl;
     int pipe_in[2];
     int pipe_out[2];
 
@@ -105,6 +64,10 @@ std::string cgiHandle(const Request& req, const Locationconfig& location)
     char **env = cgiEnv(req, location);
 
     pid_t pid = fork();
+    if (location.getRoot() != "")
+        std::string path = location.getRoot() + location.getArg() + location.getCgi_pass();
+    else
+        std::string path = config.getRoot() + location.getArg() + location.getCgi_pass();
     if (pid < 0)
         return "";
 

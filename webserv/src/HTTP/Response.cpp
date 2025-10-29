@@ -23,11 +23,11 @@ static std::string intToStr(int n)
 
 int matchLocation(std::string url, const Serverconfig& serverconfig)
 {
-    int     save = -1; 
+    int     save = -1;
     size_t     i = 0;
     size_t  bestLength = 0;
 
-    while (i < serverconfig.getLocations().size()) 
+    while (i < serverconfig.getLocations().size())
     {
         if (url.rfind(serverconfig.getLocations()[i].getArg(), 0) == 0 && bestLength < serverconfig.getLocations()[i].getArg().size())
         {
@@ -57,17 +57,31 @@ Response::Response(Request const &req, Serverconfig const &conf):
     int indexMatch = matchLocation(req.getUri(), conf);
     if (indexMatch != -1 && conf.getLocations()[indexMatch].getCgi_pass() != "")
     {
-        std::string content = cgiHandle(req, conf.getLocations()[indexMatch]);
+        std::string content = cgiHandle(req, conf.getLocations()[indexMatch], conf);
         buildCGI(content);
         setStatus(200, "OK");
         setHeader("Content-Lenght", intToStr(content.size()));
     }
     else if (req.getMethod() == "GET")
     {
-        std::string filePath = std::string(WWW) + req.getUri();
+        std::string filePath = "";
+        if (indexMatch != -1 && conf.getLocations()[indexMatch].getRoot() != "")
+            filePath = conf.getLocations()[indexMatch].getRoot() + req.getUri();
+        else
+            filePath = conf.getRoot() + req.getUri();
         if (filePath[filePath.size() - 1] == '/')
-            filePath += "index.html";
-        
+        {
+            if (indexMatch != -1 && conf.getLocations()[indexMatch].getIndex() != "")
+            {
+                filePath += conf.getLocations()[indexMatch].getIndex();
+            }
+            // else if (indexMatch != -1 && conf.getLocations()[indexMatch].getAutoindex() == true)
+            // afficher liste du contenu du fichier
+            //else
+            //erreur 403 ou 404 a verifier
+        }
+        // if (filePath[filePath.size() - 1] == '/')
+        //     filePath += "index.html";
         if (fileExists(filePath))
             buildFromFile(filePath);
         else
@@ -231,11 +245,11 @@ std::string Response::toString(void) const
 
 // int matchLocation(std::string url, const Serverconfig& serverconfig)
 // {
-//     int     save = -1; 
+//     int     save = -1;
 //     size_t     i = 0;
 //     size_t  bestLength = 0;
 
-//     while (i < serverconfig.getLocations().size()) 
+//     while (i < serverconfig.getLocations().size())
 //     {
 //         if (url.rfind(serverconfig.getLocations()[i].getArg(), 0) == 0 && bestLength < serverconfig.getLocations()[i].getArg().size())
 //         {
@@ -346,8 +360,8 @@ void    Response::buildCGI(const std::string& content)
     {
         if (line == "\r")
             break;
-    
-    size_t pos = content.find(":"); 
+
+    size_t pos = content.find(":");
 
     if (pos != std::string::npos)
     {
@@ -392,6 +406,40 @@ void    Response::buildFromFile(std::string const &path)
 
     file.close();
 }
+
+// void    Response::buildAutoindex()
+// {
+//     setVersion("HTTP/1.1");
+//     setStatus(code, reason);
+
+//     std::ostringstream path;
+//     path << "./www/errors/" << code << ".html";
+
+//     std::ifstream   file(path.str().c_str(), std::ios::binary);
+//     std::string body;
+
+//     if (file.is_open())
+//     {
+//         std::ostringstream oss;
+//         oss << file.rdbuf();
+//         body = oss.str();
+//         file.close();
+//     }
+//     else
+//     {
+//         std::ostringstream oss;
+//         oss << "<html><head><title>" << code << " " << reason
+//             << "</title></head><body><h1>"
+//             << code << " " << reason
+//             << "</h1><p>The requested page could not be found.</p></body></html>";
+//         body = oss.str();
+//     }
+
+//     setBody(body);
+//     setHeader("Content-Type", "text/html");
+//     setHeader("Content-Length", intToStr(body.size()));
+//     setKeepAlive(false);
+// }
 
 void    Response::buildError(int code, std::string const &reason)
 {

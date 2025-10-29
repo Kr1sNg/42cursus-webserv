@@ -48,7 +48,7 @@
 void	throwErrno(std::string const &reason);
 void	throwGaiError(std::string const &reason, int code);
 int		setNonBlocking(int fd);
-std::string cgiHandle(const Request& req, const Locationconfig& location);
+std::string cgiHandle(const Request& req, const Locationconfig& location, const Serverconfig& config);
 
 
 
