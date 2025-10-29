@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 12:58:08 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/10/26 09:54:00 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/29 13:52:00 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,69 +25,53 @@
 
 class Request;
 
-
 class Response
 {
 	private:
 		
-
 		std::string	_version; //HTTP v1.1
 		int 		_status; //200, 404, 500
 		std::string	_reason; //"OK", "Not Found"
+		
 		std::map<std::string, std::string> _headers; // key/value : "Content-type/length"
-		std::string	_body; //Body for the HTTP POST mode.
-
-		Serverconfig	_servConfig;
-		// bool _needChunked;
 		bool _keepAlive;
-		// std::vector<std::string> _cookie;
+		std::vector<std::string> _cookies; //to store "Set-Cookie" value
 
+		std::string	_generatedBody; //for small, in-memory bodies
+		std::string	_filePath;	// path to the file to be streamed
+		bool		_isBodyFromFile;
+		
+		std::string	getType(const std::string &path);
 
 	public:
-		Response(Request const &req, Serverconfig const &conf);
 		Response();
 		~Response();
 		Response(const Response &cpy);
 		Response	&operator=(const Response &other);
-		// Response(const Request &req);
 
 		/*setter*/
-		void setVersion(const std::string &version);
 		void setStatus(int code, const std::string &reason);
 		void setHeader(const std::string &key, const std::string &val);
-		void setBody(const std::string &body);
-		
 		void setKeepAlive(bool keep);
+		void addCookie(const std::string &cookie);
 		
-		// void MoreCookie(const std::string &cookie);
-		// void setChunked(bool needchunk);
+		void setBody(const std::string &body);
 
+		// void buildFromFile(std::string const &path);
+		void    buildFromFile(std::string const &path, Serverconfig conf);
+		// void buildError(int code, std::string const &reason);
+		void    buildError(int code, std::string const &reason, Serverconfig conf);
+		
 		/*getter*/
-		const std::string &getVersion() const;
-		int	getStatus() const;
-		const std::string &getReason() const;
-		const std::map<std::string, std::string> &getHeaders() const;
-		const std::string &getBody() const;
+		int	getStatus(void) const;
+		const std::string &getReason(void) const;
+		bool	getKeepAlive(void) const;
+		bool	isBodyFromFile(void) const;
+		const std::string	&getFilePath(void) const;
+		const std::string	&getBody(void) const;
 		
-		bool getKeepAlive() const;
-		// const std::vector<std::string> EatCookie() const;
-		// bool getChunked() const;
-
-		// static Response buildError(int code, const std::string &reason);
-		// static Response buildRedirect(const std::string &location, int code);
-		// std::string getString() const;
-		// static std::string convertFileToString(const std::string &path);
-		// std::string	BuildFromRequest(const Request &req, const Serverconfig& serverconfig);
-
-		//new add
-		std::string toString(void) const;
+		std::string getHeaderString(void) const;
 		
-		void buildFromFile(std::string const &path);
-		void buildError(int code, std::string const &reason);
-
-		std::string getType(std::string const &path);
-		
-		void    handleFileUpload(const Request &req);
 };
 
 #endif

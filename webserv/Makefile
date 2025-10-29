@@ -6,7 +6,7 @@
 #    By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/26 17:42:09 by tat-nguy          #+#    #+#              #
-#    Updated: 2025/10/25 12:26:58 by tat-nguy         ###   ########.fr        #
+#    Updated: 2025/10/29 11:24:26 by tat-nguy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,15 +22,15 @@ RESET = \033[0m
 NAME 		= webserv
 
 # Source Files
-SRCS     	= src/main.cpp src/exception.cpp  src/server/cgiHandle.cpp\
+SRCS     	= src/main.cpp src/exception.cpp  \
 				src/server/Server.cpp src/server/PollLoop.cpp \
 				src/server/Connection.cpp src/server/Listener.cpp \
 				src/config/Block.cpp src/config/Config.cpp \
 				src/config/Directive.cpp src/config/fillConfig.cpp \
 				src/config/Locationconfig.cpp src/config/parsing.cpp \
 				src/config/tokenization.cpp src/config/Serverconfig.cpp\
-				src/HTTP/Request.cpp src/HTTP/Response.cpp src/HTTP/ParserHTTP.cpp \
-# 				src/HTTP/ErrorHTTP.cpp
+				src/HTTP/Request.cpp src/HTTP/Response.cpp #src/HTTP/ParserHTTP.cpp \
+# 				src/HTTP/ErrorHTTP.cpp src/server/cgiHandle.cpp
 
 # Object Files
 OBJS = $(SRCS:.cpp=.o)

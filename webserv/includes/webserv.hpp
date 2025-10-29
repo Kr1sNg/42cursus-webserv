@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/25 18:02:24 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/29 11:00:16 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,9 @@ void	throwGaiError(std::string const &reason, int code);
 int		setNonBlocking(int fd);
 std::string cgiHandle(const Request& req, const Locationconfig& location);
 
+bool fileExists(const std::string &path);
+bool	isDirectory(const std::string &path);
+std::string	createDirectoryListing(const std::string &path);
 
 
 #endif

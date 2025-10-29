@@ -112,11 +112,13 @@ void Locationconfig::setIndex(const std::vector<std::string>& index)
     {
         _flags |= _validDirective.at("index");
         _index = index[0];
+        std::cout << "Locationconfig::setIndex:" << _index << std::endl; // it doesn't work !???
     }
 }
 
 const std::string& Locationconfig::getIndex(void) const
 {
+    std::cout << "getIndex: " << _index << std::endl;   // there's nothing inside index !??
     return (_index);
 }
 
@@ -149,18 +151,20 @@ void Locationconfig::setMethods(const std::vector<std::string>& methods)
     {
     	throw std::out_of_range("Config: getLocationConfig: methods directive already defined in this location");
 	}
-    else
+    _flags |= _validDirective.at("methods");
+    while (i < methods.size())
     {
-        _flags |= _validDirective.at("methods");
-        while (methods[i] == "GET" || methods[i] == "POST" || methods[i] == "DELETE")
+        std::string m = methods[i];
+        if (m == "GET" || m == "POST" || m == "DELETE")
         {
-            _methods.push_back(methods[i]);
-            i++;
+            _methods.push_back(m);
+            std::cout << "setMethods: " << _methods[i] << std::endl;
         }
-		
-        // if (i != methods.size())
-        //     //error
+        else
+            throw std::invalid_argument("Config: getLocationConfig: invalid HTTP methods");
+        ++i;
     }
+    std::cout << "Locationconfig::setMethods: _methods.size(): " << _methods.size() << std::endl;
 }
 
 const std::vector<std::string>& Locationconfig::getMethods(void) const
@@ -218,4 +222,28 @@ void Locationconfig::addDirective(const Directive& directive)
     {
         std::cout << "Directive " << directive.getName() << " is invalid." << std::endl;
     }
+}
+
+// Tat: Je dois ajouter pour verifier method, redirection, cgi allowed?...
+
+bool    Locationconfig::isMethodAllowed(const std::string &method)
+{
+    for (size_t i = 0; i < _methods.size(); ++i)
+    {
+        std::cout << method << " vs methods[i]: " << _methods[i] << std::endl;
+        if (method == _methods[i])
+            return true;
+    }
+    std::cout << "There's no METHODS in _methods" << std::endl;
+    return (false);
+}
+
+bool    Locationconfig::hasRedirect(void)
+{
+    return (_redirect != "");
+}
+
+bool    Locationconfig::hasCgi(void)
+{
+    return (_cgi_pass != "");
 }

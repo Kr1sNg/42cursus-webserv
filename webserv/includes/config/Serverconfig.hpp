@@ -42,7 +42,8 @@ class Serverconfig
         void setRoot(const std::vector<std::string>& root);
         const std::string& getRoot(void) const;
         void addError_page(const std::vector<std::string>& error_page);
-        const std::map<int, std::string>& getError_pages(void) const;
+        // const std::map<int, std::string>& getError_pages(void) const;
+        std::string getError_pages(int code) const;
         void setClient_max_size(const std::vector<std::string>& client_max_body_size);
         const size_t& getClient_max_size(void) const;
         void addlocation(const Locationconfig& location);
@@ -50,6 +51,8 @@ class Serverconfig
 
         void addDirective(const Directive& directive);
 
+        // to get Locationconfig
+        Locationconfig *matchLocation(const std::string &url);
 };
 
 #endif

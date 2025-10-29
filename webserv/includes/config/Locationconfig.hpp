@@ -7,8 +7,8 @@ class Locationconfig
 {
     private :
         std::string _arg;
-        std::string _root;
-        std::string _index;
+        std::string _root;  
+        std::string _index; //path to index file "index index.html"
         bool _autoindex;
         std::vector<std::string> _methods;
         std::string _cgi_pass;
@@ -50,6 +50,11 @@ class Locationconfig
         const std::string& getRedirect(void) const;
 
         void addDirective(const Directive& directive);
+
+        // new functions
+        bool    isMethodAllowed(const std::string &method);
+        bool    hasRedirect(void);
+        bool    hasCgi(void);
 };
 
 #endif
