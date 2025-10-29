@@ -91,6 +91,10 @@ class Connection: public IEventHandler
 
 		uint32_t	getEvents(void) const;
 
+		std::string trimSpace(const std::string &str);
+		bool	checkHostName(std::string ogRequest);
+		void	searchHost(const std::string &line, bool& check);
+		bool	compareHost(std::string hostname);
 		void	generateResponse(void);
 		void	generateErrorResponse(int code, std::string const &reason);
 };

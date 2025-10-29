@@ -121,7 +121,7 @@ void	Listener::handleEvent(uint32_t events)
 		{
 			sockaddr_in	clientAddr;
 			socklen_t	addrlen = sizeof(clientAddr);
-
+			
 			int clientFd = accept(_listenerFd, (sockaddr *)&clientAddr, &addrlen);
 			if (clientFd < 0)
 				break ;

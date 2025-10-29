@@ -41,7 +41,7 @@ Connection::~Connection()
 
 int		Connection::getFd(void) const
 {
-	return (_clientFd);	
+	return (_clientFd);
 }
 
 uint32_t	Connection::getEvents(void) const
