@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Connection2.cpp                                    :+:      :+:    :+:   */
+/*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 11:19:07 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 12:20:03 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,8 +166,8 @@ void	Connection::handleReadBody(void)
 	//1. handle Chunked
 	if (_request.isChunked())
 	{
-		// need to handle chunk-parsing loop -TODO
-		return ;
+		// we won't support Transfer-Encoding: chunked
+		return (generateErrorResponse(501, "Not Implemented (Transfer-Encoding)"));
 	}
 
 	//1.b check if this is an upload
@@ -189,7 +189,7 @@ void	Connection::handleReadBody(void)
 			std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
             _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
             if (!_uploadFile.is_open())
-                return (generateErrorResponse(500, "Permission Denied (uploads)"));
+                return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
         }
     }
 
@@ -202,8 +202,6 @@ void	Connection::handleReadBody(void)
 	{
 		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
 
-		// --- TODO: Write `bytesToWrite` from `leftover` to your file/CGI ---
-        // e.g., _uploadFile.write(leftover.c_str(), bytesToWrite);
 		if (_isUploading)
 			_uploadFile.write(leftover.c_str(), bytesToWrite);
 
@@ -232,8 +230,6 @@ void	Connection::handleReadBody(void)
 
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
-		// --- TODO: Write `bytesToWrite` from `buf` to your file/CGI ---
-        // e.g., _uploadFile.write(buf, bytesToWrite);
 		if (_isUploading)
 			_uploadFile.write(buf, bytesToWrite);
 		
@@ -247,8 +243,6 @@ void	Connection::handleReadBody(void)
 	//3. Body is complete
 	if (_bodyBytesReceived >= contentLength)
 	{
-		// TODO: Close your file/CGI
-        // e.g., _uploadFile.close();
 		if (_isUploading)
 			_uploadFile.close();
 
@@ -432,13 +426,13 @@ void	Connection::generateResponse(void)
 	{
 		//Construct the full file path
 		std::string	filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
-		std::cout << "Connection::generateResponse:: filePath: " << filePath << std::endl;
+		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
 		
-		// check if directory and if autoindex on
+		// check if directory -> send index AND if autoindex on -> send directory listing
 		if (isDirectory(filePath))
 		{
-			std::string indexPath = filePath + location->getIndex(); // "index.html"; // location->getIndex();
-			std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl;
+			std::string indexPath = filePath + location->getIndex(); // "index.html";
+			std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl; //
 			if (fileExists(indexPath))
 				_response.buildFromFile(indexPath, _servConfig);
 			else if (location->getAutoindex()) // we have autoindex
@@ -456,9 +450,21 @@ void	Connection::generateResponse(void)
 	// d. Handle DELETE
 	else if (_request.getMethod() == "DELETE")
 	{
-		// delete file -> TODO
-		_response.setStatus(200, "OK");
-		_response.buildFromFile("www/notif/delete_success.html", _servConfig);
+		// locate the deleting file (we delete only in /www/public/)
+		std::string filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
+		
+		if (!fileExists(filePath)) // file doesn't exsist
+			return (generateErrorResponse(404, "Not Found (deleting file)"));
+		if (isDirectory(filePath)) // cant delete directory
+			return (generateErrorResponse(403, "Forbidden (deleting directory)"));
+		if (std::remove(filePath.c_str()) == 0) // success delete
+		{
+			_response.setStatus(200, "OK");
+			_response.buildFromFile("www/notif/delete_success.html", _servConfig);
+		}
+		else
+			return (generateErrorResponse(403, "Forbidden (deleting file)"));
 	}
 	
 	// 4. finalize and set state
