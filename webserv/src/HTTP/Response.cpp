@@ -144,7 +144,6 @@ void    Response::buildCGI(Response& response, const std::string& content)
     std::string         line;
     std::string         body;
 
-    		std::cout << "buildCGI" << std::endl;
 
     while (std::getline(stream, line))
     {

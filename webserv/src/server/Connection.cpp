@@ -161,7 +161,6 @@ void	Connection::searchHost(const std::string &line, bool& check)
 	{
 		cmn = after.find(":");
 		before = trimSpace(after.substr(0, cmn));
-		std::cout << "!!!!!!! check : " << before << "!!!!!!!!" << std::endl;
 		if (before == "127.0.0.1" || before == "0.0.0.0" || before == "localhost")
 			check = true;
 		else
@@ -476,7 +475,6 @@ void	Connection::generateResponse(void)
 	// a. Check for CGI
 	if (location->getCgi_pass() != "")
     {
-		std::cout << "!!!!CGI!!!!" << std::endl;
        	std::string content = cgiHandle(_request, *location, _servConfig);
         Response::buildCGI(_response, content);
 		_response.setStatus(200, "OK");
