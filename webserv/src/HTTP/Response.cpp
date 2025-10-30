@@ -35,15 +35,6 @@ Response    &Response::operator=(const Response &other)
     return *this;
 }
 
-/* helpers */
-
-static std::string intToStr(int n)
-{
-    std::ostringstream  oss;
-    oss << n;
-    return (oss.str());
-}
-
 /* setters */
 
 void Response::setStatus(int code, const std::string &reason) {
