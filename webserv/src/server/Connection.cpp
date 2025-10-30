@@ -123,6 +123,68 @@ uint32_t	Connection::getEvents(void) const
 // 	}
 // }
 
+std::string Connection::trimSpace(const std::string &str)
+{
+    size_t start = 0;
+    size_t end = 0;
+
+    while (start < str.size() && isspace(str[start]))
+        ++start;
+    if (str.size() == start)
+        return "";
+    end = str.size() - 1;
+    while (end > start && isspace(str[end]))
+        end--;
+    return (str.substr(start, end - start + 1));
+}
+
+bool	Connection::compareHost(std::string hostname)
+{
+	size_t i = 0;
+	while (i < _servConfig.getServer_name().size())
+	{
+		if (_servConfig.getServer_name()[i] == hostname)
+			return (true);
+		i++;
+	}
+	return (false);
+}
+
+void	Connection::searchHost(const std::string &line, bool& check)
+{
+    size_t cmn;
+
+    cmn = line.find(":");
+    std::string before = trimSpace(line.substr(0, cmn));
+	std::string after = trimSpace(line.substr(cmn + 1));
+	if (before == "Host")
+	{
+		cmn = after.find(":");
+		before = trimSpace(after.substr(0, cmn));
+		std::cout << "!!!!!!! check : " << before << "!!!!!!!!" << std::endl;
+		if (before == "127.0.0.1" || before == "0.0.0.0" || before == "localhost")
+			check = true;
+		else
+			check = compareHost(before);
+	}
+}
+
+bool	Connection::checkHostName(std::string ogRequest)
+{
+	size_t start = 0;
+	bool check= false;
+
+    while (start < ogRequest.size()) {
+        size_t index = ogRequest.find("\r\n", start);
+        if (index == std::string::npos)
+            break ;
+        std::string line = ogRequest.substr(start, index - start);
+		searchHost(line, check);
+        start = index + 2;
+    }
+	return (check);
+}
+
 void	Connection::handleReadHeaders(void)
 {
 	char	buf[4096];
@@ -138,7 +200,12 @@ void	Connection::handleReadHeaders(void)
 	
 	//1. Append data to Request's buffer
 	_request.append(buf, bytesRead);
-
+	//1.5 check virtual host
+	if (!checkHostName(_request.getBuffer()))
+	{
+		_server->markForClose(_clientFd);
+		return;
+	}
 	//2. Run the parser
 	_request.parse();
 	
@@ -227,7 +294,7 @@ void	Connection::handleReadBody(void)
 			_server->markForClose(_clientFd); //client disconnected
 			return ;
 		}
-
+	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
 		if (_isUploading)
@@ -407,15 +474,18 @@ void	Connection::generateResponse(void)
 		
 	//3- Handle different request types
 	// a. Check for CGI
-	// if (location->hasCgi())
-	// {
-	// 	handleCgi();
-	// 	return ;
-	// }
+	if (location->getCgi_pass() != "")
+    {
+		std::cout << "!!!!CGI!!!!" << std::endl;
+       	std::string content = cgiHandle(_request, *location, _servConfig);
+        Response::buildCGI(_response, content);
+		_response.setStatus(200, "OK");
+        _response.setHeader("Content-Length", Response::intToStr(content.size()));
+	}
 	
 	// b. Handle POST (which is an upload)
 	// handleReadBody already saved the file, so just sent 201 created
-	if (_request.getMethod() == "POST")
+	else if (_request.getMethod() == "POST")
 	{
 		_response.setStatus(201, "Created");
 		_response.buildFromFile("www/notif/upload_success.html", _servConfig);
