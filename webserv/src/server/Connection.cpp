@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/29 13:53:29 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 12:20:03 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_request(),
 			_response(),
 			_connState(CONN_READING_HEADERS), // initial state
-			_bodyBytesReceived(0)
+			_bodyBytesReceived(0),
+			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
 	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
@@ -41,7 +42,7 @@ Connection::~Connection()
 
 int		Connection::getFd(void) const
 {
-	return (_clientFd);
+	return (_clientFd);	
 }
 
 uint32_t	Connection::getEvents(void) const
@@ -222,9 +223,6 @@ void	Connection::handleReadHeaders(void)
 		_connState = CONN_HANDLING_BODY;
 		_bodyBytesReceived = 0;
 
-		// should check config here and open a file if (isUpload) -TODO
-		// e.g: _uploadFile.open("/uploads", std::ios::binary);
-
 		handleReadBody();
 	}
 	//else: state is sill PARSING_REQUEST_LINE and PARSING_HEADER, so we do nothing and wait for the next POLLIN event.
@@ -235,9 +233,32 @@ void	Connection::handleReadBody(void)
 	//1. handle Chunked
 	if (_request.isChunked())
 	{
-		// need to handle chunk-parsing loop -TODO
-		return ;
+		// we won't support Transfer-Encoding: chunked
+		return (generateErrorResponse(501, "Not Implemented (Transfer-Encoding)"));
 	}
+
+	//1.b check if this is an upload
+	if (_bodyBytesReceived == 0) // First time in this function
+	{
+    	_isUploading = false;
+
+		Locationconfig *loc = _servConfig.matchLocation(_request.getUri());
+        if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
+		{
+            _isUploading = true;
+
+			// generate a unique name for uploaded file
+			std::stringstream ss;
+			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
+			std::string uniqueName = ss.str();
+			
+            _uploadFilePath = "www/uploads/" + uniqueName;
+			std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
+            _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
+            if (!_uploadFile.is_open())
+                return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
+        }
+    }
 
 	//2. hander Content-Length
 	size_t	contentLength = _request.getContentLength();
@@ -248,8 +269,8 @@ void	Connection::handleReadBody(void)
 	{
 		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
 
-		// --- TODO: Write `bytesToWrite` from `leftover` to your file/CGI ---
-        // e.g., _uploadFile.write(leftover.c_str(), bytesToWrite);
+		if (_isUploading)
+			_uploadFile.write(leftover.c_str(), bytesToWrite);
 
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
@@ -276,8 +297,8 @@ void	Connection::handleReadBody(void)
 	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
-		// --- TODO: Write `bytesToWrite` from `buf` to your file/CGI ---
-        // e.g., _uploadFile.write(buf, bytesToWrite);
+		if (_isUploading)
+			_uploadFile.write(buf, bytesToWrite);
 		
 		_bodyBytesReceived += bytesToWrite;
 		
@@ -289,8 +310,8 @@ void	Connection::handleReadBody(void)
 	//3. Body is complete
 	if (_bodyBytesReceived >= contentLength)
 	{
-		// TODO: Close your file/CGI
-        // e.g., _uploadFile.close();
+		if (_isUploading)
+			_uploadFile.close();
 
         // Now we can finally generate the response
         generateResponse();
@@ -327,7 +348,7 @@ void	Connection::handleWrite(void) //send
 		{
 			_fileStream.open(_response.getFilePath().c_str(), std::ios::binary);
 			if (!_fileStream.is_open())
-				return(generateErrorResponse(500, "Permission Deny"));
+				return(generateErrorResponse(500, "Permission Denied"));
 		}
 		
 		// Read a chunk from the file
@@ -467,7 +488,7 @@ void	Connection::generateResponse(void)
 	else if (_request.getMethod() == "POST")
 	{
 		_response.setStatus(201, "Created");
-		_response.buildFromFile("./notif/upload_success.html", _servConfig);
+		_response.buildFromFile("www/notif/upload_success.html", _servConfig);
 	}
 	
 	// c. Handle GET
@@ -475,13 +496,13 @@ void	Connection::generateResponse(void)
 	{
 		//Construct the full file path
 		std::string	filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
-		std::cout << "Connection::generateResponse:: filePath: " << filePath << std::endl;
+		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
 		
-		// check if directory and if autoindex on
+		// check if directory -> send index AND if autoindex on -> send directory listing
 		if (isDirectory(filePath))
 		{
-			std::string indexPath = filePath + location->getIndex(); // location->getIndex();
-			std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl;
+			std::string indexPath = filePath + location->getIndex(); // "index.html";
+			std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl; //
 			if (fileExists(indexPath))
 				_response.buildFromFile(indexPath, _servConfig);
 			else if (location->getAutoindex()) // we have autoindex
@@ -499,9 +520,21 @@ void	Connection::generateResponse(void)
 	// d. Handle DELETE
 	else if (_request.getMethod() == "DELETE")
 	{
-		// delete file -> TODO
-		_response.setStatus(200, "OK");
-		_response.buildFromFile("../notif/delete_success.html", _servConfig);
+		// locate the deleting file (we delete only in /www/public/)
+		std::string filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
+		
+		if (!fileExists(filePath)) // file doesn't exsist
+			return (generateErrorResponse(404, "Not Found (deleting file)"));
+		if (isDirectory(filePath)) // cant delete directory
+			return (generateErrorResponse(403, "Forbidden (deleting directory)"));
+		if (std::remove(filePath.c_str()) == 0) // success delete
+		{
+			_response.setStatus(200, "OK");
+			_response.buildFromFile("www/notif/delete_success.html", _servConfig);
+		}
+		else
+			return (generateErrorResponse(403, "Forbidden (deleting file)"));
 	}
 	
 	// 4. finalize and set state

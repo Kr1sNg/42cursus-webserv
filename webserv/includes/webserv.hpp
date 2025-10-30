@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/29 11:00:16 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 12:11:48 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include <map>
 # include <utility> //pair
 # include <sstream> // std::istringstream
+# include <cstdio> // std::remove
 
 
 // for socket
@@ -53,6 +54,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
 bool fileExists(const std::string &path);
 bool	isDirectory(const std::string &path);
 std::string	createDirectoryListing(const std::string &path);
+std::string intToStr(int n);
 
 
 #endif

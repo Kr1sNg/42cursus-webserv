@@ -22,11 +22,11 @@ void Locationconfig::initStatics()
 
 Locationconfig::Locationconfig()
 {
+    _autoindex = false;
     initStatics();
     _flags = 0;
     // _root = "";
     // _index = "";
-    _autoindex = false;
     // _methods = ;
     // _cgi_pass = "";
     // _redirect = "";
@@ -135,6 +135,8 @@ void Locationconfig::setAutoindex(const std::vector<std::string>& autoindex)
             _autoindex = true;
         // else (autoindex[0] != "off")
         //     //error
+        else
+            _autoindex = false;
     }
 }
 
