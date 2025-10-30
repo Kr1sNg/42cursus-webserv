@@ -68,9 +68,10 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
  
     pid_t pid = fork();
     if (location.getRoot() != "")
-        path = location.getRoot() + location.getArg() + location.getCgi_pass();
+        path = location.getRoot() + req.getUri();
     else
-        path = config.getRoot() + location.getArg() + location.getCgi_pass();
+        path = config.getRoot() +  req.getUri();
+    std::cout << path << std::endl;
     char* argv[] = {const_cast<char*>(path.c_str()), NULL};
     if (pid < 0)
         return "";
