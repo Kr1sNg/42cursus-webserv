@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Connection.cpp                                     :+:      :+:    :+:   */
+/*   Connection2.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/29 13:53:29 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 11:19:07 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_request(),
 			_response(),
 			_connState(CONN_READING_HEADERS), // initial state
-			_bodyBytesReceived(0)
+			_bodyBytesReceived(0),
+			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
 	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
@@ -41,7 +42,7 @@ Connection::~Connection()
 
 int		Connection::getFd(void) const
 {
-	return (_clientFd);
+	return (_clientFd);	
 }
 
 uint32_t	Connection::getEvents(void) const
@@ -122,67 +123,6 @@ uint32_t	Connection::getEvents(void) const
 // 	}
 // }
 
-std::string Connection::trimSpace(const std::string &str)
-{
-    size_t start = 0;
-    size_t end = 0;
-
-    while (start < str.size() && isspace(str[start]))
-        ++start;
-    if (str.size() == start)
-        return "";
-    end = str.size() - 1;
-    while (end > start && isspace(str[end]))
-        end--;
-    return (str.substr(start, end - start + 1));
-}
-
-bool	Connection::compareHost(std::string hostname)
-{
-	size_t i = 0;
-	while (i < _servConfig.getServer_name().size())
-	{
-		if (_servConfig.getServer_name()[i] == hostname)
-			return (true);
-		i++;
-	}
-	return (false);
-}
-
-void	Connection::searchHost(const std::string &line, bool& check)
-{
-    size_t cmn;
-
-    cmn = line.find(":");
-    std::string before = trimSpace(line.substr(0, cmn));
-	std::string after = trimSpace(line.substr(cmn + 1));
-	if (before == "Host")
-	{
-		cmn = after.find(":");
-		before = trimSpace(after.substr(0, cmn));
-		if (before == "127.0.0.1" || before == "0.0.0.0" || before == "localhost")
-			check = true;
-		else
-			check = compareHost(before);
-	}
-}
-
-bool	Connection::checkHostName(std::string ogRequest)
-{
-	size_t start = 0;
-	bool check= false;
-
-    while (start < ogRequest.size()) {
-        size_t index = ogRequest.find("\r\n", start);
-        if (index == std::string::npos)
-            break ;
-        std::string line = ogRequest.substr(start, index - start);
-		searchHost(line, check);
-        start = index + 2;
-    }
-	return (check);
-}
-
 void	Connection::handleReadHeaders(void)
 {
 	char	buf[4096];
@@ -216,9 +156,6 @@ void	Connection::handleReadHeaders(void)
 		_connState = CONN_HANDLING_BODY;
 		_bodyBytesReceived = 0;
 
-		// should check config here and open a file if (isUpload) -TODO
-		// e.g: _uploadFile.open("/uploads", std::ios::binary);
-
 		handleReadBody();
 	}
 	//else: state is sill PARSING_REQUEST_LINE and PARSING_HEADER, so we do nothing and wait for the next POLLIN event.
@@ -233,6 +170,29 @@ void	Connection::handleReadBody(void)
 		return ;
 	}
 
+	//1.b check if this is an upload
+	if (_bodyBytesReceived == 0) // First time in this function
+	{
+    	_isUploading = false;
+
+		Locationconfig *loc = _servConfig.matchLocation(_request.getUri());
+        if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
+		{
+            _isUploading = true;
+
+			// generate a unique name for uploaded file
+			std::stringstream ss;
+			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
+			std::string uniqueName = ss.str();
+			
+            _uploadFilePath = "www/uploads/" + uniqueName;
+			std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
+            _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
+            if (!_uploadFile.is_open())
+                return (generateErrorResponse(500, "Permission Denied (uploads)"));
+        }
+    }
+
 	//2. hander Content-Length
 	size_t	contentLength = _request.getContentLength();
 	
@@ -244,6 +204,8 @@ void	Connection::handleReadBody(void)
 
 		// --- TODO: Write `bytesToWrite` from `leftover` to your file/CGI ---
         // e.g., _uploadFile.write(leftover.c_str(), bytesToWrite);
+		if (_isUploading)
+			_uploadFile.write(leftover.c_str(), bytesToWrite);
 
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
@@ -267,15 +229,13 @@ void	Connection::handleReadBody(void)
 			_server->markForClose(_clientFd); //client disconnected
 			return ;
 		}
-		if (!checkHostName(_inBuf))
-		{
-			_server->markForClose(_clientFd);
-			return;
-		}
+
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
 		// --- TODO: Write `bytesToWrite` from `buf` to your file/CGI ---
         // e.g., _uploadFile.write(buf, bytesToWrite);
+		if (_isUploading)
+			_uploadFile.write(buf, bytesToWrite);
 		
 		_bodyBytesReceived += bytesToWrite;
 		
@@ -289,6 +249,8 @@ void	Connection::handleReadBody(void)
 	{
 		// TODO: Close your file/CGI
         // e.g., _uploadFile.close();
+		if (_isUploading)
+			_uploadFile.close();
 
         // Now we can finally generate the response
         generateResponse();
@@ -325,7 +287,7 @@ void	Connection::handleWrite(void) //send
 		{
 			_fileStream.open(_response.getFilePath().c_str(), std::ios::binary);
 			if (!_fileStream.is_open())
-				return(generateErrorResponse(500, "Permission Deny"));
+				return(generateErrorResponse(500, "Permission Denied"));
 		}
 		
 		// Read a chunk from the file
@@ -462,7 +424,7 @@ void	Connection::generateResponse(void)
 	if (_request.getMethod() == "POST")
 	{
 		_response.setStatus(201, "Created");
-		_response.buildFromFile("./notif/upload_success.html", _servConfig);
+		_response.buildFromFile("www/notif/upload_success.html", _servConfig);
 	}
 	
 	// c. Handle GET
@@ -475,7 +437,7 @@ void	Connection::generateResponse(void)
 		// check if directory and if autoindex on
 		if (isDirectory(filePath))
 		{
-			std::string indexPath = filePath + location->getIndex(); // location->getIndex();
+			std::string indexPath = filePath + location->getIndex(); // "index.html"; // location->getIndex();
 			std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl;
 			if (fileExists(indexPath))
 				_response.buildFromFile(indexPath, _servConfig);
@@ -496,7 +458,7 @@ void	Connection::generateResponse(void)
 	{
 		// delete file -> TODO
 		_response.setStatus(200, "OK");
-		_response.buildFromFile("../notif/delete_success.html", _servConfig);
+		_response.buildFromFile("www/notif/delete_success.html", _servConfig);
 	}
 	
 	// 4. finalize and set state
