@@ -160,6 +160,7 @@ void	Connection::searchHost(const std::string &line, bool& check)
 	{
 		cmn = after.find(":");
 		before = trimSpace(after.substr(0, cmn));
+		std::cout << "!!!!!!! check : " << before << "!!!!!!!!" << std::endl;
 		if (before == "127.0.0.1" || before == "0.0.0.0" || before == "localhost")
 			check = true;
 		else
@@ -198,7 +199,12 @@ void	Connection::handleReadHeaders(void)
 	
 	//1. Append data to Request's buffer
 	_request.append(buf, bytesRead);
-
+	//1.5 check virtual host
+	if (!checkHostName(_request.getBuffer()))
+	{
+		_server->markForClose(_clientFd);
+		return;
+	}
 	//2. Run the parser
 	_request.parse();
 	
@@ -267,11 +273,7 @@ void	Connection::handleReadBody(void)
 			_server->markForClose(_clientFd); //client disconnected
 			return ;
 		}
-		if (!checkHostName(_inBuf))
-		{
-			_server->markForClose(_clientFd);
-			return;
-		}
+	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
 		// --- TODO: Write `bytesToWrite` from `buf` to your file/CGI ---
@@ -451,15 +453,18 @@ void	Connection::generateResponse(void)
 		
 	//3- Handle different request types
 	// a. Check for CGI
-	// if (location->hasCgi())
-	// {
-	// 	handleCgi();
-	// 	return ;
-	// }
+	if (location->getCgi_pass() != "")
+    {
+		std::cout << "!!!!CGI!!!!" << std::endl;
+       	std::string content = cgiHandle(_request, *location, _servConfig);
+        Response::buildCGI(_response, content);
+		_response.setStatus(200, "OK");
+        _response.setHeader("Content-Length", Response::intToStr(content.size()));
+	}
 	
 	// b. Handle POST (which is an upload)
 	// handleReadBody already saved the file, so just sent 201 created
-	if (_request.getMethod() == "POST")
+	else if (_request.getMethod() == "POST")
 	{
 		_response.setStatus(201, "Created");
 		_response.buildFromFile("./notif/upload_success.html", _servConfig);

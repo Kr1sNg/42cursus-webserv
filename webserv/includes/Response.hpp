@@ -62,6 +62,7 @@ class Response
 		// void buildError(int code, std::string const &reason);
 		void    buildError(int code, std::string const &reason, Serverconfig conf);
 		
+		static void    buildCGI(Response& response, const std::string& content);
 		/*getter*/
 		int	getStatus(void) const;
 		const std::string &getReason(void) const;
@@ -69,7 +70,7 @@ class Response
 		bool	isBodyFromFile(void) const;
 		const std::string	&getFilePath(void) const;
 		const std::string	&getBody(void) const;
-		
+		static std::string	intToStr(int n);
 		std::string getHeaderString(void) const;
 		
 };

@@ -37,7 +37,7 @@ Response    &Response::operator=(const Response &other)
 
 /* helpers */
 
-static std::string intToStr(int n)
+std::string Response::intToStr(int n)
 {
     std::ostringstream  oss;
     oss << n;
@@ -136,6 +136,48 @@ void    Response::buildError(int code, std::string const &reason, Serverconfig c
     setBody(body);
     setHeader("Content-Type", "text/html");
     setHeader("Content-Length", intToStr(body.size()));
+}
+
+void    Response::buildCGI(Response& response, const std::string& content)
+{
+    std::istringstream  stream(content);
+    std::string         line;
+    std::string         body;
+
+    		std::cout << "buildCGI" << std::endl;
+
+    while (std::getline(stream, line))
+    {
+        if (line == "\r")
+            break;
+
+    size_t pos = content.find(":");
+
+    if (pos != std::string::npos)
+    {
+        if (content.substr(0, pos) == "Content-Type")
+        {
+            response.setHeader("Content-Type", content.substr(pos + 1));
+        }
+        else if (content.substr(0, pos) == "status")
+        {
+            int status;
+            size_t pos2 = content.substr(pos + 1).find(" ");
+            std::stringstream ss(content.substr(pos + 1));
+            ss >> status;
+            response.setStatus(status, content.substr(pos2 + 1));
+        }
+        else
+        {
+            response.setHeader(content.substr(0, pos), content.substr(pos + 1));
+        }
+    }
+    }
+    while (std::getline(stream, line))
+    {
+        body += line + "\n";
+    }
+    response.setBody(body);
 }
 
 /* getters */
@@ -349,43 +391,7 @@ std::string Response::getType(std::string const &path)
 //     return _needChunked;
 // }
 
-// void    Response::buildCGI(const std::string& content)
-// {
-//     std::istringstream  stream(content);
-//     std::string         line;
 
-//     while (std::getline(stream, line))
-//     {
-//         if (line == "\r")
-//             break;
-
-//     size_t pos = content.find(":");
-
-//     if (pos != std::string::npos)
-//     {
-//         if (content.substr(0, pos) == "Content-Type")
-//         {
-//             setHeader("Content-Type", content.substr(pos + 1));
-//         }
-//         else if (content.substr(0, pos) == "status")
-//         {
-//             int status;
-//             size_t pos2 = content.substr(pos + 1).find(" ");
-//             std::stringstream ss(content.substr(pos + 1));
-//             ss >> status;
-//             setStatus(status, content.substr(pos2 + 1));
-//         }
-//         else
-//         {
-//             setHeader(content.substr(0, pos), content.substr(pos + 1));
-//         }
-//     }
-//     }
-//     while (std::getline(stream, line))
-//     {
-//         _body += line + "\n";
-//     }
-// }
 
 
 

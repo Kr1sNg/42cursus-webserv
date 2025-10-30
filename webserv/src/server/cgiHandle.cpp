@@ -38,8 +38,11 @@ char **cgiEnv(const Request& req, Locationconfig location)
 
 	std::map<std::string, std::string>::const_iterator it = req.getHeaders().find("Content-Length");
 
-    env.push_back("CONTENT_LENGTH=" + it->second);
-
+    
+    if (it != req.getHeaders().end() && !it->second.empty())
+        env.push_back("CONTENT_LENGTH=" + it->second);
+    else
+        env.push_back("CONTENT_LENGTH=");
 	it = req.getHeaders().find("Content-Type");
     if (it != req.getHeaders().end() && !it->second.empty())
         env.push_back("CONTENT_TYPE=" + it->second);
@@ -57,24 +60,23 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
 {
     int pipe_in[2];
     int pipe_out[2];
-
+    std::string path;
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1)
         return "";
 
     char **env = cgiEnv(req, location);
-
+ 
     pid_t pid = fork();
     if (location.getRoot() != "")
-        std::string path = location.getRoot() + location.getArg() + location.getCgi_pass();
+        path = location.getRoot() + location.getArg() + location.getCgi_pass();
     else
-        std::string path = config.getRoot() + location.getArg() + location.getCgi_pass();
+        path = config.getRoot() + location.getArg() + location.getCgi_pass();
+    char* argv[] = {const_cast<char*>(path.c_str()), NULL};
     if (pid < 0)
         return "";
-
     if (pid == 0)
     {
-      
-        char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), NULL};
+
 
         close(pipe_in[1]);
         close(pipe_out[0]);
@@ -85,7 +87,8 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
         close(pipe_in[0]);
         close(pipe_out[1]);
 
-        execve(location.getCgi_pass().c_str(), argv, env);
+        execve(path.c_str(), argv, env);
+        std::cerr << "execve failed: " << strerror(errno) << std::endl;
         exit(1);
     }
     else
@@ -93,15 +96,15 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
         close(pipe_in[0]);
         close(pipe_out[1]);
 
-        if (req.getMethod() == "POST" && !req.getBody().empty()) {
-            ssize_t total = 0;
-            const std::string& body = req.getBody();
-            while (total < static_cast<ssize_t>(body.size())) {
-                ssize_t written = write(pipe_in[1], body.c_str() + total, body.size() - total);
-                if (written <= 0)
-                total += written;
-            }
-        }
+        // if (req.getMethod() == "POST" && !req.getBody().empty()) {
+        //     ssize_t total = 0;
+        //     const std::string& body = req.getBody();
+        //     while (total < static_cast<ssize_t>(body.size())) {
+        //         ssize_t written = write(pipe_in[1], body.c_str() + total, body.size() - total);
+        //         if (written <= 0)
+        //         total += written;
+        //     }
+        // }
         close(pipe_in[1]);
 
         std::string output;
@@ -114,6 +117,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
 
         waitpid(pid, NULL, 0);
 
+        std::cout << "output cgi : "<< output<< std::endl;
         return output;
     }
 }
