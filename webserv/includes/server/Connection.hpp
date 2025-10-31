@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/29 12:19:54 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 17:19:28 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ class Connection: public IEventHandler
 		bool			_isUploading;
 
 		std::ifstream	_fileStream;	//for streaming response bodies
+
+		std::string		_bodyCGI;
 		void			resetConnection(void);
 
 		Connection	&operator=(Connection const &rhs);

@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 12:20:03 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 17:48:43 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_response(),
 			_connState(CONN_READING_HEADERS), // initial state
 			_bodyBytesReceived(0),
-			_isUploading(false)
+			_isUploading(false),
+			_bodyCGI("")
 {
 	setNonBlocking(_clientFd);
 	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
@@ -250,7 +251,7 @@ void	Connection::handleReadBody(void)
 			std::stringstream ss;
 			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
 			std::string uniqueName = ss.str();
-			
+
             _uploadFilePath = "www/uploads/" + uniqueName;
 			std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
             _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
@@ -297,7 +298,10 @@ void	Connection::handleReadBody(void)
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
 		if (_isUploading)
+		{
 			_uploadFile.write(buf, bytesToWrite);
+			_bodyCGI.append(buf, bytesToWrite);
+		}
 		
 		_bodyBytesReceived += bytesToWrite;
 		
@@ -493,7 +497,7 @@ void	Connection::generateResponse(void)
 	else if (_request.getMethod() == "GET")
 	{
 		//Construct the full file path
-		std::string	filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::string	filePath = _servConfig.getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
 		
 		// check if directory -> send index AND if autoindex on -> send directory listing
