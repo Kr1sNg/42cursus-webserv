@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/15 18:10:44 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 17:39:57 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ Server::~Server()
 		delete it->second;
 	}
 	_connects.clear();
+	std::cout << "Server is successfully shutdown!" << std::endl; 
 }
 
 // void	Server::start(const char *hostname, const char *port)
@@ -77,7 +78,7 @@ void	Server::setFdEvents(int fd, uint32_t events)
 
 void	Server::run(void)	// create poll, listener, connection
 {
-	while (1) // or signal!!!
+	while (!g_stop) // or signal!!!
 	{
 		// perform the signle poll iteration
 		_loop.run();

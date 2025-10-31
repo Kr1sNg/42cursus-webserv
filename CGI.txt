@@ -1,0 +1,74 @@
+CGI (Common Gateway Interface)
+CGI is the most complex part. It introduces a new set of states and requires fork, pipe, and execve.
+
+Your server acts as a "gateway" between the client and the CGI script.
+
+## High-Level Workflow:
+
+1. In generateResponse:
+
+	- Your handler logic detects a CGI request (e.g., location /cgi-bin { ... }).
+
+	- Do not build a response. Instead, call a new function: handleCgi().
+
+2. Connection::handleCgi():
+
+	- Creates two pipes: pipe_to_cgi (for stdin) and pipe_from_cgi (for stdout).
+
+	- fork() a child process.
+
+3. Child Process (pid == 0):
+
+	- dup2(pipe_to_cgi[0], STDIN_FILENO) (Map pipe's read-end to stdin).
+
+	- dup2(pipe_from_cgi[1], STDOUT_FILENO) (Map pipe's write-end to stdout).
+
+	- close() all original pipe FDs.
+
+	- Set environment variables (this is how CGI works):
+
+		setenv("REQUEST_METHOD", _request.getMethod().c_str(), 1);
+
+		setenv("QUERY_STRING", _request.getQuery().c_str(), 1);
+
+		setenv("CONTENT_LENGTH", _request.getHeader("Content-Length").c_str(), 1);
+
+		setenv("CONTENT_TYPE", _request.getHeader("Content-Type").c_str(), 1);
+
+		setenv("PATH_INFO", _request.getUri().c_str(), 1);
+
+		...and many more (HTTP_HOST, SERVER_NAME, etc.).
+
+	- execve() the CGI script (e.g., /usr/bin/python with the script path as an argument).
+
+	- If execve fails, exit(1).
+
+4. Parent Process (Your Server):
+
+	- close() the unused ends of the pipes.
+
+	- waitpid(pid, ... WNOHANG) to monitor the child.
+
+	- Change the connection state: _connState = CONN_CGI_WRITE; (if there's a body to send) or CONN_CGI_READ; (if it's a GET).
+
+	- Add the pipe FDs (pipe_to_cgi[1] and pipe_from_cgi[0]) to your poll/epoll loop.
+
+5. New handleEvent States:
+
+- if (events & POLLOUT && _connState == CONN_CGI_WRITE):
+
+	- Write the request body (which you saved to a file) to pipe_to_cgi[1].
+
+	- When done, close(pipe_to_cgi[1]) and change state to CONN_CGI_READ.
+
+- if (events & POLLIN && _connState == CONN_CGI_READ):
+
+	- read() from pipe_from_cgi[0]. This is the CGI script's output.
+
+	- Store this output in a new buffer (e.g., _cgiOutBuf).
+
+	- When the pipe is closed (read returns 0), the CGI is done.
+
+	- Now, parse _cgiOutBuf. The script must provide its own headers (e.g., Content-Type: text/html\r\n\r\n...body...).
+
+	- Build your final Response from this output and send it.

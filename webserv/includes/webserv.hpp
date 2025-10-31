@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 12:11:48 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 17:48:30 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # include <utility> //pair
 # include <sstream> // std::istringstream
 # include <cstdio> // std::remove
+# include <ctime>
 
 
 // for socket
@@ -43,7 +44,7 @@
 # include "Request.hpp"
 # include "Response.hpp"
 
-
+extern volatile sig_atomic_t g_stop;
 
 // function
 void	throwErrno(std::string const &reason);

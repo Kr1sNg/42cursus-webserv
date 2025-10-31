@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/22 22:15:48 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/10/30 16:50:07 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ class Server
 		void	run(void);
 
 		void	acceptNewConnection(int clientFd, const Serverconfig &conf);
+
+		void	signalHandler(int sig);
 };
 
 #endif
