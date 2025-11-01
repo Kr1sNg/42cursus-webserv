@@ -138,7 +138,7 @@ void    Response::buildError(int code, std::string const &reason, Serverconfig c
     setHeader("Content-Length", intToStr(body.size()));
 }
 
-void    Response::buildCGI(Response& response, const std::string& content)
+void    Response::buildCGI(const std::string& content)
 {
     std::istringstream  stream(content);
     std::string         line;
@@ -156,7 +156,7 @@ void    Response::buildCGI(Response& response, const std::string& content)
     {
         if (content.substr(0, pos) == "Content-Type")
         {
-            response.setHeader("Content-Type", content.substr(pos + 1));
+            setHeader("Content-Type", content.substr(pos + 1));
         }
         else if (content.substr(0, pos) == "status")
         {
@@ -164,11 +164,11 @@ void    Response::buildCGI(Response& response, const std::string& content)
             size_t pos2 = content.substr(pos + 1).find(" ");
             std::stringstream ss(content.substr(pos + 1));
             ss >> status;
-            response.setStatus(status, content.substr(pos2 + 1));
+            setStatus(status, content.substr(pos2 + 1));
         }
         else
         {
-            response.setHeader(content.substr(0, pos), content.substr(pos + 1));
+            setHeader(content.substr(0, pos), content.substr(pos + 1));
         }
     }
     }
@@ -176,7 +176,7 @@ void    Response::buildCGI(Response& response, const std::string& content)
     {
         body += line + "\n";
     }
-    response.setBody(body);
+    setBody(body);
 }
 
 /* getters */

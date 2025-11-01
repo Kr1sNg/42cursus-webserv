@@ -22,6 +22,7 @@
 Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_server(server),
 			_servConfig(conf),
+			_bodyCGI(""),
 			_clientFd(cfd),
 			_outBuf(),
 			_events(POLLIN),
@@ -30,6 +31,7 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_connState(CONN_READING_HEADERS), // initial state
 			_bodyBytesReceived(0),
 			_isUploading(false)
+		
 {
 	setNonBlocking(_clientFd);
 	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
@@ -295,9 +297,11 @@ void	Connection::handleReadBody(void)
 		}
 	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
-		
 		if (_isUploading)
-			_uploadFile.write(buf, bytesToWrite);
+        {
+            _uploadFile.write(buf, bytesToWrite);
+            _bodyCGI.append(buf, bytesToWrite);
+        }
 		
 		_bodyBytesReceived += bytesToWrite;
 		
@@ -475,8 +479,8 @@ void	Connection::generateResponse(void)
 	// a. Check for CGI
 	if (location->getCgi_pass() != "")
     {
-       	std::string content = cgiHandle(_request, *location, _servConfig);
-        Response::buildCGI(_response, content);
+       	std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);
+       	_response.buildCGI(content);
 		_response.setStatus(200, "OK");
         _response.setHeader("Content-Length", Response::intToStr(content.size()));
 	}
