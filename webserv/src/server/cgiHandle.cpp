@@ -101,7 +101,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
     {
         close(pipe_in[0]);
         close(pipe_out[1]);
-
+        std::cout << "cgi body : " << body << std::endl;
         if (req.getMethod() == "POST" && !body.empty()) {
             ssize_t total = 0;
             while (total < static_cast<ssize_t>(body.size())) {

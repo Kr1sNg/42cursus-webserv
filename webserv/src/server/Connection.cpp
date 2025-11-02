@@ -247,7 +247,6 @@ void	Connection::handleReadBody(void)
         if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
 		{
             _isUploading = true;
-
 			// generate a unique name for uploaded file
 			std::stringstream ss;
 			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
@@ -297,8 +296,10 @@ void	Connection::handleReadBody(void)
 		}
 	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
+		std::cout << "!!test!! "<< _isUploading << std::endl;
 		if (_isUploading)
         {
+			std::cout << "!!POST!1" << std::endl;
             _uploadFile.write(buf, bytesToWrite);
             _bodyCGI.append(buf, bytesToWrite);
         }
@@ -315,7 +316,7 @@ void	Connection::handleReadBody(void)
 	{
 		if (_isUploading)
 			_uploadFile.close();
-
+		std::cout << "!!bodyCGI : " << _bodyCGI << std::endl;
         // Now we can finally generate the response
         generateResponse();
 	}
