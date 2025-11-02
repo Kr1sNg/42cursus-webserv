@@ -29,7 +29,7 @@ class Response
 {
 	private:
 		
-		std::string	_version; //HTTP v1.1
+		std::string	_version; //HTTP v1.1©c
 		int 		_status; //200, 404, 500
 		std::string	_reason; //"OK", "Not Found"
 		
@@ -60,7 +60,7 @@ class Response
 		void    buildFromFile(std::string const &path, Serverconfig conf);
 		void    buildError(int code, std::string const &reason, Serverconfig conf);
 		
-		static void    buildCGI(Response& response, const std::string& content);
+		void    buildCGI(const std::string& content);
 		/*getter*/
 		int	getStatus(void) const;
 		const std::string &getReason(void) const;

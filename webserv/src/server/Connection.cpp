@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:25:22 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:53:42 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,13 @@
 #include "../../includes/server/Server.hpp"
 #include "../../includes/Request.hpp"
 #include "../../includes/Response.hpp"
-
+#include <ctime>
 // Connection::Connection(void) {}
 
 Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_server(server),
 			_servConfig(conf),
+			_bodyCGI(""),
 			_clientFd(cfd),
 			_outBuf(),
 			_events(POLLIN),
@@ -29,8 +30,7 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_response(),
 			_connState(CONN_READING_HEADERS), // initial state
 			_bodyBytesReceived(0),
-			_isUploading(false),
-			_bodyCGI("")
+			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
 	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
@@ -246,7 +246,6 @@ void	Connection::handleReadBody(void)
         if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
 		{
             _isUploading = true;
-
 			// generate a unique name for uploaded file
 			std::stringstream ss;
 			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
@@ -270,8 +269,10 @@ void	Connection::handleReadBody(void)
 		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
 
 		if (_isUploading)
+		{
 			_uploadFile.write(leftover.c_str(), bytesToWrite);
-
+			_bodyCGI.append(leftover.c_str(), bytesToWrite);
+		}
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
 	}
@@ -281,7 +282,7 @@ void	Connection::handleReadBody(void)
 	while (_bodyBytesReceived < contentLength)
 	{
 		ssize_t bytesRead = recv(_clientFd, buf, sizeof(buf), 0);
-
+		
 		if (bytesRead < 0)
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -309,13 +310,13 @@ void	Connection::handleReadBody(void)
 		if (_bodyBytesReceived + (size_t)bytesRead > contentLength)
 			_request.getBuffer().append(buf + bytesToWrite, bytesRead - bytesToWrite);
 	}
-
+	std::cout << "!!test!! "<< _isUploading << std::endl;
 	//3. Body is complete
 	if (_bodyBytesReceived >= contentLength)
 	{
 		if (_isUploading)
 			_uploadFile.close();
-
+		std::cout << "!!bodyCGI : " << _bodyCGI << std::endl;
         // Now we can finally generate the response
         generateResponse();
 	}
@@ -479,8 +480,8 @@ void	Connection::generateResponse(void)
 	// a. Check for CGI
 	if (location->getCgi_pass() != "")
     {
-       	std::string content = cgiHandle(_request, *location, _servConfig);
-        Response::buildCGI(_response, content);
+       	std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);
+       	_response.buildCGI(content);
 		_response.setStatus(200, "OK");
         _response.setHeader("Content-Length", Response::intToStr(content.size()));
 	}
