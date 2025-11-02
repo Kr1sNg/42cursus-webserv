@@ -1,19 +1,14 @@
-<!-- We define the doctype and the language of the principal content
-Used for the web browser (if you use google in France or in an other country) -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- UTF-8 for having the good character (with accents, etc) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- This line is for the scale adaptability depends of the screen we are using -->
-    <title>404 Not Found</title>
-    <!-- The webpage title for the browser -->
+    <title>500 Internal Server Error</title>
     <style>
       body {
         margin: 0;
         height: 100vh;
-        background: url('Error404.png') no-repeat center 65%;
+        background: url('Error500.png') no-repeat center 65%;
         background-size: cover;
         display: flex;
         flex-direction: column;
@@ -25,8 +20,6 @@ Used for the web browser (if you use google in France or in an other country) --
         overflow: hidden;
         position: relative;
       }
-      /* Configure the background, the image (Error404.png), the disposition
-      of the elements, the font, the global style, etc */
 
       header {
         width: 100%;
@@ -41,15 +34,12 @@ Used for the web browser (if you use google in France or in an other country) --
         position: relative;
         z-index: 2;
       }
-      /* Content the navigation bar at the top of our website
-      the background line has 0.65, for being rounded. */
 
       header h1 {
         font-size: 1.8rem;
         color: #444;
         margin: 0;
       }
-      /* Manage the title -> the size and color. */
 
       nav {
         display: flex;
@@ -66,8 +56,6 @@ Used for the web browser (if you use google in France or in an other country) --
       nav a:hover {
         color: #ff8c8c;
       }
-      /* nav, nav a and nav a:hover define the horizontal position of the link et the space between them.
-      the 'a:hover' is for the changement of color when we move the mouse on it */
 
       .overlay {
         position: absolute;
@@ -78,8 +66,6 @@ Used for the web browser (if you use google in France or in an other country) --
         background: rgba(255, 255, 255, 0.6);
         z-index: 0;
       }
-      /* Add a white color on the background for having a better text looking
-        the z-index: 0 mean that it's behind everything */
 
       .content {
         position: relative;
@@ -90,27 +76,23 @@ Used for the web browser (if you use google in France or in an other country) --
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         margin-top: 25vh; 
       }
-      /* The principal block of the error message. Rounded opacity at 50%, and some shadow */
 
       h1 {
         font-size: 5rem;
         margin: 0;
         color: #555;
       }
-      /* Title "404" */
 
       h2 {
         font-weight: 500;
         color: #666;
         margin-top: 0.5rem;
       }
-      /* Sub title: 'This page got lost' */
 
       p {
         color: #777;
         margin: 1rem 0 2rem 0;
       }
-      /* Explication text */
 
       a.button {
         background-color: #ffd6d6;
@@ -126,7 +108,6 @@ Used for the web browser (if you use google in France or in an other country) --
         background-color: #ffb6b6;
         transform: scale(1.05);
       }
-      /* the a.button he's here for the 'back home button' */
 
       .raindrop {
         position: absolute;
@@ -136,8 +117,6 @@ Used for the web browser (if you use google in France or in an other country) --
         border-radius: 2px;
         animation: fall linear infinite;
       }
-      /* For the rain animation, each raindrop are a little blue rounded rectangle
-        it's animated by the @keyframes fall in a linear and an infinite way */
 
       @keyframes fall {
         0% {
@@ -155,7 +134,6 @@ Used for the web browser (if you use google in France or in an other country) --
     <div class="overlay"></div>
 
     <header>
-      <!-- Navigation options on the top, name of the project (Webserv) and the links with the others page. -->
       <h1>Webserv</h1>
       <nav>
         <a href="../cloe.html">Home</a>
@@ -166,15 +144,13 @@ Used for the web browser (if you use google in France or in an other country) --
     </header>
 
     <div class="content">
-      <!-- Principal bloc of the error page, display the 404 error, the error message and the back button -->
-      <h1>404</h1>
-      <h2>Oh no... This page got lost in the rain ☔</h2>
-      <p>Looks like our little Teru Teru can't find what you're looking for.</p>
+      <h1>500</h1>
+      <h2>Internal Server Error (Sorry we aren't perfect)</h2>
+      <p>Try again later !</p>
       <a class="button" href="../cloe.html">Go back home</a>
     </div>
 
     <script>
-
       const rainContainer = document.body;
       const numberOfDrops = 40;
 
@@ -188,11 +164,8 @@ Used for the web browser (if you use google in France or in an other country) --
         rainContainer.appendChild(drop);
       }
     </script>
-    <!-- The rain animation, the randomization of the position 
-      and some animation duration for each drop of water -->
   </body>
   <footer>
 	  © 2025 Webserv — Made by 3 weebs
-    <!-- Text at the bottom of the webpage. Actually a signature -->
   </footer>
 </html>
