@@ -56,12 +56,12 @@ char **cgiEnv(const Request& req, Locationconfig location)
     env.push_back("SERVER_PROTOCOL=" + req.getVersion());
     env.push_back("REDIRECT_STATUS=200");
 
-    size_t i = 0;
-    while (i < env.size())
-    {
-        std::cout << env[i] << std::endl;
-        i++;
-    }
+    // size_t i = 0;
+    // while (i < env.size())
+    // {
+    //     std::cout << env[i] << std::endl;
+    //     i++;
+    // }
 
     return (vectorToChar(env));
 }
@@ -71,6 +71,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
     int pipe_in[2];
     int pipe_out[2];
     std::string path;
+
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1)
         return "";
 
@@ -96,7 +97,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
         close(pipe_in[0]);
         close(pipe_out[1]);
 
-        execve(path.c_str(), argv, env);
+        execve(location.getCgi_pass().c_str(), argv, env);
         std::cerr << "execve failed: " << strerror(errno) << std::endl;
         exit(1);
     }
@@ -104,7 +105,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
     {
         close(pipe_in[0]);
         close(pipe_out[1]);
-        std::cout << "cgi body : " << body << std::endl;
+        // std::cout << "cgi body : " << body << std::endl;
         if (req.getMethod() == "POST" && !body.empty()) {
             ssize_t total = 0;
             while (total < static_cast<ssize_t>(body.size())) {

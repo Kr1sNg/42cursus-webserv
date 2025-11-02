@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:10:48 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 17:46:47 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,6 @@ class Connection: public IEventHandler
 
 		std::ifstream	_fileStream;	//for streaming response bodies
 
-		std::string		_bodyCGI;
 		void			resetConnection(void);
 		
 		// std::map<std::string, int>	_sessions;
