@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 16:50:07 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:12:28 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ class Server
 		std::map<int, Connection *> _connects;	// active connections
 		std::vector<int>	_fdToClose; // fds requested to close (processed after poll dispatch)
 		
+		std::map<std::string, int>	_sessions;
+		
 		Server(void);
 		Server(Server const &src);
 		Server	&operator=(Server const &rhs);
@@ -62,7 +64,11 @@ class Server
 
 		void	acceptNewConnection(int clientFd, const Serverconfig &conf);
 
-		void	signalHandler(int sig);
+		// cookie and session management
+		void	setSessionCount(std::string id);
+		void	increaseSessionCount(std::string id);
+		int		getSessionCount(std::string id);
+		
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 17:45:07 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/10/28 23:50:43 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:17:49 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,7 @@ class Request
 		void	parse(void);
 		bool    parsingRequestLine(void);
 		bool	parsingHeaders(void);
-		// bool	parsingBody(void);
-		// bool    parsingChunkedBody(void);
+
 };
 
 

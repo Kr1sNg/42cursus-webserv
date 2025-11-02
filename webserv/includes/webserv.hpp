@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 17:48:30 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 11:55:48 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 # include <sstream> // std::istringstream
 # include <cstdio> // std::remove
 # include <ctime>
+# include <algorithm>
 
 
 // for socket

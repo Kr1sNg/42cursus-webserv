@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 17:48:43 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:25:22 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -327,8 +327,8 @@ void	Connection::handleWrite(void) //send
 	if (!_outBuf.empty())
 	{	
 		std::cout << "///////" << std::endl;
-		std::cout << _outBuf << std::endl;
-		std::cout << "///////" << std::endl;
+		// std::cout << _outBuf << std::endl;
+		// std::cout << "///////" << std::endl;
 	
 		ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
 		if (n < 0)
@@ -496,6 +496,13 @@ void	Connection::generateResponse(void)
 	// c. Handle GET
 	else if (_request.getMethod() == "GET")
 	{
+		// handle session management only in /visit/
+		if (_request.getUri() == "/visit/")
+		{
+			std::string ses = sessionManagement();
+			return (generateVisitCountResponse(ses));
+		}
+		
 		//Construct the full file path
 		std::string	filePath = _servConfig.getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
@@ -558,3 +565,77 @@ void	Connection::generateResponse(void)
 	_server->setFdEvents(_clientFd, _events);
 }
 
+std::string	Connection::sessionManagement()
+{
+	// handle session
+	std::string	sessionId = parseCookie(_request.getHeader("Cookie"), "session_id");	//TODO
+	int count = _server->getSessionCount(sessionId);
+	if (!count)	//new visitor
+	{
+		sessionId = createSessionId();
+		//_server._sessions[sessionId] = 0;
+		_server->setSessionCount(sessionId);
+		_response.addCookie("session_id=" + sessionId + "; HttpOnly; Path=/; Max-Age=300");
+	}
+	else // old visitor
+	{
+		_server->increaseSessionCount(sessionId);
+	}
+	return (sessionId);
+}
+
+// from Request header: "Cookie: session_id=CK_12345; other=other"
+std::string Connection::parseCookie(const std::string &headerLine, const std::string &cookieName)
+{
+	std::stringstream ss(headerLine);
+	std::string cookie; // session_id=CK_12334, other=other...
+	std::string key = cookieName + "="; //"session_id="
+	
+	while (std::getline(ss, cookie, ';'))	//split by semicolon
+	{
+		// trim whitespace
+		size_t start = cookie.find_first_not_of(" ");
+		if (start != std::string::npos)
+			cookie = cookie.substr(start);
+		if (cookie.find(key) == 0) //found the session_id
+			return (cookie.substr(key.length()));
+	}
+	return (""); //not found
+}
+
+std::string	Connection::createSessionId()
+{
+	std::stringstream ss;
+	ss << "CK_" << std::time(NULL);
+	return (ss.str());
+}
+
+void	Connection::generateVisitCountResponse(std::string sesid)
+{
+	std::stringstream body;
+	int count = _server->getSessionCount(sesid);
+	
+	body << "<html>\r\n";
+    body << "<head><title>Visit Count</title></head>\r\n";
+    body << "<body>\r\n";
+    body << "  <h1>Session Visiting Info</h1>\r\n";
+	body << "  <p>Your Session ID: <strong>" << sesid << "</strong>.</p>\r\n";
+	body << "  <p>Session time-out: <strong>5</strong> minutes.</p>\r\n";
+    body << "  <p>You have visited this page <strong>" << count << "</strong> times.</p>\r\n";
+	body << "  <button onclick=\"window.location.href='/'\">Back to Main Page</button>\r\n";
+    body << "</body>\r\n";
+    body << "</html>\r\n";
+
+	_response.setStatus(200, "OK");
+	_response.setBody(body.str());
+	_response.setHeader("Content-Type", "text/html");
+	_response.setKeepAlive(true);
+	
+	_outBuf = _response.getHeaderString();
+	_outBuf.append(_response.getBody());
+	
+	//set state to writing
+	_connState = CONN_WRITING_RESPONSE;
+	_events = POLLOUT | POLLIN;
+	_server->setFdEvents(_clientFd, _events);
+}
