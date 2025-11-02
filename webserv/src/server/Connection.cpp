@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/29 13:53:29 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:53:42 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,21 @@
 #include "../../includes/server/Server.hpp"
 #include "../../includes/Request.hpp"
 #include "../../includes/Response.hpp"
-
+#include <ctime>
 // Connection::Connection(void) {}
 
 Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_server(server),
 			_servConfig(conf),
+			_bodyCGI(""),
 			_clientFd(cfd),
 			_outBuf(),
 			_events(POLLIN),
 			_request(),
 			_response(),
 			_connState(CONN_READING_HEADERS), // initial state
-			_bodyBytesReceived(0)
+			_bodyBytesReceived(0),
+			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
 	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
@@ -41,7 +43,7 @@ Connection::~Connection()
 
 int		Connection::getFd(void) const
 {
-	return (_clientFd);
+	return (_clientFd);	
 }
 
 uint32_t	Connection::getEvents(void) const
@@ -198,7 +200,12 @@ void	Connection::handleReadHeaders(void)
 	
 	//1. Append data to Request's buffer
 	_request.append(buf, bytesRead);
-
+	//1.5 check virtual host
+	if (!checkHostName(_request.getBuffer()))
+	{
+		_server->markForClose(_clientFd);
+		return;
+	}
 	//2. Run the parser
 	_request.parse();
 	
@@ -216,9 +223,6 @@ void	Connection::handleReadHeaders(void)
 		_connState = CONN_HANDLING_BODY;
 		_bodyBytesReceived = 0;
 
-		// should check config here and open a file if (isUpload) -TODO
-		// e.g: _uploadFile.open("/uploads", std::ios::binary);
-
 		handleReadBody();
 	}
 	//else: state is sill PARSING_REQUEST_LINE and PARSING_HEADER, so we do nothing and wait for the next POLLIN event.
@@ -229,9 +233,31 @@ void	Connection::handleReadBody(void)
 	//1. handle Chunked
 	if (_request.isChunked())
 	{
-		// need to handle chunk-parsing loop -TODO
-		return ;
+		// we won't support Transfer-Encoding: chunked
+		return (generateErrorResponse(501, "Not Implemented (Transfer-Encoding)"));
 	}
+
+	//1.b check if this is an upload
+	if (_bodyBytesReceived == 0) // First time in this function
+	{
+    	_isUploading = false;
+
+		Locationconfig *loc = _servConfig.matchLocation(_request.getUri());
+        if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
+		{
+            _isUploading = true;
+			// generate a unique name for uploaded file
+			std::stringstream ss;
+			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
+			std::string uniqueName = ss.str();
+
+            _uploadFilePath = "www/uploads/" + uniqueName;
+			std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
+            _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
+            if (!_uploadFile.is_open())
+                return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
+        }
+    }
 
 	//2. hander Content-Length
 	size_t	contentLength = _request.getContentLength();
@@ -242,9 +268,11 @@ void	Connection::handleReadBody(void)
 	{
 		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
 
-		// --- TODO: Write `bytesToWrite` from `leftover` to your file/CGI ---
-        // e.g., _uploadFile.write(leftover.c_str(), bytesToWrite);
-
+		if (_isUploading)
+		{
+			_uploadFile.write(leftover.c_str(), bytesToWrite);
+			_bodyCGI.append(leftover.c_str(), bytesToWrite);
+		}
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
 	}
@@ -254,7 +282,7 @@ void	Connection::handleReadBody(void)
 	while (_bodyBytesReceived < contentLength)
 	{
 		ssize_t bytesRead = recv(_clientFd, buf, sizeof(buf), 0);
-
+		
 		if (bytesRead < 0)
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -267,15 +295,14 @@ void	Connection::handleReadBody(void)
 			_server->markForClose(_clientFd); //client disconnected
 			return ;
 		}
-		if (!checkHostName(_inBuf))
-		{
-			_server->markForClose(_clientFd);
-			return;
-		}
+	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
-		// --- TODO: Write `bytesToWrite` from `buf` to your file/CGI ---
-        // e.g., _uploadFile.write(buf, bytesToWrite);
+		if (_isUploading)
+		{
+			_uploadFile.write(buf, bytesToWrite);
+			_bodyCGI.append(buf, bytesToWrite);
+		}
 		
 		_bodyBytesReceived += bytesToWrite;
 		
@@ -283,13 +310,13 @@ void	Connection::handleReadBody(void)
 		if (_bodyBytesReceived + (size_t)bytesRead > contentLength)
 			_request.getBuffer().append(buf + bytesToWrite, bytesRead - bytesToWrite);
 	}
-
+	std::cout << "!!test!! "<< _isUploading << std::endl;
 	//3. Body is complete
 	if (_bodyBytesReceived >= contentLength)
 	{
-		// TODO: Close your file/CGI
-        // e.g., _uploadFile.close();
-
+		if (_isUploading)
+			_uploadFile.close();
+		std::cout << "!!bodyCGI : " << _bodyCGI << std::endl;
         // Now we can finally generate the response
         generateResponse();
 	}
@@ -301,8 +328,8 @@ void	Connection::handleWrite(void) //send
 	if (!_outBuf.empty())
 	{	
 		std::cout << "///////" << std::endl;
-		std::cout << _outBuf << std::endl;
-		std::cout << "///////" << std::endl;
+		// std::cout << _outBuf << std::endl;
+		// std::cout << "///////" << std::endl;
 	
 		ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
 		if (n < 0)
@@ -325,7 +352,7 @@ void	Connection::handleWrite(void) //send
 		{
 			_fileStream.open(_response.getFilePath().c_str(), std::ios::binary);
 			if (!_fileStream.is_open())
-				return(generateErrorResponse(500, "Permission Deny"));
+				return(generateErrorResponse(500, "Permission Denied"));
 		}
 		
 		// Read a chunk from the file
@@ -451,32 +478,41 @@ void	Connection::generateResponse(void)
 		
 	//3- Handle different request types
 	// a. Check for CGI
-	// if (location->hasCgi())
-	// {
-	// 	handleCgi();
-	// 	return ;
-	// }
+	if (location->getCgi_pass() != "")
+    {
+       	std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);
+       	_response.buildCGI(content);
+		_response.setStatus(200, "OK");
+        _response.setHeader("Content-Length", Response::intToStr(content.size()));
+	}
 	
 	// b. Handle POST (which is an upload)
 	// handleReadBody already saved the file, so just sent 201 created
-	if (_request.getMethod() == "POST")
+	else if (_request.getMethod() == "POST")
 	{
 		_response.setStatus(201, "Created");
-		_response.buildFromFile("./notif/upload_success.html", _servConfig);
+		_response.buildFromFile("www/notif/upload_success.html", _servConfig);
 	}
 	
 	// c. Handle GET
 	else if (_request.getMethod() == "GET")
 	{
-		//Construct the full file path
-		std::string	filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
-		std::cout << "Connection::generateResponse:: filePath: " << filePath << std::endl;
+		// handle session management only in /visit/
+		if (_request.getUri() == "/visit/")
+		{
+			std::string ses = sessionManagement();
+			return (generateVisitCountResponse(ses));
+		}
 		
-		// check if directory and if autoindex on
+		//Construct the full file path
+		std::string	filePath = _servConfig.getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
+		
+		// check if directory -> send index AND if autoindex on -> send directory listing
 		if (isDirectory(filePath))
 		{
-			std::string indexPath = filePath + location->getIndex(); // location->getIndex();
-			std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl;
+			std::string indexPath = filePath + location->getIndex(); // "index.html";
+			std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl; //
 			if (fileExists(indexPath))
 				_response.buildFromFile(indexPath, _servConfig);
 			else if (location->getAutoindex()) // we have autoindex
@@ -494,9 +530,21 @@ void	Connection::generateResponse(void)
 	// d. Handle DELETE
 	else if (_request.getMethod() == "DELETE")
 	{
-		// delete file -> TODO
-		_response.setStatus(200, "OK");
-		_response.buildFromFile("../notif/delete_success.html", _servConfig);
+		// locate the deleting file (we delete only in /www/public/)
+		std::string filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
+		
+		if (!fileExists(filePath)) // file doesn't exsist
+			return (generateErrorResponse(404, "Not Found (deleting file)"));
+		if (isDirectory(filePath)) // cant delete directory
+			return (generateErrorResponse(403, "Forbidden (deleting directory)"));
+		if (std::remove(filePath.c_str()) == 0) // success delete
+		{
+			_response.setStatus(200, "OK");
+			_response.buildFromFile("www/notif/delete_success.html", _servConfig);
+		}
+		else
+			return (generateErrorResponse(403, "Forbidden (deleting file)"));
 	}
 	
 	// 4. finalize and set state
@@ -518,3 +566,77 @@ void	Connection::generateResponse(void)
 	_server->setFdEvents(_clientFd, _events);
 }
 
+std::string	Connection::sessionManagement()
+{
+	// handle session
+	std::string	sessionId = parseCookie(_request.getHeader("Cookie"), "session_id");	//TODO
+	int count = _server->getSessionCount(sessionId);
+	if (!count)	//new visitor
+	{
+		sessionId = createSessionId();
+		//_server._sessions[sessionId] = 0;
+		_server->setSessionCount(sessionId);
+		_response.addCookie("session_id=" + sessionId + "; HttpOnly; Path=/; Max-Age=300");
+	}
+	else // old visitor
+	{
+		_server->increaseSessionCount(sessionId);
+	}
+	return (sessionId);
+}
+
+// from Request header: "Cookie: session_id=CK_12345; other=other"
+std::string Connection::parseCookie(const std::string &headerLine, const std::string &cookieName)
+{
+	std::stringstream ss(headerLine);
+	std::string cookie; // session_id=CK_12334, other=other...
+	std::string key = cookieName + "="; //"session_id="
+	
+	while (std::getline(ss, cookie, ';'))	//split by semicolon
+	{
+		// trim whitespace
+		size_t start = cookie.find_first_not_of(" ");
+		if (start != std::string::npos)
+			cookie = cookie.substr(start);
+		if (cookie.find(key) == 0) //found the session_id
+			return (cookie.substr(key.length()));
+	}
+	return (""); //not found
+}
+
+std::string	Connection::createSessionId()
+{
+	std::stringstream ss;
+	ss << "CK_" << std::time(NULL);
+	return (ss.str());
+}
+
+void	Connection::generateVisitCountResponse(std::string sesid)
+{
+	std::stringstream body;
+	int count = _server->getSessionCount(sesid);
+	
+	body << "<html>\r\n";
+    body << "<head><title>Visit Count</title></head>\r\n";
+    body << "<body>\r\n";
+    body << "  <h1>Session Visiting Info</h1>\r\n";
+	body << "  <p>Your Session ID: <strong>" << sesid << "</strong>.</p>\r\n";
+	body << "  <p>Session time-out: <strong>5</strong> minutes.</p>\r\n";
+    body << "  <p>You have visited this page <strong>" << count << "</strong> times.</p>\r\n";
+	body << "  <button onclick=\"window.location.href='/'\">Back to Main Page</button>\r\n";
+    body << "</body>\r\n";
+    body << "</html>\r\n";
+
+	_response.setStatus(200, "OK");
+	_response.setBody(body.str());
+	_response.setHeader("Content-Type", "text/html");
+	_response.setKeepAlive(true);
+	
+	_outBuf = _response.getHeaderString();
+	_outBuf.append(_response.getBody());
+	
+	//set state to writing
+	_connState = CONN_WRITING_RESPONSE;
+	_events = POLLOUT | POLLIN;
+	_server->setFdEvents(_clientFd, _events);
+}

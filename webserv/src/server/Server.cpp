@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/15 18:10:44 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:17:18 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,8 @@ Server::~Server()
 		delete it->second;
 	}
 	_connects.clear();
+	std::cout << "Server is successfully shutdown!" << std::endl; 
 }
-
-// void	Server::start(const char *hostname, const char *port)
-// {
-// 	_listener = new Listener(this, hostname, port);
-// 	_loop.addHandler(_listener, POLLIN);
-// }
 
 void	Server::markForClose(int clientFd)
 {
@@ -77,7 +72,7 @@ void	Server::setFdEvents(int fd, uint32_t events)
 
 void	Server::run(void)	// create poll, listener, connection
 {
-	while (1) // or signal!!!
+	while (!g_stop) // or signal!!!
 	{
 		// perform the signle poll iteration
 		_loop.run();
@@ -111,4 +106,28 @@ void	Server::acceptNewConnection(int clientFd, const Serverconfig &conf)
 	_connects[clientFd] = c;
 	_loop.addHandler(c, POLLIN);
 	std::cout << "New connection accepted through fd=[" << clientFd << "]..." << std::endl;
+}
+
+void	Server::setSessionCount(std::string id)
+{
+	_sessions[id] = 1;
+}
+
+void	Server::increaseSessionCount(std::string id)
+{
+	std::map<std::string, int>::iterator it = _sessions.begin();
+	
+	for (; it != _sessions.end(); ++it)
+	{
+		if (it->first == id)
+			it->second += 1;
+	}
+}
+
+int		Server::getSessionCount(std::string id)
+{
+	std::map<std::string, int>::iterator it = _sessions.find(id);
+	if (it != _sessions.end())
+		return it->second;
+	return (0);
 }

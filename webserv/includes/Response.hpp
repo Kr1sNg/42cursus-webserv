@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 12:58:08 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/10/29 14:12:14 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:18:45 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class Response
 {
 	private:
 		
-		std::string	_version; //HTTP v1.1
+		std::string	_version; //HTTP v1.1©c
 		int 		_status; //200, 404, 500
 		std::string	_reason; //"OK", "Not Found"
 		
@@ -57,11 +57,10 @@ class Response
 		
 		void setBody(const std::string &body);
 
-		// void buildFromFile(std::string const &path);
 		void    buildFromFile(std::string const &path, Serverconfig conf);
-		// void buildError(int code, std::string const &reason);
 		void    buildError(int code, std::string const &reason, Serverconfig conf);
 		
+		void    buildCGI(const std::string& content);
 		/*getter*/
 		int	getStatus(void) const;
 		const std::string &getReason(void) const;
@@ -69,7 +68,7 @@ class Response
 		bool	isBodyFromFile(void) const;
 		const std::string	&getFilePath(void) const;
 		const std::string	&getBody(void) const;
-		
+		static std::string	intToStr(int n);
 		std::string getHeaderString(void) const;
 		
 };

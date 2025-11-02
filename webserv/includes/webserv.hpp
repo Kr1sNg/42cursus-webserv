@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/29 11:00:16 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 11:55:48 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@
 # include <map>
 # include <utility> //pair
 # include <sstream> // std::istringstream
+# include <cstdio> // std::remove
+# include <ctime>
+# include <algorithm>
 
 
 // for socket
@@ -42,17 +45,18 @@
 # include "Request.hpp"
 # include "Response.hpp"
 
-
+extern volatile sig_atomic_t g_stop;
 
 // function
 void	throwErrno(std::string const &reason);
 void	throwGaiError(std::string const &reason, int code);
 int		setNonBlocking(int fd);
-std::string cgiHandle(const Request& req, const Locationconfig& location, const Serverconfig& config);
+std::string cgiHandle(const Request& req, const Locationconfig& location, const Serverconfig& config, const std::string& body);
 
 bool fileExists(const std::string &path);
 bool	isDirectory(const std::string &path);
 std::string	createDirectoryListing(const std::string &path);
+std::string intToStr(int n);
 
 
 #endif
