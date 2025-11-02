@@ -170,7 +170,7 @@ bool    Request::parsingHeaders(void)
             else if (cl != _headers.end()) // there's Content-Length
             {
                 std::stringstream   ss(cl->second);
-                if (!(ss >> _contentLength))
+                if (!(ss >> _contentLength))// || _contentLength < 0)
                     return (setError(400, "Bad Request"));
             }
             // Decide next state

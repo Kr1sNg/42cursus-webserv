@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 14:45:38 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 08:58:09 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:28:16 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,15 +48,15 @@ bool	isDirectory(const std::string &path)
 		return (false);
 }
 
-std::string	createDirectoryListing(const std::string &path)
-{
-	std::string dir = "Directory Listing Path: " + path; 
-	return dir;
-}
-
 std::string intToStr(int n)
 {
     std::ostringstream  oss;
     oss << n;
     return (oss.str());
+}
+
+std::string	createDirectoryListing(const std::string &path)
+{
+	std::string dir = "Directory Listing Path: " + path; 
+	return dir;
 }

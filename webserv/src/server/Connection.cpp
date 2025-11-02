@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:45:39 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/02 15:53:42 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_connState(CONN_READING_HEADERS), // initial state
 			_bodyBytesReceived(0),
 			_isUploading(false)
-		
 {
 	setNonBlocking(_clientFd);
 	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
@@ -251,7 +250,7 @@ void	Connection::handleReadBody(void)
 			std::stringstream ss;
 			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
 			std::string uniqueName = ss.str();
-			
+
             _uploadFilePath = "www/uploads/" + uniqueName;
 			std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
             _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
@@ -300,10 +299,10 @@ void	Connection::handleReadBody(void)
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
 		if (_isUploading)
-        {
-            _uploadFile.write(buf, bytesToWrite);
-            _bodyCGI.append(buf, bytesToWrite);
-        }
+		{
+			_uploadFile.write(buf, bytesToWrite);
+			_bodyCGI.append(buf, bytesToWrite);
+		}
 		
 		_bodyBytesReceived += bytesToWrite;
 		
@@ -329,8 +328,8 @@ void	Connection::handleWrite(void) //send
 	if (!_outBuf.empty())
 	{	
 		std::cout << "///////" << std::endl;
-		std::cout << _outBuf << std::endl;
-		std::cout << "///////" << std::endl;
+		// std::cout << _outBuf << std::endl;
+		// std::cout << "///////" << std::endl;
 	
 		ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
 		if (n < 0)
@@ -498,8 +497,15 @@ void	Connection::generateResponse(void)
 	// c. Handle GET
 	else if (_request.getMethod() == "GET")
 	{
+		// handle session management only in /visit/
+		if (_request.getUri() == "/visit/")
+		{
+			std::string ses = sessionManagement();
+			return (generateVisitCountResponse(ses));
+		}
+		
 		//Construct the full file path
-		std::string	filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::string	filePath = _servConfig.getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
 		
 		// check if directory -> send index AND if autoindex on -> send directory listing
@@ -560,3 +566,77 @@ void	Connection::generateResponse(void)
 	_server->setFdEvents(_clientFd, _events);
 }
 
+std::string	Connection::sessionManagement()
+{
+	// handle session
+	std::string	sessionId = parseCookie(_request.getHeader("Cookie"), "session_id");	//TODO
+	int count = _server->getSessionCount(sessionId);
+	if (!count)	//new visitor
+	{
+		sessionId = createSessionId();
+		//_server._sessions[sessionId] = 0;
+		_server->setSessionCount(sessionId);
+		_response.addCookie("session_id=" + sessionId + "; HttpOnly; Path=/; Max-Age=300");
+	}
+	else // old visitor
+	{
+		_server->increaseSessionCount(sessionId);
+	}
+	return (sessionId);
+}
+
+// from Request header: "Cookie: session_id=CK_12345; other=other"
+std::string Connection::parseCookie(const std::string &headerLine, const std::string &cookieName)
+{
+	std::stringstream ss(headerLine);
+	std::string cookie; // session_id=CK_12334, other=other...
+	std::string key = cookieName + "="; //"session_id="
+	
+	while (std::getline(ss, cookie, ';'))	//split by semicolon
+	{
+		// trim whitespace
+		size_t start = cookie.find_first_not_of(" ");
+		if (start != std::string::npos)
+			cookie = cookie.substr(start);
+		if (cookie.find(key) == 0) //found the session_id
+			return (cookie.substr(key.length()));
+	}
+	return (""); //not found
+}
+
+std::string	Connection::createSessionId()
+{
+	std::stringstream ss;
+	ss << "CK_" << std::time(NULL);
+	return (ss.str());
+}
+
+void	Connection::generateVisitCountResponse(std::string sesid)
+{
+	std::stringstream body;
+	int count = _server->getSessionCount(sesid);
+	
+	body << "<html>\r\n";
+    body << "<head><title>Visit Count</title></head>\r\n";
+    body << "<body>\r\n";
+    body << "  <h1>Session Visiting Info</h1>\r\n";
+	body << "  <p>Your Session ID: <strong>" << sesid << "</strong>.</p>\r\n";
+	body << "  <p>Session time-out: <strong>5</strong> minutes.</p>\r\n";
+    body << "  <p>You have visited this page <strong>" << count << "</strong> times.</p>\r\n";
+	body << "  <button onclick=\"window.location.href='/'\">Back to Main Page</button>\r\n";
+    body << "</body>\r\n";
+    body << "</html>\r\n";
+
+	_response.setStatus(200, "OK");
+	_response.setBody(body.str());
+	_response.setHeader("Content-Type", "text/html");
+	_response.setKeepAlive(true);
+	
+	_outBuf = _response.getHeaderString();
+	_outBuf.append(_response.getBody());
+	
+	//set state to writing
+	_connState = CONN_WRITING_RESPONSE;
+	_events = POLLOUT | POLLIN;
+	_server->setFdEvents(_clientFd, _events);
+}

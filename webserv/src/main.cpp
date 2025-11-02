@@ -3,18 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:34 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/14 20:16:57 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/10/30 17:06:09 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/webserv.hpp"
 #include "../includes/server/Server.hpp"
 
+volatile sig_atomic_t g_stop = 0;
+
+void	signalHandler(int signal)
+{
+	(void)signal;
+	g_stop = 1;
+	std::cout << "\nSignal received, Server is shutting down..." << std::endl;
+}
+
 int main(int ac, char *av[])
 {
+	signal(SIGINT, signalHandler);
+	signal(SIGQUIT, signalHandler);
+	
 	try
 	{
 		if (ac != 2)

@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/29 12:19:54 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:10:48 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,12 @@ class Connection: public IEventHandler
 		bool			_isUploading;
 
 		std::ifstream	_fileStream;	//for streaming response bodies
-		void			resetConnection(void);
 
+		std::string		_bodyCGI;
+		void			resetConnection(void);
+		
+		// std::map<std::string, int>	_sessions;
+		
 		Connection	&operator=(Connection const &rhs);
 		Connection(Connection const &src);
 	
@@ -97,6 +101,13 @@ class Connection: public IEventHandler
 		bool	compareHost(std::string hostname);
 		void	generateResponse(void);
 		void	generateErrorResponse(int code, std::string const &reason);
+
+		// handle Cookies and session Management
+		std::string	sessionManagement(void);
+		std::string	parseCookie(const std::string &header, const std::string &cookie);
+		std::string	createSessionId(void);
+		void	generateVisitCountResponse(std::string ses);
+		
 };
 
 #endif
