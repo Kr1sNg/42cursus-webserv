@@ -42,7 +42,9 @@ char **cgiEnv(const Request& req, Locationconfig location)
     if (it != req.getHeaders().end() && !it->second.empty())
         env.push_back("CONTENT_LENGTH=" + it->second);
     else
+	{
         env.push_back("CONTENT_LENGTH=");
+	}
 	it = req.getHeaders().find("Content-Type");
     if (it != req.getHeaders().end() && !it->second.empty())
         env.push_back("CONTENT_TYPE=" + it->second);

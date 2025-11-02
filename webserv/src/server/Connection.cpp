@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 12:20:03 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 15:45:39 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "../../includes/server/Server.hpp"
 #include "../../includes/Request.hpp"
 #include "../../includes/Response.hpp"
-
+#include <ctime>
 // Connection::Connection(void) {}
 
 Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
@@ -270,8 +270,10 @@ void	Connection::handleReadBody(void)
 		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
 
 		if (_isUploading)
+		{
 			_uploadFile.write(leftover.c_str(), bytesToWrite);
-
+			_bodyCGI.append(leftover.c_str(), bytesToWrite);
+		}
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
 	}
@@ -281,7 +283,7 @@ void	Connection::handleReadBody(void)
 	while (_bodyBytesReceived < contentLength)
 	{
 		ssize_t bytesRead = recv(_clientFd, buf, sizeof(buf), 0);
-
+		
 		if (bytesRead < 0)
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -296,10 +298,9 @@ void	Connection::handleReadBody(void)
 		}
 	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
-		std::cout << "!!test!! "<< _isUploading << std::endl;
+		
 		if (_isUploading)
         {
-			std::cout << "!!POST!1" << std::endl;
             _uploadFile.write(buf, bytesToWrite);
             _bodyCGI.append(buf, bytesToWrite);
         }
@@ -310,7 +311,7 @@ void	Connection::handleReadBody(void)
 		if (_bodyBytesReceived + (size_t)bytesRead > contentLength)
 			_request.getBuffer().append(buf + bytesToWrite, bytesRead - bytesToWrite);
 	}
-
+	std::cout << "!!test!! "<< _isUploading << std::endl;
 	//3. Body is complete
 	if (_bodyBytesReceived >= contentLength)
 	{
