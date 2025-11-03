@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 19:46:03 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/03 17:01:14 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,13 +310,11 @@ void	Connection::handleReadBody(void)
 		if (_bodyBytesReceived + (size_t)bytesRead > contentLength)
 			_request.getBuffer().append(buf + bytesToWrite, bytesRead - bytesToWrite);
 	}
-	std::cout << "!!test!! "<< _isUploading << std::endl;
 	//3. Body is complete
 	if (_bodyBytesReceived >= contentLength)
 	{
 		if (_isUploading)
 			_uploadFile.close();
-		std::cout << "!!bodyCGI : " << _bodyCGI << std::endl;
         // Now we can finally generate the response
         generateResponse();
 	}
