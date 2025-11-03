@@ -453,6 +453,15 @@ void	Connection::generateErrorResponse(int code, const std::string &reason)
 
 void	Connection::generateResponse(void)
 {
+	// 0- // 1.a check client_max_body_size
+	std::cout << "request content length: " << _request.getContentLength()
+				<< " vs serv client max size: " << _servConfig.getClient_max_size() << std::endl;
+	if (_request.getContentLength() > _servConfig.getClient_max_size())
+	{
+		return (generateErrorResponse(400, "Bad Request (client max body size)"));
+	}
+
+
 	//1- Find the correct location block from config
 	Locationconfig *location = _servConfig.matchLocation(_request.getUri());
 	if (location == NULL)
@@ -497,8 +506,8 @@ void	Connection::generateResponse(void)
 	// c. Handle GET
 	else if (_request.getMethod() == "GET")
 	{
-		// handle session management only in /visit/
-		if (_request.getUri() == "/visit/")
+		// handle session management only in /session/
+		if (_request.getUri() == "/session/")
 		{
 			std::string ses = sessionManagement();
 			return (generateVisitCountResponse(ses));
