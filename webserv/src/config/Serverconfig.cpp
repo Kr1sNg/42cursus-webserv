@@ -25,7 +25,7 @@ Serverconfig::Serverconfig()
     // _listen[0] = "";
     // _server_name[0] = "";
     // _root = "Default";
-    _client_max_body_size = 10000;
+    // _client_max_body_size = 10000;
 }
 
 Serverconfig::Serverconfig(const Serverconfig& obj)
@@ -168,18 +168,18 @@ void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max
     //  if (client_max_body_size.size() != 1)
     //     //error
     size_t size = static_cast<size_t>(std::strtoul(client_max_body_size[0].c_str(), NULL, 10));
-    if (_flags & _validDirective.at("_client_max_body_size"))
+    if (_flags & _validDirective.at("client_max_body_size"))
     {
-        std::cout << "Error : _client_max_body_size directive already defined in this location" << std::endl;
+        throw std::runtime_error("client_max_body_size directive already defined in this location");
     }
     else
     {
-        _flags |= _validDirective.at("_client_max_body_size");
+        _flags |= _validDirective.at("client_max_body_size");
         _client_max_body_size = size;
     }
 }
 
-const size_t& Serverconfig::getClient_max_size(void) const
+size_t Serverconfig::getClient_max_size(void)
 {
     return (_client_max_body_size);
 }

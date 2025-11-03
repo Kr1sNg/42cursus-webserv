@@ -85,7 +85,7 @@ class Request
 		bool    isError(void) const;
 		
 		std::string &getBuffer(void);
-		size_t  getContentLength(void) const;
+		size_t  getContentLength(void);
 		bool    isChunked(void) const;
 
 		std::string getHeader(const std::string &keyword) const;

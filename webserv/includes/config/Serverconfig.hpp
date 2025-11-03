@@ -45,7 +45,8 @@ class Serverconfig
         // const std::map<int, std::string>& getError_pages(void) const;
         std::string getError_pages(int code) const;
         void setClient_max_size(const std::vector<std::string>& client_max_body_size);
-        const size_t& getClient_max_size(void) const;
+        
+        size_t getClient_max_size(void);
         void addlocation(const Locationconfig& location);
         const std::vector<Locationconfig>& getLocations(void) const;
 

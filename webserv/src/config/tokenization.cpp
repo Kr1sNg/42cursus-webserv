@@ -90,7 +90,7 @@ void displayServer(const Serverconfig& server)
 	std::cout << "	Root : " << server.getRoot() << std::endl;
 
         // std::map<int, std::string> _error_pages;
-	std::cout << "	Max body size : " << server.getClient_max_size() << std::endl;
+	// std::cout << "	Max body size : " << server.getClient_max_size() << std::endl;
 	i = 0;
 	while (i < server.getLocations().size())
 	{

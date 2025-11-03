@@ -301,7 +301,7 @@ const std::string &Request::getReason(void) const
     return _reason;
 }
 
-size_t  Request::getContentLength(void) const
+size_t  Request::getContentLength(void)
 {
     return _contentLength;
 }

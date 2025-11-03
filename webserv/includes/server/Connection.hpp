@@ -45,10 +45,10 @@ class Connection: public IEventHandler
 	private:
 		Server	*_server; // non-owning pointer back to server for marking close/update events	
 		Serverconfig _servConfig;
-		std::string _bodyCGI;
-
+		
 		int		_clientFd;
 		// std::string	_inBuf;	// recevive
+		std::string _bodyCGI;
 		std::string	_outBuf; // send
 
 		uint32_t	_events;
