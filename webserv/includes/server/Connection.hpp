@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:10:48 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/02 17:46:47 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,10 @@ class Connection: public IEventHandler
 	private:
 		Server	*_server; // non-owning pointer back to server for marking close/update events	
 		Serverconfig _servConfig;
-		std::string _bodyCGI;
-
+		
 		int		_clientFd;
 		// std::string	_inBuf;	// recevive
+		std::string _bodyCGI;
 		std::string	_outBuf; // send
 
 		uint32_t	_events;

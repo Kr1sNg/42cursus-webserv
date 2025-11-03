@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:53:42 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/03 17:01:14 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_server(server),
 			_servConfig(conf),
-			_bodyCGI(""),
 			_clientFd(cfd),
+			_bodyCGI(""),
 			_outBuf(),
 			_events(POLLIN),
 			_request(),
@@ -310,13 +310,11 @@ void	Connection::handleReadBody(void)
 		if (_bodyBytesReceived + (size_t)bytesRead > contentLength)
 			_request.getBuffer().append(buf + bytesToWrite, bytesRead - bytesToWrite);
 	}
-	std::cout << "!!test!! "<< _isUploading << std::endl;
 	//3. Body is complete
 	if (_bodyBytesReceived >= contentLength)
 	{
 		if (_isUploading)
 			_uploadFile.close();
-		std::cout << "!!bodyCGI : " << _bodyCGI << std::endl;
         // Now we can finally generate the response
         generateResponse();
 	}
@@ -487,6 +485,7 @@ void	Connection::generateResponse(void)
 		
 	//3- Handle different request types
 	// a. Check for CGI
+	
 	if (location->getCgi_pass() != "")
     {
        	std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);
