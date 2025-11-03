@@ -105,7 +105,10 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
     std::string path;
 
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1)
-        return "";
+	{
+        throw std::runtime_error("cgiHandle: pipe is not working.");
+		return "";
+	}
 
 	// server.putFdinpoll(pipe_out);
 	// server.putFdinpoll(pipe_in);
@@ -119,7 +122,10 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
     char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), const_cast<char*>(path.c_str()), NULL};
 	pid_t pid = fork();
     if (pid < 0)
-        return "";
+	{
+        throw std::runtime_error("cgiHandle: fork is not working.");
+		return "";
+	}
     if (pid == 0)
     {
         close(pipe_in[1]);
@@ -138,7 +144,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
 		if (value == -1)
 		{
 			freeVectorChar(env);
-			throw std::runtime_error("cgiHandle: script was not executed");
+			throw std::runtime_error("cgiHandle: script was not executed.");
 		}
         exit(1);
     }
@@ -152,8 +158,8 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
             while (total < static_cast<ssize_t>(body.size())) {
                 ssize_t written = write(pipe_in[1], body.c_str() + total, body.size() - total);
                 if (written <= 0)
-                {        
-                    // perror("write to CGI stdin failed");
+                {
+					throw std::runtime_error("cgiHandle: write to CGI stdin failed.");        
                     break;
                 }
             total += written;
