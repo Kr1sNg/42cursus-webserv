@@ -29,6 +29,15 @@ char **vectorToChar(std::vector<std::string> vector)
 	return (tab);
 }
 
+std::string makepath(std::string url)
+{
+	size_t pos = url.find('?');
+    if (pos == std::string::npos) {
+        return (url);
+    }
+    return (url.substr(0, pos));
+}
+
 char **cgiEnv(const Request& req, Locationconfig location)
 {
 	std::vector<std::string> env;
@@ -77,13 +86,13 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
 
     char **env = cgiEnv(req, location);
  
-    pid_t pid = fork();
     if (location.getRoot() != "")
-        path = location.getRoot() + req.getUri();
+        path = location.getRoot() + makepath(req.getUri());
     else
-        path = config.getRoot() +  req.getUri();
+        path = config.getRoot() +  makepath(req.getUri());
     std::cout << path << std::endl;
-    char* argv[] = {const_cast<char*>(path.c_str()), NULL};
+    char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), const_cast<char*>(path.c_str()), NULL};
+	pid_t pid = fork();
     if (pid < 0)
         return "";
     if (pid == 0)
@@ -96,9 +105,10 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
 
         close(pipe_in[0]);
         close(pipe_out[1]);
-
-        execve(location.getCgi_pass().c_str(), argv, env);
-        std::cerr << "execve failed: " << strerror(errno) << std::endl;
+      	execve(location.getCgi_pass().c_str(), argv, env);
+		// free ...
+		// throw 
+        // std::cerr << "execve failed: " << strerror(errno) << std::endl;
         exit(1);
     }
     else
@@ -112,7 +122,7 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
                 ssize_t written = write(pipe_in[1], body.c_str() + total, body.size() - total);
                 if (written <= 0)
                 {        
-                    perror("write to CGI stdin failed");
+                    // perror("write to CGI stdin failed");
                     break;
                 }
             total += written;
