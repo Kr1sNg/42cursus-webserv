@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:53:42 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/02 19:46:03 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -478,6 +478,7 @@ void	Connection::generateResponse(void)
 		
 	//3- Handle different request types
 	// a. Check for CGI
+	
 	if (location->getCgi_pass() != "")
     {
        	std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);

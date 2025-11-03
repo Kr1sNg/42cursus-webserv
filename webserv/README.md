@@ -1,9 +1,16 @@
 # HTTP 1.1
 
+## Virtuals hosts
+
+For add a virtual host, we need to add a line like :
+127.0.0.1	servername
+at this path :
+Computer/etc/hosts
+
 ## HTTP Request
 
 A HTTP Request includes 3 parts:
-	- Request-Line
+	- Request-Linemake fl
 	- Headers
 	- Body (optional)
 
