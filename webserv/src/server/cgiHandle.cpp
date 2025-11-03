@@ -16,6 +16,20 @@ std::string getQuery(std::string url)
     return url.substr(pos + 1);
 }
 
+void freeVectorChar(char **tab)
+{
+	int i = 0;
+
+    if (!tab)
+        return;
+    while (tab[i])
+	{
+        free(tab[i]);
+		i++;
+	}
+    delete[] tab;
+}
+
 char **vectorToChar(std::vector<std::string> vector)
 {
 	size_t i = 0;
@@ -37,8 +51,17 @@ std::string makepath(std::string url)
     }
     return (url.substr(0, pos));
 }
+std::string namescript(std::string url)
+{
+	std::string name;
+	size_t pos;
 
-char **cgiEnv(const Request& req, Locationconfig location)
+	name = makepath(url);
+	pos = name.find_last_of('/');
+	return (name.substr(pos + 1));
+}
+
+char **cgiEnv(const Request& req)
 {
 	std::vector<std::string> env;
 
@@ -60,7 +83,7 @@ char **cgiEnv(const Request& req, Locationconfig location)
         env.push_back("CONTENT_TYPE=" + it->second);
     else
         env.push_back("CONTENT_TYPE=");
-    env.push_back("SCRIPT_FILENAME=" + location.getCgi_pass());
+    env.push_back("SCRIPT_FILENAME=" + namescript(req.getUri()));
     env.push_back("GATEWAY_INTERFACE=CGI/1.1");
     env.push_back("SERVER_PROTOCOL=" + req.getVersion());
     env.push_back("REDIRECT_STATUS=200");
@@ -84,7 +107,9 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1)
         return "";
 
-    char **env = cgiEnv(req, location);
+	// server.putFdinpoll(pipe_out);
+	// server.putFdinpoll(pipe_in);
+    char **env = cgiEnv(req);
  
     if (location.getRoot() != "")
         path = location.getRoot() + makepath(req.getUri());
@@ -105,10 +130,16 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
 
         close(pipe_in[0]);
         close(pipe_out[1]);
-      	execve(location.getCgi_pass().c_str(), argv, env);
-		// free ...
-		// throw 
-        // std::cerr << "execve failed: " << strerror(errno) << std::endl;
+
+		//serve.markforcloseFD(pipe_out);
+		//serve.markforcloseFD(pipe_in);
+
+      	int value = execve(location.getCgi_pass().c_str(), argv, env);
+		if (value == -1)
+		{
+			freeVectorChar(env);
+			throw std::runtime_error("cgiHandle: script was not executed");
+		}
         exit(1);
     }
     else
@@ -139,8 +170,9 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
         close(pipe_out[0]);
 
         waitpid(pid, NULL, 0);
-
-        std::cout << "output cgi : "<< output<< std::endl;
+		freeVectorChar(env);
+		//serve.markforcloseFD(pipe_out);
+		//serve.markforcloseFD(pipe_in);
         return output;
     }
 }
