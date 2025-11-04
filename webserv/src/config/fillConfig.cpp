@@ -10,9 +10,9 @@ void directiveLocation(const Block& block, Locationconfig& locationconfig)
         locationconfig.addDirective(block.getDirectives()[i]);
         i++;
     }
-    locationconfig.setArg(block.getArgs()[0]);
     if (block.getArgs().size() != 1)
-        std::cout << "Error Location : You need to declare only one argument" << std::endl;
+        throw std::invalid_argument("Error Location : A location block must have exactly one argument.");
+    locationconfig.setArg(block.getArgs()[0]);
 }
 
 void directiveServer(const Block& block, Serverconfig& serverconfig)
@@ -24,15 +24,17 @@ void directiveServer(const Block& block, Serverconfig& serverconfig)
         serverconfig.addDirective(block.getDirectives()[i]);
         i++;
     }
+    if (block.getArgs().size() != 0)
+        throw std::invalid_argument("Error Server : A server block can't have an argument.");
 }
 
 Locationconfig checkLocation(const Block& block)
 {
     Locationconfig locationconfig;
-    // if (block.getBlocks().size() != 0)
-    // {
-    //     //error
-    // }
+    if (block.getBlocks().size() != 0)
+    {
+        throw std::invalid_argument("Error locationconfig: invalid block in location.");
+    }
     directiveLocation(block, locationconfig);
     return (locationconfig);
 }
@@ -44,7 +46,7 @@ Serverconfig checkServer(const Block& block)
     while (i < block.getBlocks().size())
     {
         if (block.getBlocks()[i].getName() != "location")
-            throw  std::invalid_argument("Error locationconfig: invalid location name.");
+            throw  std::invalid_argument("Error serverconfig: invalid block name.");
         else
            serverconfig.addlocation(checkLocation(block.getBlocks()[i]));
         

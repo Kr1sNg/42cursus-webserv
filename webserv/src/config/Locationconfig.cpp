@@ -25,11 +25,6 @@ Locationconfig::Locationconfig()
     _autoindex = false;
     initStatics();
     _flags = 0;
-    // _root = "";
-    // _index = "";
-    // _methods = ;
-    // _cgi_pass = "";
-    // _redirect = "";
 }
 
 Locationconfig::Locationconfig(const Locationconfig& obj)
@@ -82,11 +77,11 @@ const std::string& Locationconfig::getArg(void) const
 
 void Locationconfig::setRoot(const std::vector<std::string>& root)
 {
-    // if (root.size() > 1)
-    //     //error
+    if (root.size() != 1)
+        throw std::invalid_argument ("Error directive root : The root directive must have only one argument.");
     if (_flags & _validDirective.at("root"))
     {
-        std::cout << "Error : root directive already defined in this location" << std::endl;
+        throw std::invalid_argument ("Error directive root : the root directive is already defined in this location.");
     }
     else
     {
@@ -102,39 +97,39 @@ const std::string& Locationconfig::getRoot(void) const
 
 void Locationconfig::setIndex(const std::vector<std::string>& index)
 {
-    // if (index.size() > 1)
-    //     //error
+    if (index.size() != 1)
+        throw std::invalid_argument ("Error directive index : The index directive must have only one argument.");
     if (_flags & _validDirective.at("index"))
     {
-        std::cout << "Error : index directive already defined in this location" << std::endl;
+        throw std::invalid_argument ("Error directive index : The index directive is already defined in this location.");
     }
     else
     {
         _flags |= _validDirective.at("index");
         _index = index[0];
-        std::cout << "Locationconfig::setIndex:" << _index << std::endl; // it doesn't work !???
     }
 }
 
 const std::string& Locationconfig::getIndex(void) const
 {
-    std::cout << "getIndex: " << _index << std::endl;   // there's nothing inside index !??
     return (_index);
 }
 
 void Locationconfig::setAutoindex(const std::vector<std::string>& autoindex)
 {
+    if (autoindex.size() != 1)
+        throw std::invalid_argument ("Error directive autoindex : The autoindex directive must have only one argument.");
     if (_flags & _validDirective.at("autoindex"))
     {
-        std::cout << "Error : autoindex directive already defined in this location" << std::endl;
+        throw std::invalid_argument ("Error directive autoindex : The autoindex directive is already defined in this location.");
     }
     else
     {
         _flags |= _validDirective.at("autoindex");
         if (autoindex[0] == "on")
             _autoindex = true;
-        // else (autoindex[0] != "off")
-        //     //error
+        else if (autoindex[0] != "off")
+            throw std::invalid_argument ("Error directive autoindex : The autoindex directive has an invalid argument.");
         else
             _autoindex = false;
     }
@@ -148,25 +143,27 @@ const bool& Locationconfig::getAutoindex(void) const
 void Locationconfig::setMethods(const std::vector<std::string>& methods)
 {
     size_t i = 0;
-
+    if (methods.size() < 1 || methods.size() > 3)
+        throw std::invalid_argument ("Error directive methods : The methods directive must have beetween one and three arguments.");
     if (_flags & _validDirective.at("methods"))
     {
-    	throw std::out_of_range("Config: getLocationConfig: methods directive already defined in this location");
+        throw std::invalid_argument ("Error directive methods : The methods directive is already defined in this location.");
 	}
-    _flags |= _validDirective.at("methods");
-    while (i < methods.size())
+    else
     {
-        std::string m = methods[i];
-        if (m == "GET" || m == "POST" || m == "DELETE")
+        _flags |= _validDirective.at("methods");
+        while (i < methods.size())
         {
-            _methods.push_back(m);
-            std::cout << "setMethods: " << _methods[i] << std::endl;
+            std::string m = methods[i];
+            if (m == "GET" || m == "POST" || m == "DELETE")
+            {
+                _methods.push_back(m);
+            }
+            else
+                throw std::invalid_argument ("Error directive methods : The methods directive has an invalid argument.");
+            ++i;
         }
-        else
-            throw std::invalid_argument("Config: getLocationConfig: invalid HTTP methods");
-        ++i;
     }
-    std::cout << "Locationconfig::setMethods: _methods.size(): " << _methods.size() << std::endl;
 }
 
 const std::vector<std::string>& Locationconfig::getMethods(void) const
@@ -176,9 +173,11 @@ const std::vector<std::string>& Locationconfig::getMethods(void) const
 
 void Locationconfig::setCgi_pass(const std::vector<std::string>& cgi_pass)
 {
+    if (cgi_pass.size() != 1)
+        throw std::invalid_argument ("Error directive cgi_pass : The cgi_pass directive must have only one argument.");
     if (_flags & _validDirective.at("cgi_pass"))
     {
-        std::cout << "Error : cgi_pass directive already defined in this location" << std::endl;
+        throw std::invalid_argument ("Error directive cgi_pass : The cgi_pass directive is already defined in this location.");
     }
     else
     {
@@ -195,9 +194,11 @@ const std::string& Locationconfig::getCgi_pass(void) const
 
 void Locationconfig::setRedirect(const std::vector<std::string>& redirect)
 {
+     if (redirect.size() != 1)
+        throw std::invalid_argument ("Error directive redirect : The redirect directive must have only one argument.");
     if (_flags & _validDirective.at("redirect"))
     {
-        std::cout << "Error : redirect directive already defined in this location" << std::endl;
+        throw std::invalid_argument ("Error directive redirect : The redirect directive is already defined in this location.");
     }
     else
     {
