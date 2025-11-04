@@ -328,7 +328,7 @@ void	Connection::handleWrite(void) //send
 	//1. send from _outBuf first (headers / small body)
 	if (!_outBuf.empty())
 	{	
-		std::cout << "///////" << std::endl;
+		// std::cout << "///////" << std::endl;
 		// std::cout << _outBuf << std::endl;
 		// std::cout << "///////" << std::endl;
 	
@@ -516,7 +516,7 @@ void	Connection::generateResponse(void)
 		}
 		
 		//Construct the full file path
-		std::string	filePath = _servConfig.getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::string	filePath = location->getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
 		
 		// check if directory -> send index AND if autoindex on -> send directory listing

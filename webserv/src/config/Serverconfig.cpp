@@ -204,6 +204,14 @@ void Serverconfig::addDirective(const Directive& directive)
     }
 }
 
+void Serverconfig::checkDirective(void)
+{
+    if (_error_pages.find(404) == _error_pages.end())
+        throw std::invalid_argument ("Error directive : Server must have a 404 error page directive.");
+    if (!_listen.size())
+        throw std::invalid_argument ("Error directive : Server must have a listen directive.");
+}
+
 size_t  Serverconfig::getListenSize(void) const
 {
     return (_listen.size());
