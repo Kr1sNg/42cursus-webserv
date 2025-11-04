@@ -174,7 +174,6 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
             output.append(buffer, bytesRead);
         }
         close(pipe_out[0]);
-
         waitpid(pid, NULL, 0);
 		freeVectorChar(env);
 		//serve.markforcloseFD(pipe_out);

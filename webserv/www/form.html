@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Webserv — Home</title>
+    <title>Test CGI POST</title>
     <style>
         body {
             font-family: 'Poppins', Arial, sans-serif;
-            background: url('index1.png') no-repeat center 45% fixed;
+            background: url('images/CGI_menu.jpg') no-repeat center 45% fixed;
             background-size: 100%; 
             margin: 0;
             display: flex;
@@ -42,7 +42,6 @@
             color: #444;
             margin: 0;
         }
-
         nav {
             display: flex;
             gap: 2rem;
@@ -88,6 +87,12 @@
         h2 {
             margin-bottom: 20px;
             color: #444;
+			background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         input[type="file"] {
@@ -131,13 +136,34 @@
         </nav>
     </header>
 
-    <main>
-        <form action="/uploads" method="post" enctype="multipart/form-data">
-            <h2>Upload a File</h2>
-            <input type="file" name="file">
-            <input type="submit" value="Upload">
-        </form>
-    </main>
+<main style="display: flex; flex-direction: column; gap: 40px; max-width: 400px; margin: auto;">
+  <section>
+    <h2>Test de requête POST vers CGI bash</h2>
+    <form action="/cgi-bin/bash/test.sh" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+      <label>Nom :</label>
+      <input type="text" name="nom" value="">
+
+      <label>Langage préféré :</label>
+      <input type="text" name="langage" value="">
+
+      <input type="submit" value="Envoyer au CGI bash">
+    </form>
+  </section>
+
+  <section>
+    <h2>Test de requête POST vers CGI perl</h2>
+    <form action="/cgi-bin/perl/test.pl" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+      <label>Nom :</label>
+      <input type="text" name="nom" value="">
+
+      <label>Langage préféré :</label>
+      <input type="text" name="langage" value="">
+
+      <input type="submit" value="Envoyer au CGI perl">
+    </form>
+  </section>
+</main>
+
 
     <footer>
         © 2025 Webserv — Made by 3 weebs
