@@ -1,6 +1,19 @@
 #include "../../includes/config/generalconfig.hpp"
 #include "../../includes/webserv.hpp"
 
+// void defaultLocation(Locationconfig& config)
+// {
+//     if (config.getMethods() == "")
+//     {
+//         std::vector<std::string> 
+//         if ()
+//     }
+//     if (config.getRoot() == "")
+//     {
+//         if ()
+//     }
+// }
+
 void directiveLocation(const Block& block, Locationconfig& locationconfig)
 {
     size_t i = 0;
@@ -13,6 +26,8 @@ void directiveLocation(const Block& block, Locationconfig& locationconfig)
     if (block.getArgs().size() != 1)
         throw std::invalid_argument("Error Location : A location block must have exactly one argument.");
     locationconfig.setArg(block.getArgs()[0]);
+    // defaultLocation(locationconfig);
+    //remplir les elements par default et verification de root
 }
 
 void directiveServer(const Block& block, Serverconfig& serverconfig)
@@ -24,6 +39,7 @@ void directiveServer(const Block& block, Serverconfig& serverconfig)
         serverconfig.addDirective(block.getDirectives()[i]);
         i++;
     }
+    //verifier la presence du minimum listen et page 404
     if (block.getArgs().size() != 0)
         throw std::invalid_argument("Error Server : A server block can't have an argument.");
 }
