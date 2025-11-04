@@ -33,7 +33,10 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
-	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
+	if (_servConfig.getServer_name().size())
+		std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
+	else
+		std::cout << "Connection: servConf: server_name: Default" << std::endl;
 }
 
 Connection::~Connection()

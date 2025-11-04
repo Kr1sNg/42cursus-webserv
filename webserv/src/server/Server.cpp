@@ -103,6 +103,7 @@ void	Server::acceptNewConnection(int clientFd, const Serverconfig &conf)
 		return ;
 	// create connection object and register with the loop
 	Connection	*c = new Connection(this, clientFd, conf);
+	
 	_connects[clientFd] = c;
 	_loop.addHandler(c, POLLIN);
 	std::cout << "New connection accepted through fd=[" << clientFd << "]..." << std::endl;

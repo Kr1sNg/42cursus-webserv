@@ -194,7 +194,7 @@ const std::string& Locationconfig::getCgi_pass(void) const
 
 void Locationconfig::setRedirect(const std::vector<std::string>& redirect)
 {
-     if (redirect.size() != 1)
+    if (redirect.size() != 1)
         throw std::invalid_argument ("Error directive redirect : The redirect directive must have only one argument.");
     if (_flags & _validDirective.at("redirect"))
     {
