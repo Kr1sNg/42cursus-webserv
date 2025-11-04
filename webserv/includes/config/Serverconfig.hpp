@@ -51,6 +51,7 @@ class Serverconfig
         const std::vector<Locationconfig>& getLocations(void) const;
 
         void addDirective(const Directive& directive);
+        void checkDirective(void);
 
         // to get Locationconfig
         Locationconfig *matchLocation(const std::string &url);
