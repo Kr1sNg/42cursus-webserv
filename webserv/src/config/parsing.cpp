@@ -64,7 +64,7 @@ Block createBlock(std::vector<std::string> list, size_t *i)
             block.addBlock(createBlock(list, i));
         }
         else
-            std::cout << "error" << std::endl;
+            throw std::runtime_error("Error creating block.");
         (*i)++;
     }
     return (block);
@@ -81,7 +81,7 @@ Block createMain(std::vector<std::string> list, size_t *i)
             block.addBlock(createBlock(list, i));
         }
         else
-            std::cout << "error" << std::endl;
+            throw std::runtime_error("Error creating block.");
         (*i)++;
     }
     return (block);
