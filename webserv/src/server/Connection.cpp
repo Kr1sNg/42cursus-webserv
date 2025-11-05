@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/05 12:03:48 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:02:19 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,11 +248,16 @@ void	Connection::handleReadBody(void)
 		Locationconfig *loc = _servConfig.matchLocation(_request.getUri());
         if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
 		{
-            _isUploading = true;
-			
+			if (loc->getCgi_pass() != "")
+				_isCGI = true;
+			else
+			{
+            	_isUploading = true;
+			}
 			// generate a unique name for uploaded file
 			std::stringstream ss;
-			ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
+			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
+			// ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
 			std::string uniqueName = ss.str();
 
             _uploadFilePath = "www/uploads/" + uniqueName;
@@ -260,6 +265,7 @@ void	Connection::handleReadBody(void)
             _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
             if (!_uploadFile.is_open())
                 return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
+
         }
     }
 
@@ -271,11 +277,14 @@ void	Connection::handleReadBody(void)
 	if (!leftover.empty())
 	{
 		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
-
-		if (_isUploading)
+		
+		if (_isCGI)
+		{
+			_bodyCGI.append(leftover.c_str(), bytesToWrite);
+		}
+		else if (_isUploading)
 		{
 			_uploadFile.write(leftover.c_str(), bytesToWrite);
-			_bodyCGI.append(leftover.c_str(), bytesToWrite);
 		}
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
@@ -302,10 +311,13 @@ void	Connection::handleReadBody(void)
 	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
-		if (_isUploading)
+		if (_isCGI)
+		{
+			_bodyCGI.append(buf, bytesToWrite);
+		}
+		else if (_isUploading)
 		{
 			_uploadFile.write(buf, bytesToWrite);
-			_bodyCGI.append(buf, bytesToWrite);
 		}
 		
 		_bodyBytesReceived += bytesToWrite;

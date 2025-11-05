@@ -20,7 +20,7 @@ print "<!DOCTYPE html>
   <style>
     body {
       font-family: 'Poppins', Arial, sans-serif;
-      background: url('../../images/CGI_menu.jpg') no-repeat center 45% fixed;
+      background: url('../images/CGI_menu.jpg') no-repeat center 45% fixed;
       background-size: 100%;
       margin: 0;
       display: flex;
