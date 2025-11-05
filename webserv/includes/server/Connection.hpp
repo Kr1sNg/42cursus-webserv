@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 17:46:47 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/05 12:47:52 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ class Connection: public IEventHandler
 		std::ofstream	_uploadFile;
 		std::string		_uploadFilePath;
 		bool			_isUploading;
+		bool 			_isCGI;
 
 		std::ifstream	_fileStream;	//for streaming response bodies
 
