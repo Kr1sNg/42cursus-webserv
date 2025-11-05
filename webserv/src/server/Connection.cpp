@@ -253,7 +253,7 @@ void	Connection::handleReadBody(void)
 			else
 			{
             	_isUploading = true;
-			}
+		
 			// generate a unique name for uploaded file
 			std::stringstream ss;
 			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
@@ -265,7 +265,7 @@ void	Connection::handleReadBody(void)
             _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
             if (!_uploadFile.is_open())
                 return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
-
+			}
         }
     }
 
