@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Webserv Test Page</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+    input, textarea { width: 100%; margin: 8px 0; }
+    button { margin-top: 10px; padding: 6px 12px; cursor: pointer; }
+    #response { background: white; padding: 10px; border-radius: 5px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Webserv HTTP Method Test</h1>
+
+  <h2>GET</h2>
+  <button onclick="sendGet()">Send GET</button>
+
+  <h2>POST</h2>
+  <form id="postForm" onsubmit="sendPost(event)">
+    <textarea name="data" placeholder="Enter something to POST"></textarea>
+    <button type="submit">Send POST</button>
+  </form>
+
+  <h2>DELETE</h2>
+  <input id="deletePath" placeholder="File path to DELETE (e.g. /uploads/test.txt)" />
+  <button onclick="sendDelete()">Send DELETE</button>
+
+  <div id="response"></div>
+
+  <script>
+    async function sendGet() {
+      const res = await fetch("/test.txt");
+      const text = await res.text();
+      showResponse("GET", text);
+    }
+
+    async function sendPost(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const data = formData.get("data");
+      const res = await fetch("/upload", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: data
+      });
+      const text = await res.text();
+      showResponse("POST", text);
+    }
+
+    async function sendDelete() {
+      const path = document.getElementById("deletePath").value;
+      const res = await fetch(path, { method: "DELETE" });
+      const text = await res.text();
+      showResponse("DELETE", text);
+    }
+
+    function showResponse(method, text) {
+      document.getElementById("response").innerHTML =
+        `<h3>${method} response:</h3><pre>${text}</pre>`;
+    }
+  </script>
+</body>
+</html>
