@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/05 13:02:19 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/03 17:01:14 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,13 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
-	if (_servConfig.getServer_name().size())
-		std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
-	else
-		std::cout << "Connection: servConf: server_name: Default" << std::endl;
+	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
 }
 
 Connection::~Connection()
 {
 	close(_clientFd);
+	cleanupCgi();
 }
 
 int		Connection::getFd(void) const
@@ -195,7 +193,7 @@ void	Connection::handleReadHeaders(void)
 	
 	if (bytesRead <= 0)
 	{
-		if (bytesRead < 0) // && (errno == EAGAIN || errno == EWOULDBLOCK))
+		if (bytesRead < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
 			return; // no more data for now (not an error)
 		_server->markForClose(_clientFd);
 		return;
@@ -248,16 +246,10 @@ void	Connection::handleReadBody(void)
 		Locationconfig *loc = _servConfig.matchLocation(_request.getUri());
         if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
 		{
-			if (loc->getCgi_pass() != "")
-				_isCGI = true;
-			else
-			{
-            	_isUploading = true;
-		
+            _isUploading = true;
 			// generate a unique name for uploaded file
 			std::stringstream ss;
 			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
-			// ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
 			std::string uniqueName = ss.str();
 
             _uploadFilePath = "www/uploads/" + uniqueName;
@@ -265,7 +257,6 @@ void	Connection::handleReadBody(void)
             _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
             if (!_uploadFile.is_open())
                 return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
-			}
         }
     }
 
@@ -277,14 +268,11 @@ void	Connection::handleReadBody(void)
 	if (!leftover.empty())
 	{
 		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
-		
-		if (_isCGI)
-		{
-			_bodyCGI.append(leftover.c_str(), bytesToWrite);
-		}
-		else if (_isUploading)
+
+		if (_isUploading)
 		{
 			_uploadFile.write(leftover.c_str(), bytesToWrite);
+			_bodyCGI.append(leftover.c_str(), bytesToWrite);
 		}
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
@@ -298,8 +286,8 @@ void	Connection::handleReadBody(void)
 		
 		if (bytesRead < 0)
 		{
-			// if (errno == EAGAIN || errno == EWOULDBLOCK) //-> do not check errno after recv
-			// 	return ; //wait for next POLLIN
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				return ; //wait for next POLLIN
 			_server->markForClose(_clientFd); //error
 			return ;
 		}
@@ -311,13 +299,10 @@ void	Connection::handleReadBody(void)
 	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
-		if (_isCGI)
-		{
-			_bodyCGI.append(buf, bytesToWrite);
-		}
-		else if (_isUploading)
+		if (_isUploading)
 		{
 			_uploadFile.write(buf, bytesToWrite);
+			_bodyCGI.append(buf, bytesToWrite);
 		}
 		
 		_bodyBytesReceived += bytesToWrite;
@@ -341,15 +326,15 @@ void	Connection::handleWrite(void) //send
 	//1. send from _outBuf first (headers / small body)
 	if (!_outBuf.empty())
 	{	
-		// std::cout << "///////" << std::endl;
+		std::cout << "///////" << std::endl;
 		// std::cout << _outBuf << std::endl;
 		// std::cout << "///////" << std::endl;
 	
 		ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
-		if (n < 0)	// need to check n == 0
+		if (n < 0)
 		{
-			// if (errno != EWOULDBLOCK && errno != EAGAIN)
-			_server->markForClose(_clientFd);
+			if (errno != EWOULDBLOCK && errno != EAGAIN)
+				_server->markForClose(_clientFd);
 			return ;
 		}
 		_outBuf.erase(0, n);
@@ -379,16 +364,16 @@ void	Connection::handleWrite(void) //send
 			ssize_t n = send(_clientFd, fileBuf, bytesRead, 0);
 			if (n < 0)
 			{
-				// if (errno != EWOULDBLOCK && errno != EAGAIN)
-				// {
+				if (errno != EWOULDBLOCK && errno != EAGAIN)
+				{
 					_fileStream.close();
 					_server->markForClose(_clientFd);
-				// }
-				// else
-				// 	_fileStream.seekg(-bytesRead, std::ios::cur);
+				}
+				else
+					_fileStream.seekg(-bytesRead, std::ios::cur);
 				return ; //wait for next POLLOUT
 			}
-			if (n == 0 || n < bytesRead) // n == 0 here!
+			if (n < bytesRead)
 			{
 				// we only sent a part of chunk, keep continue
 				_fileStream.seekg(n - bytesRead, std::ios::cur);
@@ -504,10 +489,13 @@ void	Connection::generateResponse(void)
 	
 	if (location->getCgi_pass() != "")
     {
-       	std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);
-       	_response.buildCGI(content);
-		_response.setStatus(200, "OK");
-        _response.setHeader("Content-Length", Response::intToStr(content.size()));
+       	// std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);
+       	// _response.buildCGI(content);
+		// _response.setStatus(200, "OK");
+        // _response.setHeader("Content-Length", Response::intToStr(content.size()));
+		handleCgi(*location);
+	
+		return ;
 	}
 	
 	// b. Handle POST (which is an upload)
@@ -529,7 +517,7 @@ void	Connection::generateResponse(void)
 		}
 		
 		//Construct the full file path
-		std::string	filePath = location->getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::string	filePath = _servConfig.getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
 		
 		// check if directory -> send index AND if autoindex on -> send directory listing
@@ -555,7 +543,7 @@ void	Connection::generateResponse(void)
 	else if (_request.getMethod() == "DELETE")
 	{
 		// locate the deleting file (we delete only in /www/public/)
-		std::string filePath = location->getRoot() + _request.getUri();
+		std::string filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
 		
 		if (!fileExists(filePath)) // file doesn't exsist
