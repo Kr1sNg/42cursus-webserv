@@ -64,6 +64,8 @@ class Server
 
 		void	acceptNewConnection(int clientFd, const Serverconfig &conf);
 
+		void	quit(void);
+
 		// cookie and session management
 		void	setSessionCount(std::string id);
 		void	increaseSessionCount(std::string id);
