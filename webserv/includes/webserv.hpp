@@ -29,6 +29,7 @@
 # include <cstdio> // std::remove
 # include <ctime>
 # include <algorithm>
+# include <dirent.h>     // opendir, readdir, closedir
 
 
 // for socket
