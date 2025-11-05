@@ -38,6 +38,11 @@ Server::Server(Config const &config): _config(config)
 
 Server::~Server()
 {
+	quit();
+}
+
+void Server::quit(void)
+{
 	for (size_t i = 0; i < _listeners.size(); ++i)
 	{
 		_loop.removeHandler(_listeners[i]->getFd());
