@@ -57,6 +57,47 @@ std::string intToStr(int n)
 
 std::string	createDirectoryListing(const std::string &path)
 {
-	std::string dir = "Directory Listing Path: " + path; 
-	return dir;
+	DIR *dir;
+    struct dirent *entry;
+    std::ostringstream html;
+
+    dir = opendir(path.c_str());
+    if (!dir)
+        return "<html><body><h1>Forbidden</h1></body></html>";
+
+    html << "<html><head><title>Index of " << path
+         << "</title></head><body>\n";
+    html << "<h1>Index of " << path << "</h1><hr><pre>\n";
+
+    // Optional: link to parent directory if not root
+    if (path != "/" && path != ".")
+        html << "<a href=\"../\">../</a>\n";
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        std::string name = entry->d_name;
+
+        // Skip "." and ".."
+        if (name == "." || name == "..")
+            continue;
+
+        std::string fullPath = path;
+        if (fullPath[fullPath.size() - 1] != '/')
+            fullPath += '/';
+        fullPath += name;
+
+        struct stat info;
+        if (stat(fullPath.c_str(), &info) == 0)
+        {
+            if (S_ISDIR(info.st_mode))
+                html << "<a href=\"" << name << "/\">" << name << "/</a>\n";
+            else
+                html << "<a href=\"" << name << "\">" << name << "</a>\n";
+        }
+    }
+
+    closedir(dir);
+
+    html << "</pre><hr></body></html>\n";
+    return html.str();
 }
