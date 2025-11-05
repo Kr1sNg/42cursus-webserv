@@ -55,7 +55,7 @@ Request::~Request() {
 void	Request::append(const char* buffer, size_t nread)
 {
     _buffer.append(buffer, nread);
-    std::cout << "_inBuf: " << _buffer << std::endl;
+    // std::cout << "_inBuf: " << _buffer << std::endl;
 }
 
 

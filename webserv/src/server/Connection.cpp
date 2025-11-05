@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/03 17:01:14 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/05 12:03:48 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,9 +249,10 @@ void	Connection::handleReadBody(void)
         if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
 		{
             _isUploading = true;
+			
 			// generate a unique name for uploaded file
 			std::stringstream ss;
-			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
+			ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
 			std::string uniqueName = ss.str();
 
             _uploadFilePath = "www/uploads/" + uniqueName;
@@ -542,7 +543,7 @@ void	Connection::generateResponse(void)
 	else if (_request.getMethod() == "DELETE")
 	{
 		// locate the deleting file (we delete only in /www/public/)
-		std::string filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::string filePath = location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
 		
 		if (!fileExists(filePath)) // file doesn't exsist
