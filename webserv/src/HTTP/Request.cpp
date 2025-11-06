@@ -188,7 +188,6 @@ bool    Request::parsingHeaders(void)
         
         std::string key = line.substr(0, colon_pos);    // have to use camel type for key
         std::string value = trimSpace(line.substr(colon_pos + 1));
-
         _headers[key] = value;
     }
     return (false); // not error, it means we need more data, parse() loop stops for now 

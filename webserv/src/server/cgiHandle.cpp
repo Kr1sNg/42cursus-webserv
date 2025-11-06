@@ -70,7 +70,6 @@ char **cgiEnv(const Request& req)
 
 	std::map<std::string, std::string>::const_iterator it = req.getHeaders().find("Content-Length");
 
-    
     if (it != req.getHeaders().end() && !it->second.empty())
         env.push_back("CONTENT_LENGTH=" + it->second);
     else
