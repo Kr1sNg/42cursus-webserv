@@ -75,7 +75,10 @@ Listener::Listener(Server *server, const char *hostname, const char *port, const
 {
 	_listenerFd = make_listen_socket(hostname, port);
 	if (_listenerFd < 0)
+	{
+		_server->quit();
 		throw std::runtime_error("Server: Failed to create listener");
+	}
 	std::cout << "Server: waiting for connections ..." << std::endl;
 }
 

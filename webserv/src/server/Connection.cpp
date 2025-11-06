@@ -195,8 +195,6 @@ void	Connection::handleReadHeaders(void)
 	
 	if (bytesRead <= 0)
 	{
-		if (bytesRead < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
-			return; // no more data for now (not an error)
 		_server->markForClose(_clientFd);
 		return;
 	}
@@ -248,9 +246,13 @@ void	Connection::handleReadBody(void)
         if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
 		{
 			if (loc->getCgi_pass() != "")
+			{
 				_isCGI = true;
+				_isUploading = false;
+			}
 			else
 			{
+				_isCGI = false;
             	_isUploading = true;
 				
 
@@ -287,9 +289,10 @@ void	Connection::handleReadBody(void)
 		{
 			_bodyCGI.append(leftover.c_str(), bytesToWrite);
 		}
-		else if (_isUploading)
+		if (_isUploading)
 		{
 			_uploadFile.write(leftover.c_str(), bytesToWrite);
+
 		}
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
@@ -301,17 +304,11 @@ void	Connection::handleReadBody(void)
 	{
 		ssize_t bytesRead = recv(_clientFd, buf, sizeof(buf), 0);
 		
-		if (bytesRead < 0)
+		if (bytesRead <= 0)
 		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-				return ; //wait for next POLLIN
-			_server->markForClose(_clientFd); //error
-			return ;
-		}
-		if (bytesRead == 0)
-		{
-			_server->markForClose(_clientFd); //client disconnected
-			return ;
+			generateErrorResponse(400, "Bad Request (bodyBytesReceived < contentLength)");
+			// _server->markForClose(_clientFd); //error
+			return;
 		}
 	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
@@ -320,7 +317,7 @@ void	Connection::handleReadBody(void)
 		{
 			_bodyCGI.append(buf, bytesToWrite);
 		}
-		else if (_isUploading)
+		if (_isUploading)
 		{
 			_uploadFile.write(buf, bytesToWrite);
 		}
@@ -345,17 +342,12 @@ void	Connection::handleWrite(void) //send
 {
 	//1. send from _outBuf first (headers / small body)
 	if (!_outBuf.empty())
-	{	
-		// std::cout << "///////" << std::endl;
-		// std::cout << _outBuf << std::endl;
-		// std::cout << "///////" << std::endl;
-	
+	{		
 		ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
-		if (n < 0)
+		if (n <= 0)
 		{
-			if (errno != EWOULDBLOCK && errno != EAGAIN)
-				_server->markForClose(_clientFd);
-			return ;
+			_server->markForClose(_clientFd);
+			return (generateErrorResponse(500, "Permission Denied (handle Write)"));
 		}
 		_outBuf.erase(0, n);
 		
@@ -382,16 +374,11 @@ void	Connection::handleWrite(void) //send
 		if (bytesRead > 0)
 		{
 			ssize_t n = send(_clientFd, fileBuf, bytesRead, 0);
-			if (n < 0)
+			if (n <= 0)
 			{
-				if (errno != EWOULDBLOCK && errno != EAGAIN)
-				{
-					_fileStream.close();
-					_server->markForClose(_clientFd);
-				}
-				else
-					_fileStream.seekg(-bytesRead, std::ios::cur);
-				return ; //wait for next POLLOUT
+				_fileStream.close();
+				_server->markForClose(_clientFd);
+				return (generateErrorResponse(500, "Permission Denied (handle Write)"));
 			}
 			if (n < bytesRead)
 			{
@@ -479,7 +466,6 @@ void	Connection::generateResponse(void)
 	{
 		return (generateErrorResponse(400, "Bad Request (client max body size)"));
 	}
-
 
 	//1- Find the correct location block from config
 	Locationconfig *location = _servConfig.matchLocation(_request.getUri());
