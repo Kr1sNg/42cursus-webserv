@@ -1,4 +1,4 @@
-<!doctype html>
+<!-- <!doctype html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -45,4 +45,194 @@
   });
   </script>
 </body>
+</html> -->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webserv — Delete File</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: url('../images/background_delete.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #444;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-radius: 0 0 20px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: #444;
+      margin: 0;
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    nav a:hover {
+      color: #ff8c8c;
+      transform: translateY(-2px);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      gap: 1.5rem;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: #555;
+    }
+
+    p {
+      color: #666;
+      font-size: 1rem;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    input[type="text"] {
+      width: 60%;
+      max-width: 500px;
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: 2px solid #ffd6d6;
+      border-radius: 10px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    input[type="text"]:focus {
+      box-shadow: 0 0 8px rgba(255, 150, 150, 0.4);
+    }
+
+    button {
+      background-color: #ffb6b6;
+      border: none;
+      color: #444;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background-color: #ff9b9b;
+      transform: scale(1.05);
+    }
+
+    #status {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #555;
+      white-space: pre-wrap;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: #999;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Webserv</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/uploads/">Uploads</a>
+      <a href="/public/">Delete</a>
+      <a href="/form.html">CGI</a>
+      <a href="/autoindex/">Autoindex</a>
+      <a href="/session/">Session</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>DELETE File</h1>
+
+    <p>Enter the file URL inside folder public to delete (must start with <code>/public/</code>):</p>
+
+    <input id="filePath" type="text" size="60" value="/public/del.txt">
+    <button id="deleteBtn">Delete File</button>
+
+    <p id="status"></p>
+  </main>
+
+  <footer>
+    © 2025 Webserv — Made by 3 weebs 💻
+  </footer>
+
+  <script>
+  document.getElementById('deleteBtn').addEventListener('click', function () {
+    var input = document.getElementById('filePath');
+    var status = document.getElementById('status');
+    var path = input.value.trim();
+
+    // Must start with /public/
+    if (!path.startsWith('/public/')) {
+      alert('Error: You can only delete files in /public/');
+      return;
+    }
+
+    var url = 'http://localhost:8080' + path;
+    status.textContent = 'Sending DELETE request to ' + url + ' ...';
+
+    fetch(url, { method: 'DELETE' })
+      .then(function (response) {
+        if (response.ok) {
+          status.textContent = '✅ File deleted successfully (HTTP ' + response.status + ')';
+          window.location.href = 'http://localhost:8080/notif/delete_success.html';
+        } else {
+          status.textContent = '❌ Failed (HTTP ' + response.status + ' ' + response.statusText + ')';
+        }
+      })
+      .catch(function (error) {
+        status.textContent = '⚠️ Network error: ' + error;
+      });
+  });
+  </script>
+</body>
 </html>
+

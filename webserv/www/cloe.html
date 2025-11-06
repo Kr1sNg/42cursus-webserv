@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Webserv — Home</title>
+    <title>Webserv — cfiachet</title>
     <style>
         body {
             font-family: 'Poppins', Arial, sans-serif;
             background: url('index1.png') no-repeat center 45% fixed;
-            background-size: 100%; 
+            background-size: 100%;
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -69,45 +69,35 @@
             position: relative;
         }
 
-        form {
+        .quote-box {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(6px);
-            padding: 30px 40px;
-            border-radius: 15px;
+            padding: 30px 50px;
+            border-radius: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
             text-align: center;
-            animation: floatForm 5s ease-in-out infinite;
+            animation: floatBox 6s ease-in-out infinite;
         }
 
-        @keyframes floatForm {
+        @keyframes floatBox {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-12px); }
+            50% { transform: translateY(-8px); }
             100% { transform: translateY(0px); }
         }
 
-        h2 {
-            margin-bottom: 20px;
+        .quote-box h2 {
             color: #444;
+            font-weight: 600;
+            font-size: 1.4rem;
+            margin: 0 0 10px 0;
         }
 
-        input[type="file"] {
-            display: block;
-            margin: 0 auto 15px auto;
-        }
-
-        input[type="submit"] {
-            background-color: #ffb6b6;
-            color: #444;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #ff9b9b;
-            transform: scale(1.05);
+        .quote-box p {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
         }
 
         footer {
@@ -133,11 +123,10 @@
     </header>
 
     <main>
-        <form action="/uploads" method="post" enctype="multipart/form-data">
-            <h2>Upload a File</h2>
-            <input type="file" name="file">
-            <input type="submit" value="Upload">
-        </form>
+        <div class="quote-box">
+            <h2>Batman est cool mais Snowden est réel</h2>
+            <p>Ce n’est pas parce que vous n’avez rien à cacher que vous devez sacrifier votre confidentialité.</p>
+        </div>
     </main>
 
     <footer>

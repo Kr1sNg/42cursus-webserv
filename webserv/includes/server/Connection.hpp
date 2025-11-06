@@ -48,6 +48,7 @@ class Connection: public IEventHandler
 		std::string _bodyCGI;
 
 		int		_clientFd;
+		bool 	_isCGI;
 		// std::string	_inBuf;	// recevive
 		std::string	_outBuf; // send
 
