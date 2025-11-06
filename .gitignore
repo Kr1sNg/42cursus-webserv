@@ -40,4 +40,5 @@
 # debug information files
 *.dwo
 
-.vscode
+.DS_Store
+.vscode.DS_Store

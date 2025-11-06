@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:53:42 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/05 13:02:19 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_server(server),
 			_servConfig(conf),
-			_bodyCGI(""),
 			_clientFd(cfd),
+			_bodyCGI(""),
 			_outBuf(),
 			_events(POLLIN),
 			_request(),
@@ -33,7 +33,10 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
-	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
+	if (_servConfig.getServer_name().size())
+		std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
+	else
+		std::cout << "Connection: servConf: server_name: Default" << std::endl;
 }
 
 Connection::~Connection()
@@ -192,12 +195,9 @@ void	Connection::handleReadHeaders(void)
 	
 	if (bytesRead <= 0)
 	{
-		if (bytesRead < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
-			return; // no more data for now (not an error)
 		_server->markForClose(_clientFd);
 		return;
 	}
-	
 	//1. Append data to Request's buffer
 	_request.append(buf, bytesRead);
 	//1.5 check virtual host
@@ -245,17 +245,31 @@ void	Connection::handleReadBody(void)
 		Locationconfig *loc = _servConfig.matchLocation(_request.getUri());
         if (loc && loc->isMethodAllowed("POST") && _request.getMethod() == "POST")
 		{
-            _isUploading = true;
-			// generate a unique name for uploaded file
-			std::stringstream ss;
-			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
-			std::string uniqueName = ss.str();
+			if (loc->getCgi_pass() != "")
+			{
+				_isCGI = true;
+				_isUploading = false;
+			}
+			else
+			{
+				_isCGI = false;
+            	_isUploading = true;
+				
 
-            _uploadFilePath = "www/uploads/" + uniqueName;
-			std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
-            _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
-            if (!_uploadFile.is_open())
-                return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
+				std::map<std::string, std::string>::const_iterator it = _request.getHeaders().find("Content-Disposition");
+				std::cout << "Type : "<< it->second << std::endl;
+				// generate a unique name for uploaded file
+				std::stringstream ss;
+				ss << "upload_" << std::time(NULL) << "_" << _clientFd;
+				// ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
+				std::string uniqueName = ss.str();
+
+				_uploadFilePath = "www/uploads/" + uniqueName;
+				std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
+				_uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
+				if (!_uploadFile.is_open())
+					return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
+			}
         }
     }
 
@@ -264,59 +278,61 @@ void	Connection::handleReadBody(void)
 	
 	// first, process any data already in the request's buffer
 	std::string &leftover = _request.getBuffer();
+	std::cout << "requete : " << leftover << std::endl;
 	if (!leftover.empty())
 	{
-		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
+		//fonction pour obtenir les infos uploads depuis leftover
 
+		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
+		
+		if (_isCGI)
+		{
+			_bodyCGI.append(leftover.c_str(), bytesToWrite);
+		}
 		if (_isUploading)
 		{
 			_uploadFile.write(leftover.c_str(), bytesToWrite);
-			_bodyCGI.append(leftover.c_str(), bytesToWrite);
+
 		}
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
 	}
-
+	
 	// second, read new data from the socket (the rest of body)
 	char	buf[4096];
 	while (_bodyBytesReceived < contentLength)
 	{
 		ssize_t bytesRead = recv(_clientFd, buf, sizeof(buf), 0);
 		
-		if (bytesRead < 0)
+		if (bytesRead <= 0)
 		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-				return ; //wait for next POLLIN
-			_server->markForClose(_clientFd); //error
-			return ;
-		}
-		if (bytesRead == 0)
-		{
-			_server->markForClose(_clientFd); //client disconnected
-			return ;
+			generateErrorResponse(400, "Bad Request (bodyBytesReceived < contentLength)");
+			// _server->markForClose(_clientFd); //error
+			return;
 		}
 	
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
 		
+		if (_isCGI)
+		{
+			_bodyCGI.append(buf, bytesToWrite);
+		}
 		if (_isUploading)
 		{
 			_uploadFile.write(buf, bytesToWrite);
-			_bodyCGI.append(buf, bytesToWrite);
 		}
 		
 		_bodyBytesReceived += bytesToWrite;
-		
+
 		//if we read more than the body, save it for next request (pipelining)
 		if (_bodyBytesReceived + (size_t)bytesRead > contentLength)
 			_request.getBuffer().append(buf + bytesToWrite, bytesRead - bytesToWrite);
 	}
-	std::cout << "!!test!! "<< _isUploading << std::endl;
 	//3. Body is complete
 	if (_bodyBytesReceived >= contentLength)
 	{
 		if (_isUploading)
 			_uploadFile.close();
-		std::cout << "!!bodyCGI : " << _bodyCGI << std::endl;
         // Now we can finally generate the response
         generateResponse();
 	}
@@ -326,17 +342,12 @@ void	Connection::handleWrite(void) //send
 {
 	//1. send from _outBuf first (headers / small body)
 	if (!_outBuf.empty())
-	{	
-		std::cout << "///////" << std::endl;
-		// std::cout << _outBuf << std::endl;
-		// std::cout << "///////" << std::endl;
-	
+	{		
 		ssize_t n = send(_clientFd, _outBuf.c_str(), _outBuf.size(), 0);
-		if (n < 0)
+		if (n <= 0)
 		{
-			if (errno != EWOULDBLOCK && errno != EAGAIN)
-				_server->markForClose(_clientFd);
-			return ;
+			_server->markForClose(_clientFd);
+			return (generateErrorResponse(500, "Permission Denied (handle Write)"));
 		}
 		_outBuf.erase(0, n);
 		
@@ -363,16 +374,11 @@ void	Connection::handleWrite(void) //send
 		if (bytesRead > 0)
 		{
 			ssize_t n = send(_clientFd, fileBuf, bytesRead, 0);
-			if (n < 0)
+			if (n <= 0)
 			{
-				if (errno != EWOULDBLOCK && errno != EAGAIN)
-				{
-					_fileStream.close();
-					_server->markForClose(_clientFd);
-				}
-				else
-					_fileStream.seekg(-bytesRead, std::ios::cur);
-				return ; //wait for next POLLOUT
+				_fileStream.close();
+				_server->markForClose(_clientFd);
+				return (generateErrorResponse(500, "Permission Denied (handle Write)"));
 			}
 			if (n < bytesRead)
 			{
@@ -453,6 +459,14 @@ void	Connection::generateErrorResponse(int code, const std::string &reason)
 
 void	Connection::generateResponse(void)
 {
+	// 0- // 1.a check client_max_body_size
+	std::cout << "request content length: " << _request.getContentLength()
+				<< " vs serv client max size: " << _servConfig.getClient_max_size() << std::endl;
+	if (_request.getContentLength() > _servConfig.getClient_max_size())
+	{
+		return (generateErrorResponse(400, "Bad Request (client max body size)"));
+	}
+
 	//1- Find the correct location block from config
 	Locationconfig *location = _servConfig.matchLocation(_request.getUri());
 	if (location == NULL)
@@ -478,6 +492,7 @@ void	Connection::generateResponse(void)
 		
 	//3- Handle different request types
 	// a. Check for CGI
+	
 	if (location->getCgi_pass() != "")
     {
        	std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);
@@ -497,15 +512,15 @@ void	Connection::generateResponse(void)
 	// c. Handle GET
 	else if (_request.getMethod() == "GET")
 	{
-		// handle session management only in /visit/
-		if (_request.getUri() == "/visit/")
+		// handle session management only in /session/
+		if (_request.getUri() == "/session/")
 		{
 			std::string ses = sessionManagement();
 			return (generateVisitCountResponse(ses));
 		}
 		
 		//Construct the full file path
-		std::string	filePath = _servConfig.getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::string	filePath = location->getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
 		
 		// check if directory -> send index AND if autoindex on -> send directory listing
@@ -531,7 +546,7 @@ void	Connection::generateResponse(void)
 	else if (_request.getMethod() == "DELETE")
 	{
 		// locate the deleting file (we delete only in /www/public/)
-		std::string filePath = _servConfig.getRoot() + location->getRoot() + _request.getUri();
+		std::string filePath = location->getRoot() + _request.getUri();
 		std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
 		
 		if (!fileExists(filePath)) // file doesn't exsist

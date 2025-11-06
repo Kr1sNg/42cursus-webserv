@@ -1,7 +1,52 @@
 #include "../../includes/config/generalconfig.hpp"
 #include "../../includes/webserv.hpp"
 
-void directiveLocation(const Block& block, Locationconfig& locationconfig)
+void defaultLocation(Locationconfig& config, const Serverconfig& server)
+{
+    if (!config.getMethods().size())
+    {
+        Directive methods;
+        methods.setName("methods");
+        methods.addArg("GET");
+        methods.addArg("POST");
+        methods.addArg("DELETE");
+        config.addDirective(methods);
+    }
+    if (config.getRoot() == "")
+    {
+        if (server.getRoot() == "")
+            throw std::invalid_argument("Error location : A location must have a root directive.");
+        else
+        {
+            std::vector<std::string> root;
+            root.push_back(server.getRoot());
+            config.setRoot(root);
+        }
+    }
+}
+
+void checkLocationName(const Serverconfig& server)
+{
+    std::vector<std::string> checkName;
+    size_t i = 1;
+    size_t j;
+    if (server.getLocations().size())
+        checkName.push_back(server.getLocations()[0].getArg());
+    while (i < server.getLocations().size())
+    {
+        j = 0;
+        while (j < checkName.size())
+        {
+            if (checkName[j] == server.getLocations()[i].getArg())
+                throw std::invalid_argument ("Location configuration error: Two locations cannot have the same directory.");              
+            j++;
+        }
+        checkName.push_back(server.getLocations()[i].getArg());
+        i++;
+    }
+}
+
+void directiveLocation(const Block& block, Locationconfig& locationconfig, const Serverconfig& server)
 {
     size_t i = 0;
 
@@ -10,9 +55,10 @@ void directiveLocation(const Block& block, Locationconfig& locationconfig)
         locationconfig.addDirective(block.getDirectives()[i]);
         i++;
     }
-    locationconfig.setArg(block.getArgs()[0]);
     if (block.getArgs().size() != 1)
-        std::cout << "Error Location : You need to declare only one argument" << std::endl;
+        throw std::invalid_argument("Error Location : A location block must have exactly one argument.");
+    locationconfig.setArg(block.getArgs()[0]);
+    defaultLocation(locationconfig, server);
 }
 
 void directiveServer(const Block& block, Serverconfig& serverconfig)
@@ -24,16 +70,20 @@ void directiveServer(const Block& block, Serverconfig& serverconfig)
         serverconfig.addDirective(block.getDirectives()[i]);
         i++;
     }
+    serverconfig.checkDirective();
+    //verifier la presence du minimum listen et page 404
+    if (block.getArgs().size() != 0)
+        throw std::invalid_argument("Error Server : A server block can't have an argument.");
 }
 
-Locationconfig checkLocation(const Block& block)
+Locationconfig checkLocation(const Block& block, const Serverconfig& server)
 {
     Locationconfig locationconfig;
-    // if (block.getBlocks().size() != 0)
-    // {
-    //     //error
-    // }
-    directiveLocation(block, locationconfig);
+    if (block.getBlocks().size() != 0)
+    {
+        throw std::invalid_argument("Error locationconfig: invalid block in location.");
+    }
+    directiveLocation(block, locationconfig, server);
     return (locationconfig);
 }
 
@@ -41,16 +91,16 @@ Serverconfig checkServer(const Block& block)
 {
     size_t i = 0;
     Serverconfig serverconfig;
+    directiveServer(block, serverconfig);
     while (i < block.getBlocks().size())
     {
         if (block.getBlocks()[i].getName() != "location")
-            throw  std::invalid_argument("Error locationconfig: invalid location name.");
+            throw  std::invalid_argument("Error serverconfig: invalid block name.");
         else
-           serverconfig.addlocation(checkLocation(block.getBlocks()[i]));
-        
+           serverconfig.addlocation(checkLocation(block.getBlocks()[i], serverconfig));
         i++;
     }
-    directiveServer(block, serverconfig);
+    checkLocationName(serverconfig);
     return (serverconfig);
 }
 
@@ -67,9 +117,5 @@ Config checkConfig(const Block& block)
             config.addServer(checkServer(block.getBlocks()[i]));
         i++;
     }
-    // if (i != block.getBlocks().size())
-    //     //return error
-    // if (block.getDirectives().size() != 0)
-    //     //return error
     return (config);
 }

@@ -68,11 +68,6 @@ static int	make_listen_socket(const char *hostname, const char *port)
 	return (listenerFd);
 }
 
-// Listener::Listener(void)
-// 	: _server(NULL), _servConfig(dummy_conf),
-// {
-// }
-
 Listener::Listener(Server *server, const char *hostname, const char *port, const Serverconfig &conf):
 			_listenerFd(-1),
 			_server(server),
@@ -80,7 +75,10 @@ Listener::Listener(Server *server, const char *hostname, const char *port, const
 {
 	_listenerFd = make_listen_socket(hostname, port);
 	if (_listenerFd < 0)
+	{
+		_server->quit();
 		throw std::runtime_error("Server: Failed to create listener");
+	}
 	std::cout << "Server: waiting for connections ..." << std::endl;
 }
 
@@ -125,9 +123,7 @@ void	Listener::handleEvent(uint32_t events)
 			int clientFd = accept(_listenerFd, (sockaddr *)&clientAddr, &addrlen);
 			if (clientFd < 0)
 				break ;
-		
 			setNonBlocking(clientFd);
-			
 			//forward to server to register and own the connection
 			_server->acceptNewConnection(clientFd, _servConfig);
 		}

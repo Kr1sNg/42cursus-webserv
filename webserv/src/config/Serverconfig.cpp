@@ -22,10 +22,6 @@ Serverconfig::Serverconfig()
     _flags = 0;
     initStatics();
 
-    // _listen[0] = "";
-    // _server_name[0] = "";
-    // _root = "Default";
-    _client_max_body_size = 10000;
 }
 
 Serverconfig::Serverconfig(const Serverconfig& obj)
@@ -64,8 +60,8 @@ void Serverconfig::setListen(const std::vector<std::string>& listen)
     size_t i = 0;
     size_t pos;
 
-    // if (listen.size() > 1)
-    //     //error
+    if (listen.size() < 1)
+        throw std::invalid_argument ("Error directive listen : The listen directive must have enough arguments.");
     if (!(_flags & _validDirective.at("listen")))
     {
         _flags |= _validDirective.at("listen");
@@ -99,9 +95,15 @@ const std::pair<std::string, std::string>& Serverconfig::getListen(size_t index)
 
 void Serverconfig::setServer_name(const std::vector<std::string>& server_name)
 {
-    //  if (server_name.size() > 1)
-    //     //error
-    _server_name.push_back(server_name[0]);
+    if (server_name.size() < 1)
+        throw std::invalid_argument ("Error directive server_name : The server_name directive must have enough arguments.");
+    size_t i = 0;
+
+    while (i < server_name.size())
+    {
+        _server_name.push_back(server_name[i]);
+        i++;
+    }
 }
 
 const std::vector<std::string>& Serverconfig::getServer_name(void) const
@@ -111,11 +113,11 @@ const std::vector<std::string>& Serverconfig::getServer_name(void) const
 
 void Serverconfig::setRoot(const std::vector<std::string>& root)
 {
-    // if (root.size() > 1)
-    //     //error
+    if (root.size() != 1)
+        throw std::invalid_argument ("Error directive root : The root directive must have only one argument.");
     if (_flags & _validDirective.at("root"))
     {
-        std::cout << "Error : root directive already defined in this location" << std::endl;
+        throw std::invalid_argument ("Error directive root : the root directive is already defined in this server.");
     }
     else
     {
@@ -135,11 +137,9 @@ void Serverconfig::addError_page(const std::vector<std::string>& error_page)
     int index;
     
     ss >> index;
-    // if (error_page.size() != 2)
-    //     //error
     if (_error_pages.find(index) != _error_pages.end())
     {
-        std::cout << "Error : Page" << index << "already defined in this location" << std::endl;
+        throw std::invalid_argument ("Error directive : This page is already defined in this location.");
     }
     else
     {
@@ -148,11 +148,6 @@ void Serverconfig::addError_page(const std::vector<std::string>& error_page)
         _error_pages[index] = error_page[1];
     }
 }
-
-// const std::map<int, std::string>& Serverconfig::getError_pages(void) const
-// {
-//     return (_error_pages); // c'est quoi cet logique ???
-// }
 
 std::string Serverconfig::getError_pages(int code) const   // it helps to get Error page location
 {
@@ -164,22 +159,21 @@ std::string Serverconfig::getError_pages(int code) const   // it helps to get Er
 
 void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max_body_size)
 {
-
-    //  if (client_max_body_size.size() != 1)
-    //     //error
+   if (client_max_body_size.size() != 1)
+        throw std::invalid_argument ("Error directive client_max_body_size : The client_max_body_size directive must have only one argument.");
     size_t size = static_cast<size_t>(std::strtoul(client_max_body_size[0].c_str(), NULL, 10));
-    if (_flags & _validDirective.at("_client_max_body_size"))
+    if (_flags & _validDirective.at("client_max_body_size"))
     {
-        std::cout << "Error : _client_max_body_size directive already defined in this location" << std::endl;
+        throw std::invalid_argument ("Error directive client_max_body_size : the client_max_body_size directive is already defined in this server.");
     }
     else
     {
-        _flags |= _validDirective.at("_client_max_body_size");
+        _flags |= _validDirective.at("client_max_body_size");
         _client_max_body_size = size;
     }
 }
 
-const size_t& Serverconfig::getClient_max_size(void) const
+size_t Serverconfig::getClient_max_size(void)
 {
     return (_client_max_body_size);
 }
@@ -205,8 +199,17 @@ void Serverconfig::addDirective(const Directive& directive)
     }
     else
     {
-        std::cout << "Directive " << directive.getName() << " is invalid." << std::endl;
+        std::string message =  "Directive " + directive.getName() + " is invalid.";
+        throw std::runtime_error (message);
     }
+}
+
+void Serverconfig::checkDirective(void)
+{
+    if (_error_pages.find(404) == _error_pages.end())
+        throw std::invalid_argument ("Error directive : Server must have a 404 error page directive.");
+    if (!_listen.size())
+        throw std::invalid_argument ("Error directive : Server must have a listen directive.");
 }
 
 size_t  Serverconfig::getListenSize(void) const
@@ -223,7 +226,6 @@ Locationconfig *Serverconfig::matchLocation(const std::string &url)
 
     while (i < _locations.size())
     {
-        std::cout << "Serveconfig::matchLocation: _locations[i]: " << _locations[i].getArg() << std::endl;
         if (url.rfind(_locations[i].getArg(), 0) == 0 && bestLength < _locations[i].getArg().size())
         {
             bestLength = _locations[i].getArg().size();

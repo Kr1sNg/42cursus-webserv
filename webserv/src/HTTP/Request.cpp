@@ -55,7 +55,7 @@ Request::~Request() {
 void	Request::append(const char* buffer, size_t nread)
 {
     _buffer.append(buffer, nread);
-    std::cout << "_inBuf: " << _buffer << std::endl;
+    // std::cout << "_inBuf: " << _buffer << std::endl;
 }
 
 
@@ -188,7 +188,6 @@ bool    Request::parsingHeaders(void)
         
         std::string key = line.substr(0, colon_pos);    // have to use camel type for key
         std::string value = trimSpace(line.substr(colon_pos + 1));
-
         _headers[key] = value;
     }
     return (false); // not error, it means we need more data, parse() loop stops for now 
@@ -301,7 +300,7 @@ const std::string &Request::getReason(void) const
     return _reason;
 }
 
-size_t  Request::getContentLength(void) const
+size_t  Request::getContentLength(void)
 {
     return _contentLength;
 }

@@ -38,6 +38,11 @@ Server::Server(Config const &config): _config(config)
 
 Server::~Server()
 {
+	quit();
+}
+
+void Server::quit(void)
+{
 	for (size_t i = 0; i < _listeners.size(); ++i)
 	{
 		_loop.removeHandler(_listeners[i]->getFd());
@@ -103,6 +108,7 @@ void	Server::acceptNewConnection(int clientFd, const Serverconfig &conf)
 		return ;
 	// create connection object and register with the loop
 	Connection	*c = new Connection(this, clientFd, conf);
+	
 	_connects[clientFd] = c;
 	_loop.addHandler(c, POLLIN);
 	std::cout << "New connection accepted through fd=[" << clientFd << "]..." << std::endl;
