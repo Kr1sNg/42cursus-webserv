@@ -22,8 +22,8 @@
 Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_server(server),
 			_servConfig(conf),
-			_clientFd(cfd),
 			_bodyCGI(""),
+			_clientFd(cfd),
 			_outBuf(),
 			_events(POLLIN),
 			_request(),

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>403 Forbidden</title>
+  <title>400 Bad Request</title>
   <style>
     body {
       margin: 0;
       height: 100vh;
-      background: url('Error403.png') no-repeat center 40% fixed;
-      background-size: cover ;
+      background: url('Error400.png') no-repeat center 40% fixed;
+      background-size: cover;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -109,49 +109,47 @@
       width: 100%;
     }
 
-    .lock {
+    .bubble {
       width: 80px;
       height: 80px;
       position: absolute;
       top: calc(25vh + 150px);
       left: 50%;
       transform: translateX(-50%);
-      /* background: url('Error403.png') no-repeat center; */
       background-size: contain;
-      animation: swing 3s ease-in-out infinite;
+      animation: float 3.5s ease-in-out infinite;
       opacity: 0.9;
     }
 
-    @keyframes swing {
-      0% { transform: translateX(-50%) rotate(0deg); }
-      25% { transform: translateX(-50%) rotate(5deg); }
-      50% { transform: translateX(-50%) rotate(0deg); }
-      75% { transform: translateX(-50%) rotate(-5deg); }
-      100% { transform: translateX(-50%) rotate(0deg); }
+    @keyframes float {
+      0% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+      100% { transform: translateX(-50%) translateY(0); }
     }
   </style>
 </head>
 <body>
   <header>
-        <h1>Webserv</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/uploads/">Uploads</a>
-            <a href="/delete/">Delete</a>
-            <a href="/form.html">CGI</a>
-            <a href="/autoindex/">Autoindex</a>
-            <a href="/session/">Session</a>
-        </nav>
-    </header>
+    <h1>Webserv</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/uploads/">Uploads</a>
+      <a href="/delete/">Delete</a>
+      <a href="/form.html">CGI</a>
+      <a href="/autoindex/">Autoindex</a>
+      <a href="/session/">Session</a>
+    </nav>
+  </header>
 
   <div class="content">
-    <h1>403</h1>
-    <h2>Access Denied</h2>
-    <p>Sorry... you don’t have permission to view this page.</p>
+    <h1>400</h1>
+    <h2>Bad Request</h2>
+    <p>Oops... Something went wrong with your request.<br>
+    Maybe try again — we promise we won’t judge ^^</p>
     <a class="button" href="/">Go back home</a>
   </div>
 
-  <div class="lock"></div>
+  <div class="bubble"></div>
 
   <footer>
     © 2025 Webserv — Made by 3 weebs
