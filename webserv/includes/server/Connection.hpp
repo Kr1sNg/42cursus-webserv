@@ -68,7 +68,7 @@ class Connection: public IEventHandler
 
 		std::ifstream	_fileStream;	//for streaming response bodies
 
-		std::string		_bodyCGI;
+		// std::string		_bodyCGI;
 		void			resetConnection(void);
 		
 		// std::map<std::string, int>	_sessions;

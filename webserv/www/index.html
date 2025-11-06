@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Webserv - Main</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: url('IndexBackground.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #444;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-radius: 0 0 20px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: #444;
+      margin: 0;
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    nav a:hover {
+      color: #f9e4e4;
+      transform: translateY(-2px);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 2rem;
+      margin-top: 8vh;
+      width: 100%;
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 236, 236, 0.8);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      width: 60%;
+      max-width: 700px;
+      transition: transform 0.2s ease, background 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .profile-card:hover {
+      background: rgba(255, 214, 214, 0.9);
+      transform: scale(1.02);
+    }
+
+    .profile-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin-right: 2rem;
+      border: 3px solid #ffe6e6;
+    }
+
+    .profile-info h2 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #444;
+    }
+
+    .profile-info p {
+      margin: 0.3rem 0 0;
+      color: #777;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: #999;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Webserv</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/uploads/">Uploads</a>
+      <a href="/delete/">Delete</a>
+      <a href="/cgi-bin/">CGI</a>
+      <a href="/session/">Session</a>
+    </nav>
+  </header>
+
+  <main>
+    <a href="./cloe.html" class="profile-card">
+      <img src="./cloe.jpg" alt="Profile Cloe" />
+      <div class="profile-info">
+        <h2>cfiachet</h2>
+      </div>
+    </a>
+
+    <a href="./theo.html" class="profile-card">
+      <img src="./theo.jpg" alt="Profile Theo" />
+      <div class="profile-info">
+        <h2>tbahin</h2>
+      </div>
+    </a>
+
+    <a href="./tat.html" class="profile-card">
+      <img src="./tat.jpg" alt="Profile Tat" />
+      <div class="profile-info">
+        <h2>tat-nguy</h2>
+      </div>
+    </a>
+  </main>
+
+  <footer>
+    © 2025 Webserv — Made by 3 weebs 💻
+  </footer>
+</body>
+</html>
