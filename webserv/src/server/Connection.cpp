@@ -200,7 +200,6 @@ void	Connection::handleReadHeaders(void)
 		_server->markForClose(_clientFd);
 		return;
 	}
-	
 	//1. Append data to Request's buffer
 	_request.append(buf, bytesRead);
 	//1.5 check virtual host
@@ -253,18 +252,21 @@ void	Connection::handleReadBody(void)
 			else
 			{
             	_isUploading = true;
-		
-			// generate a unique name for uploaded file
-			std::stringstream ss;
-			ss << "upload_" << std::time(NULL) << "_" << _clientFd;
-			// ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
-			std::string uniqueName = ss.str();
+				
 
-            _uploadFilePath = "www/uploads/" + uniqueName;
-			std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
-            _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
-            if (!_uploadFile.is_open())
-                return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
+				std::map<std::string, std::string>::const_iterator it = _request.getHeaders().find("Content-Disposition");
+				std::cout << "Type : "<< it->second << std::endl;
+				// generate a unique name for uploaded file
+				std::stringstream ss;
+				ss << "upload_" << std::time(NULL) << "_" << _clientFd;
+				// ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
+				std::string uniqueName = ss.str();
+
+				_uploadFilePath = "www/uploads/" + uniqueName;
+				std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
+				_uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
+				if (!_uploadFile.is_open())
+					return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
 			}
         }
     }
@@ -274,8 +276,11 @@ void	Connection::handleReadBody(void)
 	
 	// first, process any data already in the request's buffer
 	std::string &leftover = _request.getBuffer();
+	std::cout << "requete : " << leftover << std::endl;
 	if (!leftover.empty())
 	{
+		//fonction pour obtenir les infos uploads depuis leftover
+
 		size_t bytesToWrite = std::min(leftover.length(), contentLength - _bodyBytesReceived);
 		
 		if (_isCGI)
@@ -289,7 +294,7 @@ void	Connection::handleReadBody(void)
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
 	}
-
+	
 	// second, read new data from the socket (the rest of body)
 	char	buf[4096];
 	while (_bodyBytesReceived < contentLength)
@@ -321,7 +326,7 @@ void	Connection::handleReadBody(void)
 		}
 		
 		_bodyBytesReceived += bytesToWrite;
-		
+
 		//if we read more than the body, save it for next request (pipelining)
 		if (_bodyBytesReceived + (size_t)bytesRead > contentLength)
 			_request.getBuffer().append(buf + bytesToWrite, bytesRead - bytesToWrite);
