@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 14:51:50 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/09/30 11:54:29 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/07 21:13:35 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ static int	make_listen_socket(const char *hostname, const char *port)
 		return (-1);
 	}
 	
-	if (listen(listenerFd, SOMAXCONN) < 0)
+	// if (listen(listenerFd, SOMAXCONN) < 0)
+	if (listen(listenerFd, 2048) < 0)
 	{
 		close(listenerFd);
 		return (-1);

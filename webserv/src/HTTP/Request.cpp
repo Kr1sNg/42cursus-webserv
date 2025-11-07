@@ -129,15 +129,15 @@ bool    Request::parsingRequestLine(void)
     //1. Method uri version
     if (!(ss >> _method))
         return (setError(400, "Bad Request (method)"));
-    std::cout << "Request method: " << _method << std::endl;
+    // std::cout << "Request method: " << _method << std::endl;
 
     if (!(ss >> _uri))
         return (setError(400, "Bad Request (uri)"));
-    std::cout << "Request uri: " << _uri << std::endl;
+    // std::cout << "Request uri: " << _uri << std::endl;
     
     if (!(ss >> _version))
         return (setError(400, "Bad Request (HTTP Version)"));
-    std::cout << "Request version: " << _version << std::endl;
+    // std::cout << "Request version: " << _version << std::endl;
     
     if (ss >> rest)
         return (setError(400, "Bad Request"));
