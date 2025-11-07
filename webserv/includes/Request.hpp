@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 17:45:07 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/11/02 15:17:49 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/07 16:00:28 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,8 @@ class Request
 		std::string _uri; 		// ressources path
 		std::string _version; 	// HTTP/1.1
 		std::map<std::string, std::string> _headers; //check explanation
-		// std::string _body; 		// body of the http request POST
+		
+		// std::string _body; 		// 11-07 test body of the http request POST
 		
 		size_t	_contentLength;	// expected body length from Content-Length
 		// size_t	_bodyBytesRead;	// how many body bytes we've read so far

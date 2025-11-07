@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/05 13:02:19 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/07 17:22:36 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -285,16 +285,17 @@ void	Connection::handleReadBody(void)
 				// std::map<std::string, std::string>::const_iterator it = _request.getHeaders().find("Content-Disposition");
 				// std::cout << "Type : "<< it->second << std::endl;
 				// generate a unique name for uploaded file
-				std::stringstream ss;
-				ss << "upload_" << std::time(NULL) << "_" << _clientFd;
-				// ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
-				std::string uniqueName = ss.str();
+				
+				// std::stringstream ss;
+				// ss << "upload_" << std::time(NULL) << "_" << _clientFd;
+				// // ss << "upload_" << std::time(NULL) << "_" << _clientFd << extention;
+				// std::string uniqueName = ss.str();
 
-				_uploadFilePath = "www/uploads/" + uniqueName;
-				std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
-				_uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
-				if (!_uploadFile.is_open())
-					return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
+				// _uploadFilePath = "www/uploads/" + uniqueName;
+				// std::cout << "uploadFilePath: " << _uploadFilePath << std::endl; //
+				// _uploadFile.open(_uploadFilePath.c_str(), std::ios::binary);
+				// if (!_uploadFile.is_open())
+				// 	return (generateErrorResponse(500, "Permission Denied (uploads can't open file)"));
 			}
         }
     }
@@ -317,52 +318,75 @@ void	Connection::handleReadBody(void)
 		}
 		if (_isUploading)
 		{
-			_uploadFile.write(leftover.c_str(), bytesToWrite);
-
+			_reqBody.append(leftover.c_str(), bytesToWrite);
 		}
 		_bodyBytesReceived += bytesToWrite;
 		leftover.erase(0, bytesToWrite);
 	}
 	
 	// second, read new data from the socket (the rest of body)
-	char	buf[4096];
-	while (_bodyBytesReceived < contentLength)
+	char	buf[BUFFER];
+	ssize_t bytesRead = 0;
+	if (_bodyBytesReceived < contentLength)
 	{
-		ssize_t bytesRead = recv(_clientFd, buf, sizeof(buf), 0);
+		bytesRead = recv(_clientFd, buf, sizeof(buf), 0);
 		
-		if (bytesRead <= 0)
+		if (bytesRead < 0)
+			usleep(500);
+		if (bytesRead == 0)
 		{
-			generateErrorResponse(400, "Bad Request (bodyBytesReceived < contentLength)");
-			// _server->markForClose(_clientFd); //error
-			return;
+			if (_bodyBytesReceived < contentLength)
+				return (generateErrorResponse(400, "Bad Request (Incomplete Body)"));
 		}
-	
+	}
+	if (bytesRead > 0)
+	{
 		size_t bytesToWrite = std::min((size_t)bytesRead, contentLength - _bodyBytesReceived);
-		
+	
 		if (_isCGI)
 		{
 			_bodyCGI.append(buf, bytesToWrite);
 		}
 		if (_isUploading)
 		{
-			_uploadFile.write(buf, bytesToWrite);
+			_reqBody.append(buf, bytesToWrite);
 		}
 		
 		_bodyBytesReceived += bytesToWrite;
 
-		//if we read more than the body, save it for next request (pipelining)
-		if (_bodyBytesReceived + (size_t)bytesRead > contentLength)
+		if ((size_t)bytesRead > bytesToWrite)
 			_request.getBuffer().append(buf + bytesToWrite, bytesRead - bytesToWrite);
 	}
-	//3. Body is complete
+
 	if (_bodyBytesReceived >= contentLength)
 	{
 		if (_isUploading)
-			_uploadFile.close();
-        // Now we can finally generate the response
+		{
+			std::string contentType = _request.getHeader("Content-Type");
+			UploadedFile file = parseMultipartBody(_reqBody, contentType);
+			
+			if (file.filename.empty())
+			{
+				return generateErrorResponse(400, "Bad Request (no file found)");
+			}
+			std::string savePath = "www/uploads/" + file.filename;
+			if (fileExists(savePath))
+			{
+				return generateErrorResponse(400, "Bad Request (file exist)");
+			}
+			std::ofstream out(savePath.c_str(), std::ios::binary);
+			if (!out.is_open())
+				return generateErrorResponse(500, "Permission Denied (can't save upload)");
+			out.write(file.content.c_str(), file.content.size());
+			out.close();
+
+			std::cout << "Uploaded: " << file.filename
+					<< " (" << file.contentType << ")" << std::endl;
+		}
         generateResponse();
 	}
 }
+
 
 void	Connection::handleWrite(void) //send
 {
