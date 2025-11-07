@@ -45,19 +45,22 @@
 
 # include "Request.hpp"
 # include "Response.hpp"
-
+# include "server/PollLoop.hpp"
 extern volatile sig_atomic_t g_stop;
 
 // function
+class PollLoop;
+class Connection;
+
 void	throwErrno(std::string const &reason);
 void	throwGaiError(std::string const &reason, int code);
 int		setNonBlocking(int fd);
-std::string cgiHandle(const Request& req, const Locationconfig& location, const Serverconfig& config, const std::string& body);
 
 bool fileExists(const std::string &path);
 bool	isDirectory(const std::string &path);
 std::string	createDirectoryListing(const std::string &path);
 std::string intToStr(int n);
 
+void cgiHandle(Connection& parent, const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
 
 #endif

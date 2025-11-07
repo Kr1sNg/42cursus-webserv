@@ -1,3 +1,4 @@
+#include "../../includes/server/CGIHandler.hpp"
 #include "../../includes/webserv.hpp"
 #include <unistd.h>
 #include <sys/types.h>
@@ -97,7 +98,7 @@ char **cgiEnv(const Request& req)
     return (vectorToChar(env));
 }
 
-std::string cgiHandle(const Request& req, const Locationconfig& location, const Serverconfig& config, const std::string& body)
+void cgiHandle(Connection& parent, const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop)
 {
     int pipe_in[2];
     int pipe_out[2];
@@ -106,24 +107,18 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1)
 	{
         throw std::runtime_error("cgiHandle: pipe is not working.");
-		return "";
+		return ;
 	}
-
-	// server.putFdinpoll(pipe_out);
-	// server.putFdinpoll(pipe_in);
     char **env = cgiEnv(req);
  
-    if (location.getRoot() != "")
-        path = location.getRoot() + makepath(req.getUri());
-    else
-        path = config.getRoot() +  makepath(req.getUri());
+    path = location.getRoot() +  makepath(req.getUri());
     std::cout << path << std::endl;
     char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), const_cast<char*>(path.c_str()), NULL};
 	pid_t pid = fork();
     if (pid < 0)
 	{
         throw std::runtime_error("cgiHandle: fork is not working.");
-		return "";
+		return ;
 	}
     if (pid == 0)
     {
@@ -135,9 +130,6 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
 
         close(pipe_in[0]);
         close(pipe_out[1]);
-
-		//serve.markforcloseFD(pipe_out);
-		//serve.markforcloseFD(pipe_in);
 
       	int value = execve(location.getCgi_pass().c_str(), argv, env);
 		if (value == -1)
@@ -151,32 +143,15 @@ std::string cgiHandle(const Request& req, const Locationconfig& location, const 
     {
         close(pipe_in[0]);
         close(pipe_out[1]);
-        // std::cout << "cgi body : " << body << std::endl;
-        if (req.getMethod() == "POST" && !body.empty()) {
-            ssize_t total = 0;
-            while (total < static_cast<ssize_t>(body.size())) {
-                ssize_t written = write(pipe_in[1], body.c_str() + total, body.size() - total);
-                if (written <= 0)
-                {
-					throw std::runtime_error("cgiHandle: write to CGI stdin failed.");        
-                    break;
-                }
-            total += written;
-            }
-        }
-        close(pipe_in[1]);
 
-        std::string output;
-        char buffer[4096];
-        ssize_t bytesRead;
-        while ((bytesRead = read(pipe_out[0], buffer, sizeof(buffer))) > 0) {
-            output.append(buffer, bytesRead);
-        }
-        close(pipe_out[0]);
-        waitpid(pid, NULL, 0);
+        CgiConnection *cgiIn  = new CgiConnection(&parent, pipe_in[1], false, pid, _loop, body);
+        CgiConnection *cgiOut = new CgiConnection(&parent, pipe_out[0], true, pid, _loop, body);
+    
+        fcntl(pipe_in[1], F_SETFL, O_NONBLOCK);
+        fcntl(pipe_out[0], F_SETFL, O_NONBLOCK);
+
+        _loop.addHandler(cgiIn, POLLOUT);
+        _loop.addHandler(cgiOut, POLLIN);
 		freeVectorChar(env);
-		//serve.markforcloseFD(pipe_out);
-		//serve.markforcloseFD(pipe_in);
-        return output;
     }
 }

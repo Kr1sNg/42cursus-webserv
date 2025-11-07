@@ -33,7 +33,6 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
-	std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
 }
 
 Connection::~Connection()
@@ -493,8 +492,8 @@ void	Connection::generateResponse(void)
        	// _response.buildCGI(content);
 		// _response.setStatus(200, "OK");
         // _response.setHeader("Content-Length", Response::intToStr(content.size()));
+		
 		handleCgi(*location);
-	
 		return ;
 	}
 	

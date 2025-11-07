@@ -38,6 +38,7 @@ enum ConnectionState
 	CONN_HANDLING_BODY,
 	CONN_GENERATING_RESPONSE,
 	CONN_WRITING_RESPONSE,
+	CONN_WAITING_CGI
 };
 
 class Connection: public IEventHandler
@@ -49,6 +50,7 @@ class Connection: public IEventHandler
 		int		_clientFd;
 		// std::string	_inBuf;	// recevive
 		std::string _bodyCGI;
+		std::string _cgiOutput;
 		std::string	_outBuf; // send
 
 		uint32_t	_events;
@@ -106,8 +108,9 @@ class Connection: public IEventHandler
 		std::string	sessionManagement(void);
 		std::string	parseCookie(const std::string &header, const std::string &cookie);
 		std::string	createSessionId(void);
-		void	generateVisitCountResponse(std::string ses);
-		
+		void		generateVisitCountResponse(std::string ses);
+		std::string& getCgiOutput(void);
+		void 		onCgiComplete();
 };
 
 #endif
