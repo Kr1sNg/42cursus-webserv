@@ -31,6 +31,7 @@ SRCS     	= src/main.cpp src/exception.cpp  \
 				src/config/tokenization.cpp src/config/Serverconfig.cpp\
 				src/HTTP/Request.cpp src/HTTP/Response.cpp src/server/cgiHandle.cpp \
 				src/server/uploadFile.cpp \
+				src/server/CGIHandler.cpp
 # 				src/HTTP/ErrorHTTP.cpp src/HTTP/ParserHTTP.cpp
 
 # Object Files
