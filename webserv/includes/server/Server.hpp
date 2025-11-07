@@ -71,6 +71,7 @@ class Server
 		void	increaseSessionCount(std::string id);
 		int		getSessionCount(std::string id);
 		
+		PollLoop&	getLoop(void);
 };
 
 #endif

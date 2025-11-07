@@ -54,6 +54,11 @@ uint32_t	Connection::getEvents(void) const
 	return (_events);
 }
 
+std::string& Connection::getCgiOutput(void)
+{
+	return (_cgiOutput);
+}
+
 // void	Connection::recvIntoBuffer(void) //receive !!!!
 // {
 // 	char 	buf[4096];
@@ -126,6 +131,27 @@ uint32_t	Connection::getEvents(void) const
 // 		}
 // 	}
 // }
+
+void Connection::onCgiComplete()
+{
+    std::cout << "[Connection] CGI finished, output size: " << _cgiOutput.size() << std::endl;
+
+    // Construire la réponse HTTP avec le contenu du CGI
+    _response.buildCGI(_cgiOutput);
+    _response.setStatus(200, "OK");
+    _response.setHeader("Content-Length", Response::intToStr(_cgiOutput.size()));
+
+    // Placer la réponse dans le buffer d'envoi
+    _outBuf = _response.getHeaderString();
+    if (!_response.getBody().empty())
+        _outBuf.append(_response.getBody());
+
+    // Passer la connexion en état écriture
+    _connState = CONN_WRITING_RESPONSE;
+    _events = POLLIN | POLLOUT;
+    _server->setFdEvents(_clientFd, _events);
+}
+
 
 std::string Connection::trimSpace(const std::string &str)
 {
@@ -256,8 +282,8 @@ void	Connection::handleReadBody(void)
             	_isUploading = true;
 				
 
-				std::map<std::string, std::string>::const_iterator it = _request.getHeaders().find("Content-Disposition");
-				std::cout << "Type : "<< it->second << std::endl;
+				// std::map<std::string, std::string>::const_iterator it = _request.getHeaders().find("Content-Disposition");
+				// std::cout << "Type : "<< it->second << std::endl;
 				// generate a unique name for uploaded file
 				std::stringstream ss;
 				ss << "upload_" << std::time(NULL) << "_" << _clientFd;
@@ -495,10 +521,12 @@ void	Connection::generateResponse(void)
 	
 	if (location->getCgi_pass() != "")
     {
-       	std::string content = cgiHandle(_request, *location, _servConfig, _bodyCGI);
-       	_response.buildCGI(content);
-		_response.setStatus(200, "OK");
-        _response.setHeader("Content-Length", Response::intToStr(content.size()));
+		_connState = CONN_WAITING_CGI; 
+       	cgiHandle(*this, _request, *location, _bodyCGI, _server->getLoop());
+		return ;
+       	// _response.buildCGI(content);
+		// _response.setStatus(200, "OK");
+        // _response.setHeader("Content-Length", Response::intToStr(content.size()));
 	}
 	
 	// b. Handle POST (which is an upload)

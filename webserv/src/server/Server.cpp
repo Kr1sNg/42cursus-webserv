@@ -137,3 +137,8 @@ int		Server::getSessionCount(std::string id)
 		return it->second;
 	return (0);
 }
+
+PollLoop&	Server::getLoop(void)
+{
+	return (_loop);
+}
