@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: theo <theo@student.42.fr>                  +#+  +:+       +#+         #
+#    By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/26 17:42:09 by tat-nguy          #+#    #+#              #
-#    Updated: 2025/11/07 03:01:12 by theo             ###   ########.fr        #
+#    Updated: 2025/11/07 16:10:13 by tat-nguy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,7 @@ SRCS     	= src/main.cpp src/exception.cpp  \
 				src/config/Locationconfig.cpp src/config/parsing.cpp \
 				src/config/tokenization.cpp src/config/Serverconfig.cpp\
 				src/HTTP/Request.cpp src/HTTP/Response.cpp src/server/cgiHandle.cpp \
+				src/server/uploadFile.cpp \
 				src/server/CGIHandler.cpp
 # 				src/HTTP/ErrorHTTP.cpp src/HTTP/ParserHTTP.cpp
 

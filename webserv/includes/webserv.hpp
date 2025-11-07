@@ -6,14 +6,14 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 11:55:48 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/07 16:42:45 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef _WEBSERV_HPP_
 # define _WEBSERV_HPP_
 # define WWW "./www"
-
+# define BUFFER 5000000
 
 # include <iostream>
 # include <string>
@@ -48,6 +48,14 @@
 # include "server/PollLoop.hpp"
 extern volatile sig_atomic_t g_stop;
 
+struct UploadedFile
+{
+	std::string filename;
+	std::string contentType;
+	std::string content;
+};
+
+
 // function
 class PollLoop;
 class Connection;
@@ -62,5 +70,7 @@ std::string	createDirectoryListing(const std::string &path);
 std::string intToStr(int n);
 
 void cgiHandle(Connection& parent, const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
+
+UploadedFile parseMultipartBody(const std::string &body, const std::string &contentTypeHeader);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:10:48 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/07 16:24:09 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,10 @@ class Connection: public IEventHandler
 		// size_t	_headerEndPos;
 		// size_t	_contentLength;
 
+		std::string		_reqBody; // added Nov 07
 		ConnectionState	_connState;
 		size_t			_bodyBytesReceived;
-		std::ofstream	_uploadFile;
+		// std::ofstream	_uploadFile;
 		std::string		_uploadFilePath;
 		bool			_isUploading;
 
