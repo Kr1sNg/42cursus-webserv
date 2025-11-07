@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/07 17:22:36 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/07 17:46:37 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -362,6 +362,10 @@ void	Connection::handleReadBody(void)
 	{
 		if (_isUploading)
 		{
+			if (_request.getContentLength() > _servConfig.getClient_max_size())
+			{
+				return (generateErrorResponse(400, "Bad Request (client max body size)"));
+			}
 			std::string contentType = _request.getHeader("Content-Type");
 			UploadedFile file = parseMultipartBody(_reqBody, contentType);
 			

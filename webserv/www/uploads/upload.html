@@ -63,6 +63,7 @@
         main {
             flex: 1;
             display: flex;
+            flex-direction: column; /* Changed to column */
             justify-content: center;
             align-items: center;
             width: 100%;
@@ -109,7 +110,16 @@
             background-color: #ff9b9b;
             transform: scale(1.05);
         }
-
+        
+        /* */
+        #status {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            min-height: 1.2em; /* Prevents layout jump */
+            color: #444;
+        }
+        
         footer {
             text-align: center;
             padding: 1rem;
@@ -133,16 +143,74 @@
     </header>
 
     <main>
-        <form action="/uploads" method="post" enctype="multipart/form-data">
+        <form id="uploadForm" action="/uploads" method="post" enctype="multipart/form-data">
             <h2>Upload a File</h2>
             <input type="file" name="file">
             <input type="submit" value="Upload">
         </form>
+
+        <p id="status"></p>
+
     </main>
 
     <footer>
         © 2025 Webserv — Made by 3 weebs
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the form and status elements
+            const form = document.getElementById('uploadForm');
+            const status = document.getElementById('status');
+
+            // Listen for the form's 'submit' event
+            form.addEventListener('submit', function(event) {
+                // Prevent the default form submission (which reloads the page)
+                event.preventDefault(); 
+
+                const fileInput = form.querySelector('input[type="file"]');
+                
+                // Check if a file is actually selected
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    status.textContent = '⚠️ Please select a file first.';
+                    status.style.color = '#d9534f'; // Error red
+                    return;
+                }
+
+                // Create a FormData object from the form
+                const formData = new FormData(form);
+
+                status.textContent = 'Uploading...';
+                status.style.color = '#555'; // Neutral color
+
+                // Use fetch to send the form data
+                fetch(form.action, {
+                    method: form.method,
+                    body: formData, 
+                    // Note: Don't set Content-Type header manually for FormData.
+                    // The browser does it, including the necessary 'boundary'.
+                })
+                .then(function(response) {
+                    // Check if the response was successful (HTTP 200-299)
+                    if (response.ok) {
+                        status.textContent = '✅ File uploaded successfully (HTTP ' + response.status + ')';
+                        status.style.color = 'green';
+  						window.location.href = 'http://localhost:8080/notif/upload_success.html';
+
+                    } else {
+                        // Handle server errors
+                        status.textContent = '❌ Failed (HTTP ' + response.status + ' ' + response.statusText + ')';
+                        status.style.color = '#d9534f'; // Error red
+                    }
+                })
+                .catch(function(error) {
+                    // Handle network errors
+                    status.textContent = '⚠️ Network error: ' + error.message;
+                    status.style.color = '#d9534f'; // Error red
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>
