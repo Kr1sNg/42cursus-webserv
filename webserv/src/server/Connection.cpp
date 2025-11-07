@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/07 17:46:37 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/07 21:01:49 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,10 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_isUploading(false)
 {
 	setNonBlocking(_clientFd);
-	if (_servConfig.getServer_name().size())
-		std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
-	else
-		std::cout << "Connection: servConf: server_name: Default" << std::endl;
+	// if (_servConfig.getServer_name().size())
+		// std::cout << "Connection: servConf: server_name: " << _servConfig.getServer_name()[0] << std::endl;
+	// else
+		// std::cout << "Connection: servConf: server_name: Default" << std::endl;
 }
 
 Connection::~Connection()
@@ -305,7 +305,7 @@ void	Connection::handleReadBody(void)
 	
 	// first, process any data already in the request's buffer
 	std::string &leftover = _request.getBuffer();
-	std::cout << "requete : " << leftover << std::endl;
+	// std::cout << "requete : " << leftover << std::endl;
 	if (!leftover.empty())
 	{
 		//fonction pour obtenir les infos uploads depuis leftover
@@ -384,8 +384,8 @@ void	Connection::handleReadBody(void)
 			out.write(file.content.c_str(), file.content.size());
 			out.close();
 
-			std::cout << "Uploaded: " << file.filename
-					<< " (" << file.contentType << ")" << std::endl;
+			// std::cout << "Uploaded: " << file.filename
+			// 		<< " (" << file.contentType << ")" << std::endl;
 		}
         generateResponse();
 	}
@@ -514,8 +514,8 @@ void	Connection::generateErrorResponse(int code, const std::string &reason)
 void	Connection::generateResponse(void)
 {
 	// 0- // 1.a check client_max_body_size
-	std::cout << "request content length: " << _request.getContentLength()
-				<< " vs serv client max size: " << _servConfig.getClient_max_size() << std::endl;
+	// std::cout << "request content length: " << _request.getContentLength()
+	// 			<< " vs serv client max size: " << _servConfig.getClient_max_size() << std::endl;
 	if (_request.getContentLength() > _servConfig.getClient_max_size())
 	{
 		return (generateErrorResponse(400, "Bad Request (client max body size)"));
@@ -577,13 +577,13 @@ void	Connection::generateResponse(void)
 		
 		//Construct the full file path
 		std::string	filePath = location->getRoot() + _request.getUri(); //_servConfig.getRoot() + location->getRoot() + _request.getUri();
-		std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
+		// std::cout << "generateResponse::GET: filePath: " << filePath << std::endl;
 		
 		// check if directory -> send index AND if autoindex on -> send directory listing
 		if (isDirectory(filePath))
 		{
 			std::string indexPath = filePath + location->getIndex(); // "index.html";
-			std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl; //
+			// std::cout << "Connection::generateResponse:: indexPath: " << indexPath << std::endl; //
 			if (fileExists(indexPath))
 				_response.buildFromFile(indexPath, _servConfig);
 			else if (location->getAutoindex()) // we have autoindex
@@ -603,7 +603,7 @@ void	Connection::generateResponse(void)
 	{
 		// locate the deleting file (we delete only in /www/public/)
 		std::string filePath = location->getRoot() + _request.getUri();
-		std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
+		// std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
 		
 		if (!fileExists(filePath)) // file doesn't exsist
 			return (generateErrorResponse(404, "Not Found (deleting file)"));

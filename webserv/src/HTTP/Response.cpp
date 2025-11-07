@@ -213,7 +213,7 @@ std::string Response::getHeaderString(void) const
 
     //1. Status line
     ss << _version << " " << _status << " " << _reason << "\r\n";
-    std::cout << ss.str() << std::endl;
+    std::cout << ss.str();
 
     //2. Headers
     for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)

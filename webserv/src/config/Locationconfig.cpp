@@ -224,7 +224,7 @@ void Locationconfig::addDirective(const Directive& directive)
     else
     {
         throw  std::invalid_argument("Error locationconfig: invalid directive.");
-        std::cout << "Directive " << directive.getName() << " is invalid." << std::endl;
+        // std::cout << "Directive " << directive.getName() << " is invalid." << std::endl;
     }
 }
 
@@ -234,11 +234,11 @@ bool    Locationconfig::isMethodAllowed(const std::string &method)
 {
     for (size_t i = 0; i < _methods.size(); ++i)
     {
-        std::cout << method << " vs methods[i]: " << _methods[i] << std::endl;
+        // std::cout << method << " vs methods[i]: " << _methods[i] << std::endl;
         if (method == _methods[i])
             return true;
     }
-    std::cout << "There's no METHODS in _methods" << std::endl;
+    // std::cout << "There's no METHODS in _methods" << std::endl;
     return (false);
 }
 

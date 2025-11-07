@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:17:18 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/07 21:02:14 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void	Server::run(void)	// create poll, listener, connection
 					delete it->second;
 					_connects.erase(it);
 				}
-				std::cout << "Connection: socket closed fd[" << fd << "]." << std::endl;
+				// std::cout << "Connection: socket closed fd[" << fd << "]." << std::endl;
 			}
 			_fdToClose.clear();
 		}
@@ -111,7 +111,7 @@ void	Server::acceptNewConnection(int clientFd, const Serverconfig &conf)
 	
 	_connects[clientFd] = c;
 	_loop.addHandler(c, POLLIN);
-	std::cout << "New connection accepted through fd=[" << clientFd << "]..." << std::endl;
+	// std::cout << "New connection accepted through fd=[" << clientFd << "]..." << std::endl;
 }
 
 void	Server::setSessionCount(std::string id)
