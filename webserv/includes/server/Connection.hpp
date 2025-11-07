@@ -46,7 +46,6 @@ class Connection: public IEventHandler
 	private:
 		Server	*_server; // non-owning pointer back to server for marking close/update events	
 		Serverconfig _servConfig;
-		std::string _bodyCGI;
 
 		int		_clientFd;
 		bool 	_isCGI;
@@ -72,7 +71,6 @@ class Connection: public IEventHandler
 
 		std::ifstream	_fileStream;	//for streaming response bodies
 
-		std::string		_bodyCGI;
 		void			resetConnection(void);
 		
 		// std::map<std::string, int>	_sessions;
