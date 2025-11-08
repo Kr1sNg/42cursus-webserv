@@ -113,7 +113,7 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
     char **env = cgiEnv(req);
  
     path = location.getRoot() +  makepath(req.getUri());
-    // std::cout << path << std::endl;
+    std::cout << path << std::endl;
     char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), const_cast<char*>(path.c_str()), NULL};
 	pid_t pid = fork();
     if (pid < 0)
