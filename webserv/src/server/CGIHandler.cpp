@@ -58,8 +58,9 @@ void CgiConnection::handleRead()
 
 	char buffer[4096];
 	ssize_t n = read(_fd, buffer, sizeof(buffer));
+	std::cout << "n : "<< n << std::endl;
 	if (n > 0)
-	_parent->getCgiOutput().append(buffer, n);
+		_parent->getCgiOutput().append(buffer, n);
 	else if (n == 0)
 	{
 		closeConnection();
@@ -86,7 +87,12 @@ void CgiConnection::handleWrite()
 
 void CgiConnection::handleEvent(uint32_t events)
 {
-	if (events & POLLIN) handleRead();
-	if (events & POLLOUT) handleWrite();
+	std::cout << "handle CGI"<< std::endl;
+	if (_isOutput && (events & (POLLIN | POLLHUP)))
+		handleRead();
+	if (!_isOutput && (events & (POLLOUT | POLLHUP)))
+		handleWrite();
+	if (events & POLLERR)
+		throw std::runtime_error("error of fd.");
 }
 
