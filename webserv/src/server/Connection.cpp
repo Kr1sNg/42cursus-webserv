@@ -42,6 +42,10 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 Connection::~Connection()
 {
 	close(_clientFd);
+	for (size_t i = 0; i < _cgiConnects.size(); ++i)
+	{
+		delete _cgiConnects[i];
+	}
 }
 
 int		Connection::getFd(void) const
@@ -550,7 +554,7 @@ void	Connection::generateResponse(void)
 	if (location->getCgi_pass() != "")
     {
 		_connState = CONN_WAITING_CGI; 
-       	cgiHandle(*this, _request, *location, _bodyCGI, _server->getLoop());
+       	cgiHandle(_request, *location, _bodyCGI, _server->getLoop());
 		return ;
        	// _response.buildCGI(content);
 		// _response.setStatus(200, "OK");

@@ -29,8 +29,10 @@
 # include "PollLoop.hpp"
 # include "../Request.hpp"
 # include "../Response.hpp"
+# include "CGIHandler.hpp"
 
 class Server;
+class CgiConnection;
 
 enum ConnectionState
 {
@@ -74,7 +76,7 @@ class Connection: public IEventHandler
 
 		void			resetConnection(void);
 		
-		// std::map<std::string, int>	_sessions;
+		std::vector<CgiConnection *> _cgiConnects; // pour CGI connection
 		
 		Connection	&operator=(Connection const &rhs);
 		Connection(Connection const &src);
@@ -110,8 +112,11 @@ class Connection: public IEventHandler
 		std::string	parseCookie(const std::string &header, const std::string &cookie);
 		std::string	createSessionId(void);
 		void		generateVisitCountResponse(std::string ses);
+
+		// CGI
 		std::string& getCgiOutput(void);
 		void 		onCgiComplete();
+		void cgiHandle(const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
 };
 
 #endif

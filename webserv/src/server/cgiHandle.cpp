@@ -98,7 +98,8 @@ char **cgiEnv(const Request& req)
     return (vectorToChar(env));
 }
 
-void cgiHandle(Connection& parent, const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop)
+//void cgiHandle(Connection& parent, const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop)
+void Connection::cgiHandle(const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop)
 {
     int pipe_in[2];
     int pipe_out[2];
@@ -144,9 +145,17 @@ void cgiHandle(Connection& parent, const Request& req, const Locationconfig& loc
         close(pipe_in[0]);
         close(pipe_out[1]);
 
-        CgiConnection *cgiIn  = new CgiConnection(&parent, pipe_in[1], false, pid, _loop, body);
-        CgiConnection *cgiOut = new CgiConnection(&parent, pipe_out[0], true, pid, _loop, body);
-    
+        CgiConnection *cgiIn  = new CgiConnection(this, pipe_in[1], false, pid, _loop, body);
+        CgiConnection *cgiOut = new CgiConnection(this, pipe_out[0], true, pid, _loop, body);
+
+
+        _cgiConnects.push_back(cgiIn); //
+        _cgiConnects.push_back(cgiOut); //
+
+        // add to vector CgiConnection of Connection _parent.
+        // then when deconstructor ~Connection(), we can delete CgiConnection
+        // or we can delete when we kill the cgi
+
         fcntl(pipe_in[1], F_SETFL, O_NONBLOCK);
         fcntl(pipe_out[0], F_SETFL, O_NONBLOCK);
 
