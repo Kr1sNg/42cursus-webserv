@@ -13,7 +13,7 @@
 #ifndef _WEBSERV_HPP_
 # define _WEBSERV_HPP_
 # define WWW "./www"
-# define BUFFER 5000000
+# define BUFFER 4096
 
 # include <iostream>
 # include <string>
@@ -69,7 +69,7 @@ bool	isDirectory(const std::string &path);
 std::string	createDirectoryListing(const std::string &path);
 std::string intToStr(int n);
 
-void cgiHandle(Connection& parent, const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
+//void cgiHandle(Connection& parent, const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
 
 UploadedFile parseMultipartBody(const std::string &body, const std::string &contentTypeHeader);
 

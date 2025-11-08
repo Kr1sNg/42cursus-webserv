@@ -7,6 +7,8 @@
 
 CgiConnection::CgiConnection( Connection* parent, int fd, bool isOutput, pid_t pid, PollLoop &loop, std::string body)
 	: _parent(parent), _fd(fd), _isOutput(isOutput), _writeBuffer(""), _writeOffset(0),  _pid(pid), _loop(loop)
+// CgiConnection::CgiConnection(int fd, bool isOutput, pid_t pid, PollLoop &loop, std::string body)
+// 	: _fd(fd), _isOutput(isOutput), _writeBuffer(""), _writeOffset(0),  _pid(pid), _loop(loop)
 {
 	if (!_isOutput)
 		_writeBuffer = body;
@@ -28,7 +30,7 @@ CgiConnection& CgiConnection::operator=(const CgiConnection& other)
 {
     if (this != &other)
     {
-        _parent   = other._parent;
+       _parent   = other._parent;
         _fd       = other._fd;
         _isOutput = other._isOutput;
         _pid      = other._pid;
