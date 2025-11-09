@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:01:19 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:12:28 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 12:29:24 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ The server also owns removal of connections
 # include "../config/Config.hpp"
 # include "../config/Serverconfig.hpp"
 
+
+
 class Server
 {
 	private:
@@ -41,6 +43,8 @@ class Server
 		std::vector<int>	_fdToClose; // fds requested to close (processed after poll dispatch)
 		
 		std::map<std::string, int>	_sessions;
+
+		std::vector<CgiJob> _cgiActive;
 		
 		Server(void);
 		Server(Server const &src);
@@ -72,6 +76,9 @@ class Server
 		int		getSessionCount(std::string id);
 		
 		PollLoop&	getLoop(void);
+
+		//
+		void	addCgiActive(CgiJob job);
 };
 
 #endif

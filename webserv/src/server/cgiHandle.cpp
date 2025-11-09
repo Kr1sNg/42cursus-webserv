@@ -1,4 +1,5 @@
 #include "../../includes/server/CGIHandler.hpp"
+#include "../../includes/server/Server.hpp"
 #include "../../includes/webserv.hpp"
 #include <unistd.h>
 #include <sys/types.h>
@@ -163,6 +164,14 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
         // add to vector CgiConnection of Connection _parent.
         // then when deconstructor ~Connection(), we can delete CgiConnection
         // or we can delete when we kill the cgi
+
+        // store pid into structure CgiJob
+        CgiJob job;
+        job.pid = pid;
+        job.start_time = std::time(NULL);
+        job.fd = _clientFd;
+        _server->addCgiActive(job);
+
 
         fcntl(pipe_in[1], F_SETFL, O_NONBLOCK);
         fcntl(pipe_out[0], F_SETFL, O_NONBLOCK);

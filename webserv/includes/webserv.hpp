@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/07 16:42:45 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 12:58:47 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define _WEBSERV_HPP_
 # define WWW "./www"
 # define BUFFER 4096
+# define CGI_TIMEOUT_SECONDS 5
 
 # include <iostream>
 # include <string>
@@ -55,6 +56,12 @@ struct UploadedFile
 	std::string content;
 };
 
+struct CgiJob
+{
+	pid_t	pid;
+	time_t	start_time;
+	int		fd; //from Connection
+};
 
 // function
 class PollLoop;

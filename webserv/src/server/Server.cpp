@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 13:06:40 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/07 21:02:14 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 13:21:09 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,34 @@ void	Server::run(void)	// create poll, listener, connection
 			}
 			_fdToClose.clear();
 		}
+
+		if (!_cgiActive.empty())
+		{
+			for (size_t i = 0; i < _cgiActive.size(); i++)
+			{
+				// 1. Check timeout
+				if (std::time(NULL) - _cgiActive[i].start_time > CGI_TIMEOUT_SECONDS)
+				{
+					kill(_cgiActive[i].pid, SIGKILL);
+					_connects[_cgiActive[i].fd]->generateErrorResponse(504, "Gateway Timeout");
+					continue ;
+				}
+				
+				// // 2. Check if it finished
+				// int status;
+				// pid_t finished_pid = waitpid(_cgiActive[i].pid, &status, WNOHANG);
+
+				// // process just finish
+				// if (finished_pid == _cgiActive[i].pid)
+				// {
+				// 	// handle_cgi_exit(); // => je dois faire ou tu a deja ?
+				// }
+				// if (finished_pid == 0) // process still running
+				// 	continue ;
+				// if (finished_pid == -1) // there was en error
+				// 	_connects[_cgiActive[i].fd]->generateErrorResponse(500, "Internal Server Error");
+			}
+		}
 	}
 }
 
@@ -142,3 +170,43 @@ PollLoop&	Server::getLoop(void)
 {
 	return (_loop);
 }
+
+void	Server::addCgiActive(CgiJob job)
+{
+	_cgiActive.push_back(job);
+}
+
+/*
+void	Server::handle_cgi_exit(CgiJob &job, int status)
+{
+    
+    if (WIFEXITED(status)) {
+        // Case 1: The script exited normally.
+        int exit_code = WEXITSTATUS(status);
+        
+        if (exit_code == 0) {
+            // SUCCESS!
+            // The script ran and finished without error.
+            // You're done. Send 200 OK (or whatever CGI header said).
+        } else {
+            // SCRIPT ERROR!
+            // The script (py, bash, etc.) failed and returned a non-zero code.
+            // This is a 500 Internal Server Error.
+            send_http_response(job.client_fd, 500);
+        }
+
+    } else if (WIFSIGNALED(status)) {
+        // Case 2: The script was killed by a signal.
+        int signal_number = WTERMSIG(status);
+        
+        // This could be from a crash (like SIGSEGV)
+        // or from *our own timeout* (SIGKILL).
+        
+        // This is also a 500 Internal Server Error
+        // (unless it was our timeout, which we already handled).
+        send_http_response(job.client_fd, 500);
+    }
+    
+    // ... clean up the job, close pipes ...
+}
+*/
