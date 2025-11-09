@@ -147,6 +147,7 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
     }
     else
     {
+        _start_time = std::time(NULL);
         close(pipe_in[0]);
         close(pipe_out[1]);
 		close(pipe_err[1]);
@@ -165,14 +166,7 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
         // then when deconstructor ~Connection(), we can delete CgiConnection
         // or we can delete when we kill the cgi
 
-        // store pid into structure CgiJob
-        CgiJob job;
-        job.pid = pid;
-        job.start_time = std::time(NULL);
-        job.fd = _clientFd;
-        _server->addCgiActive(job);
-
-
+       
         fcntl(pipe_in[1], F_SETFL, O_NONBLOCK);
         fcntl(pipe_out[0], F_SETFL, O_NONBLOCK);
         fcntl(pipe_err[0], F_SETFL, O_NONBLOCK);
@@ -180,6 +174,7 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
         _loop.addHandler(cgiIn, POLLOUT);
         _loop.addHandler(cgiOut, POLLIN);
         _loop.addHandler(cgiErr, POLLIN);
+
 		freeVectorChar(env);
     }
 }

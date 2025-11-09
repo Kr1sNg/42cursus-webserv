@@ -56,7 +56,7 @@ class Connection: public IEventHandler
 		std::string _cgiOutput;
 		std::string	_outBuf; // send
 		std::string	_err_msg;
-
+		time_t		_start_time;
 		uint32_t	_events;
 	
 		Request		_request;
@@ -119,6 +119,7 @@ class Connection: public IEventHandler
 		void selectErrorCGI(std::string err_msg);
 		std::string& getCGIError(void);
 		std::string& getCgiOutput(void);
+		time_t		getStartTime(void);
 		void 		onCgiComplete();
 		void cgiHandle(const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
 };

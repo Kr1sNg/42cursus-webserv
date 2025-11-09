@@ -38,10 +38,10 @@ The solution is to have your main server process check a timer. This is best don
         // ... poll/select on network sockets ...
 
         // Also, loop through all active CGI jobs
-        for (CGI_Job& job : active_cgi_jobs) {
+        for (CGI_& job : active_cgi_jobs) {
 
             // 1. Check for timeout
-            if (time(NULL) - job.startTime > CGI_TIMEOUT_SECONDS) {
+            if (time(NULL) - .startTime > CGI_TIMEOUT_SECONDS) {
                 // Script took too long!
                 kill(job.pid, SIGKILL); // Forcefully kill the child
                 
