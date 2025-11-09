@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/09 11:23:06 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 13:07:03 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,6 @@ void Connection::selectErrorCGI(std::string err_msg)
 void Connection::onCgiComplete()
 {
     // std::cout << "[Connection] CGI finished, output size: " << _cgiOutput.size() << std::endl;
-
 	if (_err_msg != "")
 	{
 		std::cout << "error msg : " << _err_msg << std::endl;
