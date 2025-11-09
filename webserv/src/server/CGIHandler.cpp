@@ -5,9 +5,9 @@
 #include <sys/wait.h>
 #include <iostream>
 
-CgiConnection::CgiConnection( Connection* parent, int fd, bool isOutput, pid_t pid, PollLoop &loop, std::string body)
+CgiConnection::CgiConnection( Connection* parent, int fd, int isOutput, pid_t pid, PollLoop &loop, std::string body)
 	: _parent(parent), _fd(fd), _isOutput(isOutput), _writeBuffer(""), _writeOffset(0),  _pid(pid), _loop(loop)
-// CgiConnection::CgiConnection(int fd, bool isOutput, pid_t pid, PollLoop &loop, std::string body)
+// CgiConnection::CgiConnection(int fd, int isOutput, pid_t pid, PollLoop &loop, std::string body)
 // 	: _fd(fd), _isOutput(isOutput), _writeBuffer(""), _writeOffset(0),  _pid(pid), _loop(loop)
 {
 	if (!_isOutput)
@@ -54,13 +54,15 @@ void CgiConnection::closeConnection()
 
 void CgiConnection::handleRead()
 {
-	if (!_isOutput) return;
+	if (!_isOutput)
+		return;
 
 	char buffer[4096];
 	ssize_t n = read(_fd, buffer, sizeof(buffer));
-	std::cout << "n : "<< n << std::endl;
-	if (n > 0)
+	if (n > 0 && _isOutput != 2)
 		_parent->getCgiOutput().append(buffer, n);
+	else if (n > 0 && _isOutput == 2)
+		_parent->getCGIError().append(buffer, n);
 	else if (n == 0)
 	{
 		closeConnection();
@@ -72,7 +74,8 @@ void CgiConnection::handleRead()
 
 void CgiConnection::handleWrite()
 {
-	if (_isOutput) return;
+	if (_isOutput)
+		return;
 
 	if (_writeOffset < _writeBuffer.size())
 	{
@@ -87,7 +90,6 @@ void CgiConnection::handleWrite()
 
 void CgiConnection::handleEvent(uint32_t events)
 {
-	std::cout << "handle CGI"<< std::endl;
 	if (_isOutput && (events & (POLLIN | POLLHUP)))
 		handleRead();
 	if (!_isOutput && (events & (POLLOUT | POLLHUP)))

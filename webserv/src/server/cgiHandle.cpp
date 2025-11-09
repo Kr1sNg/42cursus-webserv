@@ -103,9 +103,10 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
 {
     int pipe_in[2];
     int pipe_out[2];
+    int pipe_err[2];
     std::string path;
 
-    if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1)
+    if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1|| pipe(pipe_err) == -1)
 	{
         throw std::runtime_error("cgiHandle: pipe is not working.");
 		return ;
@@ -125,18 +126,21 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
     {
         close(pipe_in[1]);
         close(pipe_out[0]);
+        close(pipe_err[0]);
 
         dup2(pipe_in[0], STDIN_FILENO);
         dup2(pipe_out[1], STDOUT_FILENO);
+        dup2(pipe_err[1], STDERR_FILENO);
 
         close(pipe_in[0]);
         close(pipe_out[1]);
-
+        close(pipe_err[1]);
       	int value = execve(location.getCgi_pass().c_str(), argv, env);
 		if (value == -1)
 		{
 			freeVectorChar(env);
 			throw std::runtime_error("cgiHandle: script was not executed.");
+            exit(1);
 		}
         exit(1);
     }
@@ -144,23 +148,29 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
     {
         close(pipe_in[0]);
         close(pipe_out[1]);
+		close(pipe_err[1]);
+        
+       
+		// CGIerror(pipe_err[0]);
 
         CgiConnection *cgiIn  = new CgiConnection(this, pipe_in[1], false, pid, _loop, body);
         CgiConnection *cgiOut = new CgiConnection(this, pipe_out[0], true, pid, _loop, body);
-
+        CgiConnection *cgiErr  = new CgiConnection(this, pipe_err[0], 2, pid, _loop, body);
 
         _cgiConnects.push_back(cgiIn); //
         _cgiConnects.push_back(cgiOut); //
-
+        _cgiConnects.push_back(cgiErr); //
         // add to vector CgiConnection of Connection _parent.
         // then when deconstructor ~Connection(), we can delete CgiConnection
         // or we can delete when we kill the cgi
 
         fcntl(pipe_in[1], F_SETFL, O_NONBLOCK);
         fcntl(pipe_out[0], F_SETFL, O_NONBLOCK);
+        fcntl(pipe_err[0], F_SETFL, O_NONBLOCK);
 
         _loop.addHandler(cgiIn, POLLOUT);
         _loop.addHandler(cgiOut, POLLIN);
+        _loop.addHandler(cgiErr, POLLIN);
 		freeVectorChar(env);
     }
 }
