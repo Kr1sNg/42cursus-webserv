@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-import cgi
-import cgitb
-import os
 import sys
+import time
 
-print("Content-Type: text/html; charset=UTF-8\n")
+# En-tête HTTP minimal
 
 print("""<!DOCTYPE html>
 <html lang='en'>
@@ -16,7 +12,6 @@ print("""<!DOCTYPE html>
   <style>
     body {
       font-family: 'Poppins', Arial, sans-serif;
-      background: url('../../CGI_menu.jpg') no-repeat center 45% fixed;
       background-size: 100%;
       margin: 0;
       display: flex;
@@ -60,29 +55,7 @@ print("""<!DOCTYPE html>
 
 <main>
 
-<h2>CGI Python ✅</h2>
-<section>
-""")
-
-form = cgi.FieldStorage()
-
-# --- Traitement des données POST ---
-if os.environ.get("REQUEST_METHOD", "") == "POST" and form:
-    print("<h3>Données reçues :</h3><ul>")
-    for key in form.keys():
-        value = form.getvalue(key)
-        print(f"<li><b>{key}</b> = {value}</li>")
-    print("</ul>")
-else:
-    print("<p>Aucune donnée POST reçue.</p>")
-
-# --- Affichage de l’environnement CGI ---
-print("<h3>Environnement CGI :</h3><pre>")
-for key in sorted(os.environ.keys()):
-    val = os.environ[key]
-    print(f"{key} = {val}")
-print("""</pre>
-</section>
+<p> "Hello" </p>
 </main>
 
 <footer>© 2025 Webserv — Made by 3 weebs</footer>

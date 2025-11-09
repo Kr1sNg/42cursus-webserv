@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 12:58:08 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/11/02 15:18:45 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 23:36:12 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class Response
 		void    buildFromFile(std::string const &path, Serverconfig conf);
 		void    buildError(int code, std::string const &reason, Serverconfig conf);
 		
-		void    buildCGI(const std::string& content);
+		bool    buildCGI(const std::string& content);
 		/*getter*/
 		int	getStatus(void) const;
 		const std::string &getReason(void) const;

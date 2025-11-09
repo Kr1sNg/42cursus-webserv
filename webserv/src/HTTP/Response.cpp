@@ -112,7 +112,7 @@ void    Response::buildError(int code, std::string const &reason, Serverconfig c
     std::ostringstream path;
     // path << "./www/error/" << code << ".html";
     path << conf.getError_pages(code);
-
+	// std::cout << "path error : " << conf.getError_pages(code) << " num : " << code << std::endl;
     std::ifstream   file(path.str().c_str(), std::ios::binary);
     std::string body;
 
@@ -138,7 +138,7 @@ void    Response::buildError(int code, std::string const &reason, Serverconfig c
     setHeader("Content-Length", intToStr(body.size()));
 }
 
-void    Response::buildCGI(const std::string& content)
+bool    Response::buildCGI(const std::string& content)
 {
     std::istringstream  stream(content);
     std::string         line;
@@ -150,33 +150,40 @@ void    Response::buildCGI(const std::string& content)
         if (line == "\r")
             break;
 
-    size_t pos = content.find(":");
+		size_t pos = content.find(":");
 
-    if (pos != std::string::npos)
-    {
-        if (content.substr(0, pos) == "Content-Type")
-        {
-            setHeader("Content-Type", content.substr(pos + 1));
-        }
-        else if (content.substr(0, pos) == "status")
-        {
-            int status;
-            size_t pos2 = content.substr(pos + 1).find(" ");
-            std::stringstream ss(content.substr(pos + 1));
-            ss >> status;
-            setStatus(status, content.substr(pos2 + 1));
-        }
-        else
-        {
-            setHeader(content.substr(0, pos), content.substr(pos + 1));
-        }
+		if (pos != std::string::npos)
+		{
+			if (content.substr(0, pos) == "Content-Type")
+			{
+				setHeader("Content-Type", content.substr(pos + 1));
+			}
+			else if (content.substr(0, pos) == "status")
+			{
+				int status;
+				size_t pos2 = content.substr(pos + 1).find(" ");
+				std::stringstream ss(content.substr(pos + 1));
+				ss >> status;
+				setStatus(status, content.substr(pos2 + 1));
+			}
+			else
+			{
+				setHeader(content.substr(0, pos), content.substr(pos + 1));
+			}
+		}
+		if (getHeaderString().find("Content-Type") == std::string::npos)
+		{
+			_headers.clear();
+			return (true);
+		}
     }
-    }
+
     while (std::getline(stream, line))
     {
         body += line + "\n";
     }
     setBody(body);
+	return (false);
 }
 
 /* getters */
