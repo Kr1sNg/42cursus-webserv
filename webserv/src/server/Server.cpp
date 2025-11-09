@@ -108,8 +108,10 @@ void	Server::run(void)	// create poll, listener, connection
 				if (std::time(NULL) - _cgiActive[i].start_time > CGI_TIMEOUT_SECONDS)
 				{
 					kill(_cgiActive[i].pid, SIGKILL);
-					_connects[_cgiActive[i].fd]->generateErrorResponse(504, "Gateway Timeout");
-					continue ;
+					_connects[_cgiActive[i].fd]->getCGIError() = "Timeout";
+					_cgiActive.clear();
+					// _connects[_cgiActive[i].fd]->generateErrorResponse(504, "Gateway Timeout");
+					break ;
 				}
 				
 				// // 2. Check if it finished

@@ -69,6 +69,11 @@ std::string& Connection::getCGIError(void)
 	return (_err_msg);
 }
 
+time_t		Connection::getStartTime(void)
+{
+	return (_start_time);
+}
+
 // void	Connection::recvIntoBuffer(void) //receive !!!!
 // {
 // 	char 	buf[4096];

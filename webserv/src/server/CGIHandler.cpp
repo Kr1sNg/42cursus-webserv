@@ -90,6 +90,11 @@ void CgiConnection::handleWrite()
 
 void CgiConnection::handleEvent(uint32_t events)
 {
+	if (std::time(NULL) - _parent->getStartTime() > 5)
+	{
+		kill(_pid, SIGKILL);
+		_parent->getCGIError() = "Timeout";
+	}
 	if (_isOutput && (events & (POLLIN | POLLHUP)))
 		handleRead();
 	if (!_isOutput && (events & (POLLOUT | POLLHUP)))
