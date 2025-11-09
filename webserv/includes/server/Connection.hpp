@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/09 13:08:47 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 16:49:07 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ class Connection: public IEventHandler
 		void		generateVisitCountResponse(std::string ses);
 
 		// CGI
-		void CGIerror(int fd);
+		void generateErrorResponseCGI(int code, const std::string &reason);
 		void selectErrorCGI(std::string err_msg);
 		std::string& getCGIError(void);
 		std::string& getCgiOutput(void);

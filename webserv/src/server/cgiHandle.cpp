@@ -136,14 +136,13 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
         close(pipe_in[0]);
         close(pipe_out[1]);
         close(pipe_err[1]);
-      	int value = execve(location.getCgi_pass().c_str(), argv, env);
-		if (value == -1)
+		if (execve(location.getCgi_pass().c_str(), argv, env))
 		{
 			freeVectorChar(env);
-			throw std::runtime_error("cgiHandle: script was not executed.");
-            exit(1);
+			std::cerr << "execve failed : " << strerror(errno) << std::endl;
+            _exit(127);
 		}
-        exit(1);
+        _exit(1);
     }
     else
     {
@@ -153,7 +152,6 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
 		close(pipe_err[1]);
         
        
-		// CGIerror(pipe_err[0]);
 
         CgiConnection *cgiIn  = new CgiConnection(this, pipe_in[1], false, pid, _loop, body);
         CgiConnection *cgiOut = new CgiConnection(this, pipe_out[0], true, pid, _loop, body);

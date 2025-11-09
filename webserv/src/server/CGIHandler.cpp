@@ -54,6 +54,7 @@ void CgiConnection::closeConnection()
 
 void CgiConnection::handleRead()
 {
+	int status;
 	if (!_isOutput)
 		return;
 
@@ -66,9 +67,9 @@ void CgiConnection::handleRead()
 	else if (n == 0)
 	{
 		closeConnection();
-		int status;
 		waitpid(_pid, &status, 0);
-		_parent->onCgiComplete();
+		if (_isOutput != 2)
+			_parent->onCgiComplete();
 	}
 }
 

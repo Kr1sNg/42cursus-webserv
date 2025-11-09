@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/09 13:07:03 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 17:56:22 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,42 +146,58 @@ time_t		Connection::getStartTime(void)
 // 		}
 // 	}
 // }
+void	Connection::generateErrorResponseCGI(int code, const std::string &reason)
+{
+	_response.buildError(code, reason, _servConfig);
+	_response.setKeepAlive(false);
+	_outBuf = _response.getHeaderString();
+	
+	// append generated body if it's small
+	if (!_response.getBody().empty())
+		_outBuf.append(_response.getBody());
+
+	// set state to writing
+    _connState = CONN_WRITING_RESPONSE;
+    _events = POLLIN | POLLOUT;
+    _server->setFdEvents(_clientFd, _events);
+}
 
 void Connection::selectErrorCGI(std::string err_msg)
 {
 	if (err_msg.find("No such file or directory") != std::string::npos)
 	{
-		generateErrorResponse(404, "No such file or directory");
+		generateErrorResponseCGI(404, "No such file or directory");
 	}
 	else if (err_msg.find("directory") != std::string::npos)
 	{
-		generateErrorResponse(404, "No such file or directory");
+		generateErrorResponseCGI(404, "No such file or directory");
 	}
 	else if (err_msg.find("Permission") != std::string::npos)
 	{
-		generateErrorResponse(403, "Forbidden");
+		generateErrorResponseCGI(403, "Forbidden");
 	}
 	else if (err_msg.find("permitted") != std::string::npos)
 	{
-		generateErrorResponse(403, "Forbidden");
+		generateErrorResponseCGI(403, "Forbidden");
 	}
 	else
 	{
-		generateErrorResponse(500, "Internal Server Error");
+		generateErrorResponseCGI(500, "Internal Server Error");
 	}
 }
 
 void Connection::onCgiComplete()
 {
     // std::cout << "[Connection] CGI finished, output size: " << _cgiOutput.size() << std::endl;
-	if (_err_msg != "")
+	if (_err_msg != "" || !_cgiOutput.size())
 	{
 		std::cout << "error msg : " << _err_msg << std::endl;
 		selectErrorCGI(_err_msg);
+		_isCGI = false;
 		return ;
 	}
-	else if (!_cgiOutput.size())
-		return ;
+	// else if (!_cgiOutput.size())
+	// 	return ;
     // Construire la réponse HTTP avec le contenu du CGI
 
 
