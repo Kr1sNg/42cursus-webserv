@@ -63,7 +63,11 @@ void CgiConnection::handleRead()
 	if (n > 0 && _isOutput != 2)
 		_parent->getCgiOutput().append(buffer, n);
 	else if (n > 0 && _isOutput == 2)
+	{
 		_parent->getCGIError().append(buffer, n);
+		closeConnection();
+		waitpid(_pid, &status, 0);
+	}	
 	else if (n == 0)
 	{
 		closeConnection();

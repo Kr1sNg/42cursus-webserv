@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/09 17:56:22 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/09 23:45:28 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,19 +189,24 @@ void Connection::selectErrorCGI(std::string err_msg)
 void Connection::onCgiComplete()
 {
     // std::cout << "[Connection] CGI finished, output size: " << _cgiOutput.size() << std::endl;
-	if (_err_msg != "" || !_cgiOutput.size())
+	if (_err_msg != "")
 	{
 		std::cout << "error msg : " << _err_msg << std::endl;
 		selectErrorCGI(_err_msg);
-		_isCGI = false;
 		return ;
 	}
+	if (!_cgiOutput.size())
+		return ;
 	// else if (!_cgiOutput.size())
 	// 	return ;
     // Construire la réponse HTTP avec le contenu du CGI
 
 
-    _response.buildCGI(_cgiOutput);
+    if (_response.buildCGI(_cgiOutput))
+	{
+		generateErrorResponseCGI(500, "Bad Gateway");
+		return ;
+	}
     _response.setStatus(200, "OK");
     _response.setHeader("Content-Length", Response::intToStr(_cgiOutput.size()));
 
@@ -544,7 +549,6 @@ void	Connection::handleEvent(uint32_t events)
 		_server->markForClose(_clientFd);
 		return ;
 	}
-
 	if (events & POLLIN)
 	{
 		if (_connState == CONN_READING_HEADERS)
