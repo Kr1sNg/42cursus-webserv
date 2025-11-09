@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 14:45:38 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/02 15:28:16 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 11:19:53 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,8 @@ std::string	createDirectoryListing(const std::string &path)
     }
 
     closedir(dir);
-
-    html << "</pre><hr></body></html>\n";
+    html << "</pre><hr>";
+    html << "<button onclick=\"window.location.href='/'\">Back to Home</button>\r\n";
+    html << "</body></html>\n";
     return html.str();
 }

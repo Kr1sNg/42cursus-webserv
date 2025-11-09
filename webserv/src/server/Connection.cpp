@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/07 21:01:49 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/09 11:23:06 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -645,7 +645,7 @@ void	Connection::generateResponse(void)
 	// d. Handle DELETE
 	else if (_request.getMethod() == "DELETE")
 	{
-		// locate the deleting file (we delete only in /www/public/)
+		// locate the deleting file (we delete only in /www/uploads/)
 		std::string filePath = location->getRoot() + _request.getUri();
 		// std::cout << "generateResponse::DELETE: filePath: " << filePath << std::endl;
 		
@@ -738,7 +738,7 @@ void	Connection::generateVisitCountResponse(std::string sesid)
 	body << "  <p>Your Session ID: <strong>" << sesid << "</strong>.</p>\r\n";
 	body << "  <p>Session time-out: <strong>5</strong> minutes.</p>\r\n";
     body << "  <p>You have visited this page <strong>" << count << "</strong> times.</p>\r\n";
-	body << "  <button onclick=\"window.location.href='/'\">Back to Main Page</button>\r\n";
+	body << "  <button onclick=\"window.location.href='/'\">Back to Home</button>\r\n";
     body << "</body>\r\n";
     body << "</html>\r\n";
 

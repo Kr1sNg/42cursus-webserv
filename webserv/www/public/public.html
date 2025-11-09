@@ -192,9 +192,9 @@
   <main>
     <h1>DELETE File</h1>
 
-    <p>Enter the file URL inside folder public to delete (must start with <code>/public/</code>):</p>
+    <p>Enter the file URL inside folder 'uploads' to delete (must start with <code>/uploads/</code>):</p>
 
-    <input id="filePath" type="text" size="60" value="/public/del.txt">
+    <input id="filePath" type="text" size="60" value="/uploads/del.txt">
     <button id="deleteBtn">Delete File</button>
 
     <p id="status"></p>
@@ -210,9 +210,9 @@
     var status = document.getElementById('status');
     var path = input.value.trim();
 
-    // Must start with /public/
-    if (!path.startsWith('/public/')) {
-      alert('Error: You can only delete files in /public/');
+    // Must start with /uploads/
+    if (!path.startsWith('/uploads/')) {
+      alert('Error: You can only delete files in /uploads/ folder');
       return;
     }
 
