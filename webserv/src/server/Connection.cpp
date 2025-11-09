@@ -25,6 +25,7 @@ Connection::Connection(Server *server, int cfd, const Serverconfig &conf):
 			_clientFd(cfd),
 			_bodyCGI(""),
 			_outBuf(),
+			_err_msg(""),
 			_events(POLLIN),
 			_request(),
 			_response(),
@@ -61,6 +62,11 @@ uint32_t	Connection::getEvents(void) const
 std::string& Connection::getCgiOutput(void)
 {
 	return (_cgiOutput);
+}
+
+std::string& Connection::getCGIError(void)
+{
+	return (_err_msg);
 }
 
 // void	Connection::recvIntoBuffer(void) //receive !!!!
@@ -136,11 +142,45 @@ std::string& Connection::getCgiOutput(void)
 // 	}
 // }
 
+void Connection::selectErrorCGI(std::string err_msg)
+{
+	if (err_msg.find("No such file or directory") != std::string::npos)
+	{
+		generateErrorResponse(404, "No such file or directory");
+	}
+	else if (err_msg.find("directory") != std::string::npos)
+	{
+		generateErrorResponse(404, "No such file or directory");
+	}
+	else if (err_msg.find("Permission") != std::string::npos)
+	{
+		generateErrorResponse(403, "Forbidden");
+	}
+	else if (err_msg.find("permitted") != std::string::npos)
+	{
+		generateErrorResponse(403, "Forbidden");
+	}
+	else
+	{
+		generateErrorResponse(500, "Internal Server Error");
+	}
+}
+
 void Connection::onCgiComplete()
 {
-    std::cout << "[Connection] CGI finished, output size: " << _cgiOutput.size() << std::endl;
+    // std::cout << "[Connection] CGI finished, output size: " << _cgiOutput.size() << std::endl;
 
+	if (_err_msg != "")
+	{
+		std::cout << "error msg : " << _err_msg << std::endl;
+		selectErrorCGI(_err_msg);
+		return ;
+	}
+	else if (!_cgiOutput.size())
+		return ;
     // Construire la réponse HTTP avec le contenu du CGI
+
+
     _response.buildCGI(_cgiOutput);
     _response.setStatus(200, "OK");
     _response.setHeader("Content-Length", Response::intToStr(_cgiOutput.size()));

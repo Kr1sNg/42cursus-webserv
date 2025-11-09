@@ -55,6 +55,7 @@ class Connection: public IEventHandler
 		std::string _bodyCGI;
 		std::string _cgiOutput;
 		std::string	_outBuf; // send
+		std::string	_err_msg;
 
 		uint32_t	_events;
 	
@@ -114,6 +115,9 @@ class Connection: public IEventHandler
 		void		generateVisitCountResponse(std::string ses);
 
 		// CGI
+		void CGIerror(int fd);
+		void selectErrorCGI(std::string err_msg);
+		std::string& getCGIError(void);
 		std::string& getCgiOutput(void);
 		void 		onCgiComplete();
 		void cgiHandle(const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
