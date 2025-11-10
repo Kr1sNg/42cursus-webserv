@@ -157,10 +157,24 @@ std::string Serverconfig::getError_pages(int code) const   // it helps to get Er
     return (_root);
 }
 
+bool allIsNotDigit(std::string str)
+{
+	size_t i = 0;
+	while (i < str.size())
+	{
+		if (!std::isdigit(str[i]))
+			return (true);
+		i++;
+	}
+	return (false);
+}
+
 void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max_body_size)
 {
-   if (client_max_body_size.size() != 1)
+   if (client_max_body_size.size() != 1 )
         throw std::invalid_argument ("Error directive client_max_body_size : The client_max_body_size directive must have only one argument.");
+	else if (allIsNotDigit(client_max_body_size[0]))
+            throw std::invalid_argument("Error client_max_body_size invalid");
     size_t size = static_cast<size_t>(std::strtoul(client_max_body_size[0].c_str(), NULL, 10));
     if (_flags & _validDirective.at("client_max_body_size"))
     {
