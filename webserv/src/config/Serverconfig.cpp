@@ -173,6 +173,8 @@ void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max
 {
    if (client_max_body_size.size() != 1 )
         throw std::invalid_argument ("Error directive client_max_body_size : The client_max_body_size directive must have only one argument.");
+	else if (allIsNotDigit(client_max_body_size[0]))
+            throw std::invalid_argument("Error client_max_body_size invalid");
     size_t size = static_cast<size_t>(std::strtoul(client_max_body_size[0].c_str(), NULL, 10));
     if (_flags & _validDirective.at("client_max_body_size"))
     {
@@ -181,7 +183,10 @@ void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max
     else
     {
         _flags |= _validDirective.at("client_max_body_size");
-        _client_max_body_size = size;
+        if (size >= 0 && size < 2147483647)
+            _client_max_body_size = size;
+        else
+            throw std::invalid_argument("Error client_max_body_size invalid");
     }
 }
 
