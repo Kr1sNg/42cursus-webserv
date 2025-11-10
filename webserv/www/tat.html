@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -107,5 +107,211 @@
 
     </div>
 
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tat Hoang Nguyen — Resume</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: url('TatIndex.png') no-repeat center 40%;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            color: #444;
+            text-align: left;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 2.5rem;
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-radius: 0 0 20px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #444;
+            margin: 0;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        nav a:hover {
+            color: #ff8c8c;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 20px;
+            padding: 3rem 4rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 8vh 0;
+            max-width: 800px;
+            width: 80%;
+        }
+
+        h1, h2 {
+            color: #444;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .contact-info {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            border-bottom: 2px solid rgba(255, 200, 200, 0.8);
+            padding-bottom: 8px;
+            font-size: 1.4rem;
+            color: #444;
+        }
+
+        .job-title {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .company {
+            font-style: italic;
+            color: #555;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        a {
+            color: #ff8c8c;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            color: #999;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Webserv</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/uploads/">Uploads</a>
+            <a href="/public/">Delete</a>
+            <a href="/form.html">CGI</a>
+            <a href="/autoindex/">Autoindex</a>
+            <a href="/redirect/">Redirect</a>
+            <a href="/session/">Session</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Tat Hoang NGUYEN</h1>
+        <div class="contact-info">
+            tat-nguy@student.42perpignan.fr | (+33) 622-862-262 | 
+            <a href="https://github.com/Kr1sNg" target="_blank">GitHub</a>
+        </div>
+
+        <div class="section">
+            <h2>Summary</h2>
+            <p>
+                Motivated Computer Science student from 42 Perpignan, with a background in International Business, seeking a 6-month internship or 2-year apprenticeship starting in February 2026.
+            </p>
+            <p>
+                Passionate about software development and emerging technologies, I aim to contribute to innovative projects in Web/Application Development, Data Analysis, or Artificial Intelligence while expanding my technical expertise.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Skills</h2>
+            <ul>
+                <li><strong>Languages:</strong> C, C++, Bash, Python, HTML, CSS, SQL</li>
+                <li><strong>Tools & Tech:</strong> Git, Docker, VirtualBox, Nginx, MariaDB</li>
+                <li><strong>Operating Systems:</strong> Linux Debian/Ubuntu, macOS, Windows</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Experience</h2>
+            <p>
+                <span class="job-title">Student & Project Developer</span><br>
+                <span class="company">Ecole 42 Perpignan (2024 - Present)</span>
+            </p>
+            <ul>
+                <li><strong>Inception:</strong> Deployed a multi-container application using Docker Compose, Nginx, WordPress, and MariaDB, including bonus services like Redis and FTP.</li>
+                <li><strong>Webserv:</strong> Designed and implemented a custom HTTP server in C++.</li>
+                <li><strong>Minishell:</strong> Developed a functional Unix shell in C, handling processes, signals, and I/O redirection.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Education</h2>
+            <p>
+                <span class="job-title">Peer-to-Peer Learning</span><br>
+                <span class="company">Ecole 42 Perpignan (2024 - Present)</span>
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        © 2025 Webserv — Made by 3 weebs
+    </footer>
 </body>
 </html>

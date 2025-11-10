@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>405 Method not Allowed</title>
+    <title>502 Bad Gateway</title>
     <style>
       body {
         margin: 0;
         height: 100vh;
-        background: url('/error/Error405.png') no-repeat center 65%;
+        background: url('/error/Error502.png') no-repeat center 65%;
         background-size: cover;
         display: flex;
         flex-direction: column;
@@ -134,22 +134,22 @@
     <div class="overlay"></div>
 
     <header>
-      <h1>Webserv</h1>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/uploads/">Uploads</a>
-        <a href="/public/">Delete</a>
-        <a href="/cgi-bin/">CGI</a>
-        <a href="/autoindex/">Autoindex</a>
-        <a href="/redirect/">Redirect</a>
-        <a href="/session/">Session</a>
-      </nav>
+        <h1>Webserv</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/uploads/">Uploads</a>
+            <a href="/public/">Delete</a>
+            <a href="/form.html">CGI</a>
+            <a href="/autoindex/">Autoindex</a>
+            <a href="/redirect/">Redirect</a>
+            <a href="/session/">Session</a>
+        </nav>
     </header>
 
     <div class="content">
-      <h1>405</h1>
-      <h2>Method not allowed</h2>
-      <p>Method you tried to use isn't allowed</p>
+      <h1>502</h1>
+      <h2>the server couldn't achieved his path.</h2>
+      <p>Please, empty your cache or try again later!</p>
       <a class="button" href="/">Go back home</a>
     </div>
 
