@@ -169,7 +169,10 @@ void Serverconfig::setClient_max_size(const std::vector<std::string>& client_max
     else
     {
         _flags |= _validDirective.at("client_max_body_size");
-        _client_max_body_size = size;
+        if (size >= 0 && size < 2147483647)
+            _client_max_body_size = size;
+        else
+            throw std::invalid_argument("Error client_max_body_size invalid");
     }
 }
 

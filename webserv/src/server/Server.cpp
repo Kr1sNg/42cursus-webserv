@@ -99,36 +99,6 @@ void	Server::run(void)	// create poll, listener, connection
 			}
 			_fdToClose.clear();
 		}
-
-		if (!_cgiActive.empty())
-		{
-			for (size_t i = 0; i < _cgiActive.size(); i++)
-			{
-				// 1. Check timeout
-				if (std::time(NULL) - _cgiActive[i].start_time > CGI_TIMEOUT_SECONDS)
-				{
-					kill(_cgiActive[i].pid, SIGKILL);
-					_connects[_cgiActive[i].fd]->getCGIError() = "Timeout";
-					_cgiActive.clear();
-					// _connects[_cgiActive[i].fd]->generateErrorResponse(504, "Gateway Timeout");
-					break ;
-				}
-				
-				// // 2. Check if it finished
-				// int status;
-				// pid_t finished_pid = waitpid(_cgiActive[i].pid, &status, WNOHANG);
-
-				// // process just finish
-				// if (finished_pid == _cgiActive[i].pid)
-				// {
-				// 	// handle_cgi_exit(); // => je dois faire ou tu a deja ?
-				// }
-				// if (finished_pid == 0) // process still running
-				// 	continue ;
-				// if (finished_pid == -1) // there was en error
-				// 	_connects[_cgiActive[i].fd]->generateErrorResponse(500, "Internal Server Error");
-			}
-		}
 	}
 }
 
