@@ -7,6 +7,8 @@ For add a virtual host, we need to add a line like :
 at this path :
 Computer/etc/hosts
 
+## url resolve 
+
 ## HTTP Request
 
 A HTTP Request includes 3 parts:

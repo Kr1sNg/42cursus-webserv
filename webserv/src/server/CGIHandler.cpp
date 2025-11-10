@@ -88,6 +88,8 @@ void CgiConnection::handleWrite()
 		_writeBuffer.size() - _writeOffset);
 		if (n > 0)
 			_writeOffset += n;
+		else
+			return ;	// check n <= 0 after write()
 	}
 	if (_writeOffset >= _writeBuffer.size())
 		closeConnection();

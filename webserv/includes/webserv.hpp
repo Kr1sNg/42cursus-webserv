@@ -14,7 +14,6 @@
 # define _WEBSERV_HPP_
 # define WWW "./www"
 # define BUFFER 4096
-# define CGI_TIMEOUT_SECONDS 5
 
 # include <iostream>
 # include <string>
