@@ -63,6 +63,29 @@ std::string namescript(std::string url)
 	return (name.substr(pos + 1));
 }
 
+std::string getExtension(std::string path)
+{
+	size_t pos = path.find_last_of('.');
+	if (pos == std::string::npos)
+		return "";
+	return(path.substr(pos + 1));
+}
+
+int compareExt(std::string extension, std::string CGI_pass)
+{
+	std::cout << "extension : " << extension << " CGI_pass" << CGI_pass << std::endl;
+	if (extension == "py" && CGI_pass.find("python") != std::string::npos)
+		return (0);
+	else if (extension == "sh" && CGI_pass.find("bash") != std::string::npos)
+		return (0);
+	else if (extension == "pl" && CGI_pass.find("perl") != std::string::npos)
+		return (0);
+	else if (extension == "py" || extension == "sh" || extension == "pl")
+		return (2);
+	else
+		return (1);
+}
+
 char **cgiEnv(const Request& req)
 {
 	std::vector<std::string> env;
@@ -115,6 +138,27 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
     char **env = cgiEnv(req);
  
     path = location.getRoot() +  makepath(req.getUri());
+	if (access(path.c_str(), F_OK) != 0)
+	{
+		generateErrorResponseCGI(404, "No such file or directory");
+		return;
+	}
+	int checkEx = compareExt(getExtension(path), location.getCgi_pass());
+	if (checkEx)
+	{
+		freeVectorChar(env);
+		if (checkEx == 1)
+		{
+			generateErrorResponseCGI(501, "Not implemented");
+			return;
+
+		}
+		else
+		{
+			generateErrorResponseCGI(500, "Bad correlation beetwen extention and CGI_pass directive");
+			return;
+		}
+	}
     std::cout << path << std::endl;
     char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), const_cast<char*>(path.c_str()), NULL};
 	pid_t pid = fork();
