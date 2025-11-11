@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/09 23:45:28 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/12 00:51:28 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,22 @@ time_t		Connection::getStartTime(void)
 // 		}
 // 	}
 // }
+
+void	Connection::generateAutoIndexResponse(std::string path)
+{
+	std::string	listing = createDirectoryListing(path);
+	_response.setKeepAlive(false);
+	_response.setBody(listing);
+	_response.setHeader("Content-Type", "text/html");
+	_outBuf = _response.getHeaderString();
+
+	if (!_response.getBody().empty())
+		_outBuf.append(_response.getBody());
+
+	_connState = CONN_WRITING_RESPONSE;
+    _events = POLLIN | POLLOUT;
+    _server->setFdEvents(_clientFd, _events);
+}
 void	Connection::generateErrorResponseCGI(int code, const std::string &reason)
 {
 	_response.buildError(code, reason, _servConfig);
@@ -204,7 +220,7 @@ void Connection::onCgiComplete()
 
     if (_response.buildCGI(_cgiOutput))
 	{
-		generateErrorResponseCGI(500, "Bad Gateway");
+		generateErrorResponseCGI(502, "Bad Gateway");
 		return ;
 	}
     _response.setStatus(200, "OK");
@@ -617,7 +633,7 @@ void	Connection::generateResponse(void)
 	
 	if (location->getCgi_pass() != "")
     {
-		_connState = CONN_WAITING_CGI; 
+		_connState = CONN_WAITING_CGI;
        	cgiHandle(_request, *location, _bodyCGI, _server->getLoop());
 		return ;
        	// _response.buildCGI(content);

@@ -6,7 +6,7 @@
 /*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/09 23:32:15 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/12 00:10:32 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ class Connection: public IEventHandler
 		void		generateVisitCountResponse(std::string ses);
 
 		// CGI
+		void generateAutoIndexResponse(std::string path);
 		void generateErrorResponseCGI(int code, const std::string &reason);
 		void selectErrorCGI(std::string err_msg);
 		std::string& getCGIError(void);

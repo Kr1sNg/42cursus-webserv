@@ -138,6 +138,22 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
     char **env = cgiEnv(req);
  
     path = location.getRoot() +  makepath(req.getUri());
+	std::cout << path << std::endl;
+	if (path[path.size() - 1] == '/')
+	{
+		if (location.getIndex() != "")
+			path += location.getIndex();
+		else if (location.getAutoindex())
+		{
+			generateAutoIndexResponse(path);
+			return;
+		}
+		else
+		{
+			generateErrorResponseCGI(403, "Forbidden");
+			return;
+		}
+	}
 	if (access(path.c_str(), F_OK) != 0)
 	{
 		generateErrorResponseCGI(404, "No such file or directory");
@@ -159,7 +175,7 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
 			return;
 		}
 	}
-    std::cout << path << std::endl;
+
     char* argv[] = {const_cast<char*>(location.getCgi_pass().c_str()), const_cast<char*>(path.c_str()), NULL};
 	pid_t pid = fork();
     if (pid < 0)
