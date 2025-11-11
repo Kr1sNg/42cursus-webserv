@@ -9,6 +9,10 @@ Computer/etc/hosts
 
 ## url resolve 
 
+curl -v --resolve example.com:8181:127.0.0.1 http://example.com:8181/
+
+hostname : example.com
+
 ## HTTP Request
 
 A HTTP Request includes 3 parts:
