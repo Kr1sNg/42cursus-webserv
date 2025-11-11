@@ -1,44 +1,6 @@
 #!/usr/bin/env bash
 
 # En-têtes HTTP obligatoires
-# echo "Content-Type: text/html; charset=utf-8"
-# echo ""  # ligne vide = fin des en-têtes
-
-# echo "<html><body><h2>CGI Bash ✅</h2>"
-
-# # Lire le corps de la requête POST
-# if [ "$REQUEST_METHOD" = "POST" ]; then
-#   read -n "$CONTENT_LENGTH" POST_DATA
-
-#   # Fonction pour décoder URL-encoding
-#   urldecode() {
-#     local data="${1//+/ }"
-#     printf '%b' "${data//%/\\x}"
-#   }
-
-#   echo "<h3>Données reçues :</h3><ul>"
-
-#   # Séparer chaque paire clé=valeur
-#   IFS='&' read -ra pairs <<< "$POST_DATA"
-#   for pair in "${pairs[@]}"; do
-#     key=$(echo "$pair" | cut -d= -f1)
-#     val=$(echo "$pair" | cut -d= -f2-)
-#     echo "<li><b>$(urldecode "$key")</b> = $(urldecode "$val")</li>"
-#   done
-
-#   echo "</ul>"
-# else
-#   echo "<p>Aucune donnée POST reçue.</p>"
-# fi
-
-# echo "<h3>Environnement CGI :</h3><pre>"
-# env | sort
-# echo "</pre></body></html>"
-
-
-#!/usr/bin/env bash
-
-# En-têtes HTTP obligatoires
 echo "Content-Type: text/html; charset=utf-8"
 echo ""  # ligne vide = fin des en-têtes
 
@@ -51,7 +13,7 @@ echo "<!DOCTYPE html>
   <style>
     body {
       font-family: 'Poppins', Arial, sans-serif;
-      background: url('../../CGI_menu.jpg') no-repeat center 45% fixed;
+      background: url('../../CGI_menu.jpg') no-repeat center 20% fixed;
       background-size: 100%;
       margin: 0;
       display: flex;
@@ -59,7 +21,6 @@ echo "<!DOCTYPE html>
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      animation: floatBackground 12s ease-in-out infinite;
     }
     @keyframes floatBackground { 0% { background-position: center 45%; } 50% { background-position: center 48%; } 100% { background-position: center 45%; } }
     header { width: 100%; max-width: 1100px; display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2.5rem; background: rgba(255,255,255,0.85); box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 0 0 20px 20px; position: relative; z-index: 2; }
