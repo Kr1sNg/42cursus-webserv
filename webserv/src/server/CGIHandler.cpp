@@ -75,6 +75,8 @@ void CgiConnection::handleRead()
 		if (_isOutput != 2)
 			_parent->onCgiComplete();
 	}
+	else // means (n < 0)
+		return ;
 }
 
 void CgiConnection::handleWrite()
@@ -86,10 +88,10 @@ void CgiConnection::handleWrite()
 	{
 		ssize_t n = write(_fd, _writeBuffer.c_str() + _writeOffset,
 		_writeBuffer.size() - _writeOffset);
-		if (n > 0)
-			_writeOffset += n;
+		if (n <= 0)
+			return ;
 		else
-			return ;	// check n <= 0 after write()
+			_writeOffset += n;
 	}
 	if (_writeOffset >= _writeBuffer.size())
 		closeConnection();
@@ -97,7 +99,7 @@ void CgiConnection::handleWrite()
 
 void CgiConnection::handleEvent(uint32_t events)
 {
-	if (std::time(NULL) - _parent->getStartTime() > 5)
+	if (std::time(NULL) - _parent->getStartTime() > 1)
 	{
 		kill(_pid, SIGKILL);
 		_parent->getCGIError() = "Timeout";
