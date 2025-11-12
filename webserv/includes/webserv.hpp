@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/09 23:33:05 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/12 16:20:03 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@
 # include <fcntl.h>	//fcntl
 // # include <sys/epoll.h>
 # include <cstdlib>
+#include <sys/time.h>
 
 # include "config/generalconfig.hpp" 
 
@@ -78,5 +79,7 @@ std::string intToStr(int n);
 //void cgiHandle(Connection& parent, const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
 
 UploadedFile parseMultipartBody(const std::string &body, const std::string &contentTypeHeader);
+
+long	getCurrentTimeMs(void);
 
 #endif
