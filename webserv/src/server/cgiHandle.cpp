@@ -206,7 +206,8 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
     }
     else
     {
-        _start_time = std::time(NULL);
+        // _start_time = std::time(NULL);
+		_start_time = getCurrentTimeMs();
         close(pipe_in[0]);
         close(pipe_out[1]);
 		close(pipe_err[1]);

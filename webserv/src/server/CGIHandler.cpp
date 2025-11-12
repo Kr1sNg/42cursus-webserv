@@ -99,7 +99,7 @@ void CgiConnection::handleWrite()
 
 void CgiConnection::handleEvent(uint32_t events)
 {
-	if (std::time(NULL) - _parent->getStartTime() > 1)
+	if (getCurrentTimeMs() - _parent->getStartTime() > 300)
 	{
 		kill(_pid, SIGKILL);
 		_parent->getCGIError() = "Timeout";

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/12 00:10:32 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/12 16:21:35 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ class Connection: public IEventHandler
 		std::string _cgiOutput;
 		std::string	_outBuf; // send
 		std::string	_err_msg;
-		time_t		_start_time;
+		long		_start_time;
 		uint32_t	_events;
 	
 		Request		_request;
@@ -120,7 +120,7 @@ class Connection: public IEventHandler
 		void selectErrorCGI(std::string err_msg);
 		std::string& getCGIError(void);
 		std::string& getCgiOutput(void);
-		time_t		getStartTime(void);
+		long		getStartTime(void);
 		void 		onCgiComplete();
 		void cgiHandle(const Request& req, const Locationconfig& location, const std::string& body, PollLoop& _loop);
 };

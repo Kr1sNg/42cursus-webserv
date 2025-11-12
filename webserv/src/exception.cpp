@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/20 14:45:38 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/09 11:19:53 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/12 16:19:36 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,4 +101,11 @@ std::string	createDirectoryListing(const std::string &path)
     html << "<button onclick=\"window.location.href='/'\">Back to Home</button>\r\n";
     html << "</body></html>\n";
     return html.str();
+}
+
+long	getCurrentTimeMs(void)
+{
+	struct timeval	tv;
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000L + tv.tv_usec / 1000L);
 }
