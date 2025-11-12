@@ -114,6 +114,20 @@
             transform: scale(1.05);
         }
 
+		button{
+            background-color: #ffb6b6;
+            color: #444;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #ff9b9b;
+            transform: scale(1.05);
+        }
         footer {
             text-align: center;
             padding: 1rem;
@@ -163,6 +177,9 @@
       <input type="submit" value="Envoyer au CGI python">
     </form>
   </section>
+  <section>
+	<button onclick="window.location.href='/error/error_cgi.html'">Errors scripts</button>
+</section>
 </main>
 
 

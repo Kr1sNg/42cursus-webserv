@@ -39,6 +39,20 @@ echo "<!DOCTYPE html>
     button { background-color: #ffb6b6; color: #444; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }
     button:hover { background-color: #ff9b9b; transform: scale(1.05); }
     footer { text-align: center; padding: 1rem; color: #999; font-size: 0.9rem; }
+		button{
+            background-color: #ffb6b6;
+            color: #444;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #ff9b9b;
+            transform: scale(1.05);
+        }
   </style>
 </head>
 <body>
