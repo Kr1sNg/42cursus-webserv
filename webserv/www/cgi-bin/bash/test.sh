@@ -59,13 +59,6 @@ echo "<!DOCTYPE html>
 
 <header>
   <h1>Webserv</h1>
-  <nav>
-    <a href='/'>Home</a>
-    <a href='/uploads/'>Uploads</a>
-    <a href='/delete/'>Delete</a>
-    <a href='/form.html'>CGI</a>
-    <a href='/session/'>Session</a>
-  </nav>
 </header>
 
 <main>
