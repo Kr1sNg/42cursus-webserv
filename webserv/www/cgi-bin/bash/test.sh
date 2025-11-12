@@ -29,15 +29,15 @@ echo "<!DOCTYPE html>
     nav a { color: #555; text-decoration: none; font-weight: 500; transition: color 0.2s ease, transform 0.2s ease; }
     nav a:hover { color: #ff8c8c; transform: translateY(-2px); }
     main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 40px; width: 100%; max-width: 600px; padding: 50px 20px; box-sizing: border-box; }
-    section { width: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); padding: 30px 40px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); animation: floatForm 6s ease-in-out infinite; }
+    section { width: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); padding: 30px 40px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     @keyframes floatForm { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
     h2 { background-color: white; color: #333; padding: 10px 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
     section { display: flex; flex-direction: column; gap: 15px; }
     label { font-weight: 500; color: #444; }
     input[type='text'] { padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
     input[type='text']:focus { border-color: #ff9b9b; }
-    input[type='submit'] { background-color: #ffb6b6; color: #444; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }
-    input[type='submit']:hover { background-color: #ff9b9b; transform: scale(1.05); }
+    button { background-color: #ffb6b6; color: #444; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }
+    button:hover { background-color: #ff9b9b; transform: scale(1.05); }
     footer { text-align: center; padding: 1rem; color: #999; font-size: 0.9rem; }
   </style>
 </head>
@@ -87,8 +87,10 @@ echo "<h3>Environnement CGI :</h3><pre>"
 env | sort
 echo "</pre>
 </section>
+<section>
+<button onclick=\"window.location.href='/'\">Back to Home</button>
+</section>
 </main>
-
 
 <footer>© 2025 Webserv — Made by 3 weebs</footer>
 

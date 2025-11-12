@@ -40,8 +40,8 @@ print("""<!DOCTYPE html>
     label { font-weight: 500; color: #444; }
     input[type='text'] { padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
     input[type='text']:focus { border-color: #ff9b9b; }
-    input[type='submit'] { background-color: #ffb6b6; color: #444; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }
-    input[type='submit']:hover { background-color: #ff9b9b; transform: scale(1.05); }
+    button { background-color: #ffb6b6; color: #444; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }
+    button:hover { background-color: #ff9b9b; transform: scale(1.05); }
     footer { text-align: center; padding: 1rem; color: #999; font-size: 0.9rem; }
   </style>
 </head>
@@ -82,6 +82,9 @@ for key in sorted(os.environ.keys()):
     val = os.environ[key]
     print(f"{key} = {val}")
 print("""</pre>
+</section>
+<section>
+<button onclick=\"window.location.href='/'\">Back to Home</button>
 </section>
 </main>
 
