@@ -19,7 +19,7 @@ class CgiConnection : public IEventHandler
 		size_t _writeOffset;
 		pid_t _pid;	//=> we can use to kill
 		PollLoop &_loop;
-
+		bool	_active;
 	public:
 		CgiConnection( Connection* parent, int fd, int isOutput, pid_t pid, PollLoop &loop, std::string body);
 		// CgiConnection( int fd, bool isOutput, pid_t pid, PollLoop &loop, std::string body);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:34 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/10/30 17:06:09 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/12 15:09:04 by tbahin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int main(int ac, char *av[])
 {
 	signal(SIGINT, signalHandler);
 	signal(SIGQUIT, signalHandler);
-	
+	signal(SIGPIPE, SIG_IGN);
 	try
 	{
 		if (ac != 2)
