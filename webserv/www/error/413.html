@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>413 Content Too Large</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: url('/error/Error400.png') no-repeat center 40% fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Poppins', Arial, sans-serif;
+      color: #444;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-radius: 0 0 20px 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: #444;
+      margin: 0;
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    nav a:hover {
+      color: #ff8c8c;
+      transform: translateY(-2px);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 20px;
+      padding: 2rem 3rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 25vh;
+    }
+
+    h1 {
+      font-size: 5rem;
+      margin: 0;
+      color: #555;
+    }
+
+    h2 {
+      font-weight: 500;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+
+    p {
+      color: #777;
+      margin: 1rem 0 2rem 0;
+    }
+
+    a.button {
+      background-color: #ffd6d6;
+      color: #444;
+      text-decoration: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    a.button:hover {
+      background-color: #ffb6b6;
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: #999;
+      font-size: 0.9rem;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .bubble {
+      width: 80px;
+      height: 80px;
+      position: absolute;
+      top: calc(25vh + 150px);
+      left: 50%;
+      transform: translateX(-50%);
+      background-size: contain;
+      animation: float 3.5s ease-in-out infinite;
+      opacity: 0.9;
+    }
+
+    @keyframes float {
+      0% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+      100% { transform: translateX(-50%) translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Webserv</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/uploads/">Uploads</a>
+      <a href="/public/">Delete</a>
+      <a href="/form.html">CGI</a>
+      <a href="/autoindex/">Autoindex</a>
+      <a href="/redirect/">Redirect</a>
+      <a href="/session/">Session</a>
+    </nav>
+  </header>
+
+  <div class="content">
+    <h1>413</h1>
+    <h2>Content Too Large</h2>
+    <p>Oops... Something went wrong with your request.<br>
+    Maybe try again — we promise we won’t judge ^^</p>
+    <a class="button" href="/">Go back home</a>
+  </div>
+
+  <div class="bubble"></div>
+
+  <footer>
+    © 2025 Webserv — Made by 3 weebs
+  </footer>
+</body>
+</html>

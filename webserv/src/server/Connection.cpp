@@ -449,7 +449,7 @@ void	Connection::handleReadBody(void)
 		{
 			if (_request.getContentLength() > _servConfig.getClient_max_size())
 			{
-				return (generateErrorResponse(400, "Bad Request (client max body size)"));
+				return (generateErrorResponse(413, "Content Too Large"));
 			}
 			std::string contentType = _request.getHeader("Content-Type");
 			UploadedFile file = parseMultipartBody(_reqBody, contentType);
@@ -602,7 +602,7 @@ void	Connection::generateResponse(void)
 	// 			<< " vs serv client max size: " << _servConfig.getClient_max_size() << std::endl;
 	if (_request.getContentLength() > _servConfig.getClient_max_size())
 	{
-		return (generateErrorResponse(400, "Bad Request (client max body size)"));
+		return (generateErrorResponse(413, "Content Too Large"));
 	}
 
 	//1- Find the correct location block from config
