@@ -21,7 +21,7 @@ Serverconfig::Serverconfig()
 {
     _flags = 0;
     initStatics();
-
+	_client_max_body_size = 5000000;
 }
 
 Serverconfig::Serverconfig(const Serverconfig& obj)
