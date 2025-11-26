@@ -145,17 +145,20 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
 			path += location.getIndex();
 		else if (location.getAutoindex())
 		{
+			freeVectorChar(env);
 			generateAutoIndexResponse(path);
 			return;
 		}
 		else
 		{
+			freeVectorChar(env);
 			generateErrorResponseCGI(403, "Forbidden");
 			return;
 		}
 	}
 	if (access(path.c_str(), F_OK) != 0)
 	{
+		freeVectorChar(env);
 		generateErrorResponseCGI(404, "No such file or directory");
 		return;
 	}
@@ -165,12 +168,14 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
 		freeVectorChar(env);
 		if (checkEx == 1)
 		{
+			freeVectorChar(env);
 			generateErrorResponseCGI(501, "Not implemented");
 			return;
 
 		}
 		else
 		{
+			freeVectorChar(env);
 			generateErrorResponseCGI(500, "Bad correlation beetwen extention and CGI_pass directive");
 			return;
 		}
@@ -180,6 +185,7 @@ void Connection::cgiHandle(const Request& req, const Locationconfig& location, c
 	pid_t pid = fork();
     if (pid < 0)
 	{
+		freeVectorChar(env);
         throw std::runtime_error("cgiHandle: fork is not working.");
 		return ;
 	}
