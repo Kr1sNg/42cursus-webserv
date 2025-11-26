@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:17 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/14 20:22:29 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/26 18:02:03 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 #include "../../includes/server/Connection.hpp"
 #include "../../includes/server/PollLoop.hpp"
 #include "../../includes/server/Server.hpp"
-#include "../../includes/Request.hpp"
-#include "../../includes/Response.hpp"
+#include "../../includes/http/Request.hpp"
+#include "../../includes/http/Response.hpp"
 #include <ctime>
 // Connection::Connection(void) {}
 
@@ -416,8 +416,13 @@ void	Connection::handleReadBody(void)
 	{
 		bytesRead = recv(_clientFd, buf, sizeof(buf), 0);
 		
+		// if (bytesRead < 0)
+		// 	usleep(500);
 		if (bytesRead < 0)
-			usleep(500);
+		{
+			_server->markForClose(_clientFd);
+			return;
+		}
 		if (bytesRead == 0)
 		{
 			if (_bodyBytesReceived < contentLength)
@@ -452,23 +457,26 @@ void	Connection::handleReadBody(void)
 				return (generateErrorResponse(413, "Content Too Large"));
 			}
 			std::string contentType = _request.getHeader("Content-Type");
-			UploadedFile file = parseMultipartBody(_reqBody, contentType);
+			if (contentType != "plain/text" && contentType != "text/plain")
+			// if (contentType == "application/x-www-form-urlencoded")
+			{
+				UploadedFile file = parseMultipartBody(_reqBody, contentType);
 			
-			if (file.filename.empty())
-			{
-				return generateErrorResponse(400, "Bad Request (no file found)");
+				if (file.filename.empty())
+				{
+					return generateErrorResponse(400, "Bad Request (no file found)");
+				}
+				std::string savePath = "www/uploads/" + file.filename;
+				if (fileExists(savePath))
+				{
+					return generateErrorResponse(400, "Bad Request (file exist)");
+				}
+				std::ofstream out(savePath.c_str(), std::ios::binary);
+				if (!out.is_open())
+					return generateErrorResponse(500, "Permission Denied (can't save upload)");
+				out.write(file.content.c_str(), file.content.size());
+				out.close();
 			}
-			std::string savePath = "www/uploads/" + file.filename;
-			if (fileExists(savePath))
-			{
-				return generateErrorResponse(400, "Bad Request (file exist)");
-			}
-			std::ofstream out(savePath.c_str(), std::ios::binary);
-			if (!out.is_open())
-				return generateErrorResponse(500, "Permission Denied (can't save upload)");
-			out.write(file.content.c_str(), file.content.size());
-			out.close();
-
 			// std::cout << "Uploaded: " << file.filename
 			// 		<< " (" << file.contentType << ")" << std::endl;
 		}

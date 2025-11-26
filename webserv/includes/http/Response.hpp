@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbahin <tbahin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/18 12:58:08 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/11/09 23:36:12 by tbahin           ###   ########.fr       */
+/*   Updated: 2025/11/26 18:00:42 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,8 @@
 # include <fstream>
 # include <iostream>
 # include <stdexcept>
-# include "config/generalconfig.hpp"
-# include "webserv.hpp"
-// # include "Request.hpp"
+# include "../config/generalconfig.hpp"
+# include "../webserv.hpp"
 
 class Request;
 

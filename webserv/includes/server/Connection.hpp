@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 10:22:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/12 16:21:35 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/26 18:01:05 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@
 # include "../webserv.hpp"
 # include "IEventHandler.hpp"
 # include "PollLoop.hpp"
-# include "../Request.hpp"
-# include "../Response.hpp"
+# include "../http/Request.hpp"
+# include "../http/Response.hpp"
 # include "CGIHandler.hpp"
 
 class Server;

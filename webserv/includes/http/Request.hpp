@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 17:45:07 by cfiachet          #+#    #+#             */
-/*   Updated: 2025/11/07 16:00:28 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/26 17:59:12 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@
 # include <cctype>
 # include <sys/stat.h>
 
-# include "webserv.hpp"
-# include "config/generalconfig.hpp"
+# include "../webserv.hpp"
+# include "../config/generalconfig.hpp"
 /* std::map<string, string> variable ; explanation.
 ** it tooks 2 strings, the result will be something like that
 ** headers["Authorization"] = "token"; access in write and read
