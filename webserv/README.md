@@ -13,6 +13,13 @@ curl -v --resolve example.com:8181:127.0.0.1 http://example.com:8181/
 
 hostname : example.com
 
+## SIEGE / STRESS TEST
+end=$((SECONDS+10))
+while [ $SECONDS -lt $end ]; do
+    for i in {1..10}; do curl -s http://localhost:8080/ > /dev/null & done
+done
+
+
 ## HTTP Request
 
 A HTTP Request includes 3 parts:
