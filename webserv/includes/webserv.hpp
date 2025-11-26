@@ -6,7 +6,7 @@
 /*   By: tat-nguy <tat-nguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:42:05 by tat-nguy          #+#    #+#             */
-/*   Updated: 2025/11/12 16:20:03 by tat-nguy         ###   ########.fr       */
+/*   Updated: 2025/11/26 17:59:51 by tat-nguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@
 
 # include "config/generalconfig.hpp" 
 
-# include "Request.hpp"
-# include "Response.hpp"
+# include "http/Request.hpp"
+# include "http/Response.hpp"
 # include "server/PollLoop.hpp"
 extern volatile sig_atomic_t g_stop;
 
